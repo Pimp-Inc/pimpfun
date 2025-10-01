@@ -77,3 +77,22 @@ temp/
 # Game save files (for development)
 *.save
 *.dat
+
+# Development and audit files
+*AUDIT*.md
+*FIXES*.md
+*STATUS*.md
+*CHECKLIST*.md
+IMPLEMENTATION_*.md
+CREW_SYSTEM_*.md
+CREW_ENHANCEMENT_*.md
+CURRENT_*.md
+QUICK_START.txt
+RESET_*.sql
+*-backup.html
+*-v[0-9].html
+
+# Design documents (internal)
+*_design.pdf
+*_enhancements.pdf
+*_mathematics.pdf

@@ -74,7 +74,7 @@ class GameStateManager {
    */
   validateGameState(state) {
     const errors = [];
-    
+
     if (!state || typeof state !== 'object') {
       return { valid: false, errors: ['Game state must be an object'] };
     }
@@ -116,18 +116,18 @@ class GameStateManager {
    */
   migrateGameState(oldState) {
     const newState = this.initializeNewGameState();
-    
+
     if (!oldState) return newState;
 
     // Merge old state into new structure, preserving existing data
     if (oldState.player) {
       Object.assign(newState.player, oldState.player);
     }
-    
+
     if (oldState.resources) {
       Object.assign(newState.resources, oldState.resources);
     }
-    
+
     if (oldState.supplies) {
       Object.assign(newState.supplies, oldState.supplies);
     }
@@ -151,7 +151,7 @@ class GameStateManager {
     if (!state) return 0;
 
     let netWorth = state.player?.cash || 0;
-    
+
     // Add resource values
     const resourceValues = {
       hoes: 1000,
@@ -183,7 +183,7 @@ class GameStateManager {
     if (!state.stats) {
       state.stats = this.defaultState.stats;
     }
-    
+
     if (state.stats[statType] !== undefined) {
       state.stats[statType] += value;
     }
@@ -213,14 +213,14 @@ class GameStateManager {
     }
 
     state.player.cash -= cost;
-    
+
     if (state.resources[item] !== undefined) {
       state.resources[item] += quantity;
     }
-    
+
     this.updateStats(state, 'totalPurchases', 1);
     this.updateStats(state, 'totalCashEarned', -cost);
-    
+
     return true;
   }
 
@@ -238,14 +238,14 @@ class GameStateManager {
     const timeElapsed = Date.now() - state.player.lastLogin;
     const minutesElapsed = Math.floor(timeElapsed / (1000 * 60));
     const turnsToAdd = Math.floor(minutesElapsed / 5); // 1 turn per 5 minutes
-    
+
     if (turnsToAdd > 0) {
       const maxTurns = 200;
       const currentTurns = state.player.turns || 0;
       state.player.turns = Math.min(maxTurns, currentTurns + turnsToAdd);
       state.player.lastLogin = Date.now();
     }
-    
+
     return turnsToAdd;
   }
 }

@@ -152,7 +152,7 @@ describe('SupabaseConfig', () => {
   describe('initSupabase', () => {
     test('should initialize Supabase client successfully', async () => {
       const result = await supabaseConfig.initSupabase();
-      
+
       expect(result).toBe(true);
       expect(supabaseConfig.isConnected).toBe(true);
       expect(supabaseConfig.client).toBeDefined();
@@ -165,7 +165,7 @@ describe('SupabaseConfig', () => {
       });
 
       const result = await supabaseConfig.initSupabase();
-      
+
       expect(result).toBe(false);
       expect(supabaseConfig.isConnected).toBe(false);
     });
@@ -210,7 +210,7 @@ describe('SupabaseConfig', () => {
 
     test('should throw error if not initialized', async () => {
       const uninitializedConfig = new MockSupabaseConfig();
-      
+
       await expect(uninitializedConfig.signUp('test@example.com', 'password123'))
         .rejects.toThrow('Supabase not initialized');
     });
@@ -294,7 +294,7 @@ describe('SupabaseConfig', () => {
       });
 
       const gameState = { player: { cash: 1000 } };
-      
+
       await expect(supabaseConfig.saveGameState('user123', gameState))
         .rejects.toThrow('Database error');
     });
@@ -311,7 +311,7 @@ describe('SupabaseConfig', () => {
         data: [{ game_data: gameData }],
         error: null
       };
-      
+
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue(mockResponse)
@@ -326,7 +326,7 @@ describe('SupabaseConfig', () => {
 
     test('should return null when no game state found', async () => {
       const mockResponse = { data: [], error: null };
-      
+
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue(mockResponse)
@@ -340,7 +340,7 @@ describe('SupabaseConfig', () => {
 
     test('should handle load error', async () => {
       const mockResponse = { data: null, error: { message: 'Database error' } };
-      
+
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockResolvedValue(mockResponse)
@@ -359,14 +359,14 @@ describe('SupabaseConfig', () => {
 
     test('should correctly report user sign-in status', () => {
       expect(supabaseConfig.isUserSignedIn()).toBe(false);
-      
+
       supabaseConfig.currentUser = { id: 'user123' };
       expect(supabaseConfig.isUserSignedIn()).toBe(true);
     });
 
     test('should return current user', () => {
       expect(supabaseConfig.getCurrentUser()).toBe(null);
-      
+
       const user = { id: 'user123', email: 'test@example.com' };
       supabaseConfig.currentUser = user;
       expect(supabaseConfig.getCurrentUser()).toEqual(user);
@@ -390,7 +390,7 @@ describe('Database Integration Flow', () => {
       error: null
     };
     mockSupabase.auth.signUp.mockResolvedValue(signUpResponse);
-    
+
     await supabaseConfig.signUp('test@example.com', 'password123');
 
     // Sign in
@@ -399,7 +399,7 @@ describe('Database Integration Flow', () => {
       error: null
     };
     mockSupabase.auth.signInWithPassword.mockResolvedValue(signInResponse);
-    
+
     await supabaseConfig.signIn('test@example.com', 'password123');
     expect(supabaseConfig.isUserSignedIn()).toBe(true);
 
@@ -408,7 +408,7 @@ describe('Database Integration Flow', () => {
     mockSupabase.from.mockReturnValue({
       upsert: jest.fn().mockResolvedValue({ data: [{ id: 1 }], error: null })
     });
-    
+
     await supabaseConfig.saveGameState('user123', gameState);
 
     // Load game state
@@ -420,7 +420,7 @@ describe('Database Integration Flow', () => {
         })
       })
     });
-    
+
     const loadedState = await supabaseConfig.loadGameState('user123');
     expect(loadedState).toEqual(gameState);
 
