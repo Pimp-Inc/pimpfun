@@ -1,0 +1,42 @@
+PIMP.FUN Empire City v3 - Complete Package
+===========================================
+
+🚀 QUICK START:
+1. Double-click "start.bat" 
+   OR
+2. Open "index.html" in your browser
+
+🎯 WHAT'S FIXED:
+✅ No data loss on refresh
+✅ Enhanced stores with quantity selectors  
+✅ All 5 NYC districts work properly
+✅ Hood Pimps spawn correctly
+✅ Midtown scout button fixed
+✅ No obnoxious debug spam
+✅ Complete standalone version
+
+🗽 FEATURES:
+- 5 NYC Districts: Uptown, Midtown, Crooklyn, Harbor Docks, Financial District
+- 168+ NPCs: Street Pimps, District Bosses, Kingpins
+- Enhanced Corner Store: Buy 5 kegs (1000 beers) at once!
+- Daily 4:20PM Payout System
+- Heat Management with Police Bribes
+- Economic Dashboard
+- Asset Protection (single-player mode)
+- Complete Game Reset for testing
+
+🛒 STORE SYSTEM:
+- Corner Store: Quantity selectors for beer, condoms, medicine
+- Gun Store: Bulk weapon and thug purchases
+- All stores have live total calculations
+
+📁 ALL FILES INCLUDED:
+- index.html (main game)
+- store-systems.js (store module)
+- images/ (all graphics)  
+- docs/ (JSON data files)
+- PimpFun_Whitepaper.pdf
+- README.md (detailed docs)
+
+🎮 Ready to play! No dependencies, no setup required.
+

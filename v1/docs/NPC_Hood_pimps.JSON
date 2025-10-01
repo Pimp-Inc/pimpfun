@@ -1,0 +1,834 @@
+const NPC_PIMPS = {
+    // ROOKIE TIER (21 NPCs) - Street Level
+    rookies: [
+        {
+            id: "r001",
+            name: "Slick Ricky",
+            title: "Corner Hustler",
+            stats: {
+                hoes: 8,
+                thugs: 4,
+                cash: 2500,
+                crack: 50,
+                weapons: { pistols: 4 },
+                vehicles: { bicycle: 1 },
+                netWorth: 25000
+            },
+            respect: 5,
+            territory: "Backstreets",
+            personality: "cocky",
+            taunt: "You stepping to me? I own this corner!"
+        },
+        {
+            id: "r002",
+            name: "Baby Face Marcus",
+            title: "New Jack",
+            stats: {
+                hoes: 10,
+                thugs: 3,
+                cash: 3000,
+                crack: 30,
+                weapons: { pistols: 2, glock: 1 },
+                vehicles: { bicycle: 2 },
+                netWorth: 28000
+            },
+            respect: 3,
+            territory: "Midtown",
+            personality: "nervous",
+            taunt: "My cousin gonna hear about this!"
+        },
+        {
+            id: "r003",
+            name: "Skinny Pete",
+            title: "Wannabe",
+            stats: {
+                hoes: 6,
+                thugs: 5,
+                cash: 1800,
+                crack: 80,
+                weapons: { pistols: 5 },
+                vehicles: {},
+                netWorth: 20000
+            },
+            respect: 8,
+            territory: "Backstreets",
+            personality: "desperate",
+            taunt: "I need this money, man!"
+        },
+        {
+            id: "r004",
+            name: "Two-Time Tommy",
+            title: "Small Timer",
+            stats: {
+                hoes: 12,
+                thugs: 6,
+                cash: 4000,
+                crack: 100,
+                weapons: { pistols: 4, shotgun: 2 },
+                vehicles: { bicycle: 1, lowrider: 1 },
+                netWorth: 35000
+            },
+            respect: 10,
+            territory: "Midtown",
+            personality: "loud",
+            taunt: "Tommy runs these blocks!"
+        },
+        {
+            id: "r005",
+            name: "Lil' Jerome",
+            title: "Block Boy",
+            stats: {
+                hoes: 9,
+                thugs: 4,
+                cash: 2200,
+                crack: 60,
+                weapons: { pistols: 3, glock: 1 },
+                vehicles: { bicycle: 3 },
+                netWorth: 26000
+            },
+            respect: 6,
+            territory: "Backstreets",
+            personality: "ambitious",
+            taunt: "I'm gonna be somebody!"
+        },
+        {
+            id: "r006",
+            name: "Dice",
+            title: "Gambler",
+            stats: {
+                hoes: 7,
+                thugs: 7,
+                cash: 5000,
+                crack: 40,
+                weapons: { pistols: 7 },
+                vehicles: { lowrider: 1 },
+                netWorth: 32000
+            },
+            respect: 7,
+            territory: "Midtown",
+            personality: "risky",
+            taunt: "Wanna roll the dice?"
+        },
+        {
+            id: "r007",
+            name: "Fast Eddie",
+            title: "Runner",
+            stats: {
+                hoes: 5,
+                thugs: 3,
+                cash: 1500,
+                crack: 120,
+                weapons: { pistols: 2, glock: 1 },
+                vehicles: { bicycle: 4 },
+                netWorth: 22000
+            },
+            respect: 4,
+            territory: "Backstreets",
+            personality: "jumpy",
+            taunt: "Can't catch me!"
+        },
+        {
+            id: "r008",
+            name: "Smooth Mike",
+            title: "Sweet Talker",
+            stats: {
+                hoes: 15,
+                thugs: 2,
+                cash: 4500,
+                crack: 20,
+                weapons: { pistols: 2 },
+                vehicles: { lowrider: 1 },
+                netWorth: 38000
+            },
+            respect: 9,
+            territory: "Midtown",
+            personality: "charming",
+            taunt: "Ladies love Smooth Mike!"
+        },
+        {
+            id: "r009",
+            name: "Young Blood",
+            title: "Fresh Meat",
+            stats: {
+                hoes: 8,
+                thugs: 5,
+                cash: 2000,
+                crack: 70,
+                weapons: { pistols: 5 },
+                vehicles: {},
+                netWorth: 24000
+            },
+            respect: 2,
+            territory: "Backstreets",
+            personality: "eager",
+            taunt: "I'm new but I ain't soft!"
+        },
+        {
+            id: "r010",
+            name: "Rusty James",
+            title: "Old Timer",
+            stats: {
+                hoes: 11,
+                thugs: 8,
+                cash: 3500,
+                crack: 90,
+                weapons: { pistols: 6, shotgun: 2 },
+                vehicles: { lowrider: 1 },
+                netWorth: 34000
+            },
+            respect: 15,
+            territory: "Midtown",
+            personality: "tired",
+            taunt: "Been doing this too long..."
+        },
+        {
+            id: "r011",
+            name: "Flashy Frank",
+            title: "Show Off",
+            stats: {
+                hoes: 9,
+                thugs: 3,
+                cash: 6000,
+                crack: 30,
+                weapons: { glock: 3 },
+                vehicles: { lowrider: 2 },
+                netWorth: 40000
+            },
+            respect: 8,
+            territory: "Uptown",
+            personality: "boastful",
+            taunt: "Check out my ride!"
+        },
+        {
+            id: "r012",
+            name: "Quiet Storm",
+            title: "Silent Type",
+            stats: {
+                hoes: 10,
+                thugs: 6,
+                cash: 2800,
+                crack: 110,
+                weapons: { pistols: 4, glock: 2 },
+                vehicles: { bicycle: 2 },
+                netWorth: 30000
+            },
+            respect: 12,
+            territory: "Backstreets",
+            personality: "mysterious",
+            taunt: "..."
+        },
+        {
+            id: "r013",
+            name: "Brooklyn Bobby",
+            title: "East Coast",
+            stats: {
+                hoes: 13,
+                thugs: 5,
+                cash: 3800,
+                crack: 65,
+                weapons: { pistols: 3, shotgun: 2 },
+                vehicles: { lowrider: 1 },
+                netWorth: 36000
+            },
+            respect: 11,
+            territory: "Midtown",
+            personality: "tough",
+            taunt: "Brooklyn in the house!"
+        },
+        {
+            id: "r014",
+            name: "Dirty Dan",
+            title: "Grimey",
+            stats: {
+                hoes: 7,
+                thugs: 9,
+                cash: 1200,
+                crack: 150,
+                weapons: { pistols: 9 },
+                vehicles: {},
+                netWorth: 27000
+            },
+            respect: 6,
+            territory: "Backstreets",
+            personality: "ruthless",
+            taunt: "I fight dirty!"
+        },
+        {
+            id: "r015",
+            name: "Lucky Lou",
+            title: "Fortunate Son",
+            stats: {
+                hoes: 14,
+                thugs: 4,
+                cash: 7000,
+                crack: 45,
+                weapons: { glock: 4 },
+                vehicles: { lowrider: 1, bicycle: 2 },
+                netWorth: 42000
+            },
+            respect: 13,
+            territory: "Midtown",
+            personality: "confident",
+            taunt: "Luck's on my side!"
+        },
+        {
+            id: "r016",
+            name: "Sneaky Steve",
+            title: "Backstabber",
+            stats: {
+                hoes: 6,
+                thugs: 7,
+                cash: 2400,
+                crack: 85,
+                weapons: { pistols: 5, glock: 2 },
+                vehicles: { bicycle: 3 },
+                netWorth: 25000
+            },
+            respect: 4,
+            territory: "Backstreets",
+            personality: "sneaky",
+            taunt: "You never saw me coming!"
+        },
+        {
+            id: "r017",
+            name: "Memphis Mac",
+            title: "Southern Player",
+            stats: {
+                hoes: 11,
+                thugs: 5,
+                cash: 3200,
+                crack: 75,
+                weapons: { pistols: 3, shotgun: 2 },
+                vehicles: { lowrider: 1 },
+                netWorth: 33000
+            },
+            respect: 9,
+            territory: "Midtown",
+            personality: "smooth",
+            taunt: "Southern hospitality, baby!"
+        },
+        {
+            id: "r018",
+            name: "Crazy Eight",
+            title: "Wild Card",
+            stats: {
+                hoes: 8,
+                thugs: 8,
+                cash: 888,
+                crack: 88,
+                weapons: { pistols: 8 },
+                vehicles: {},
+                netWorth: 28888
+            },
+            respect: 8,
+            territory: "Backstreets",
+            personality: "unpredictable",
+            taunt: "Eight is my lucky number!"
+        },
+        {
+            id: "r019",
+            name: "Dollar Bill",
+            title: "Money Man",
+            stats: {
+                hoes: 10,
+                thugs: 3,
+                cash: 8000,
+                crack: 25,
+                weapons: { glock: 3 },
+                vehicles: { lowrider: 2 },
+                netWorth: 45000
+            },
+            respect: 14,
+            territory: "Uptown",
+            personality: "greedy",
+            taunt: "Cash rules everything!"
+        },
+        {
+            id: "r020",
+            name: "Westside Willie",
+            title: "Territory Guard",
+            stats: {
+                hoes: 9,
+                thugs: 10,
+                cash: 2600,
+                crack: 95,
+                weapons: { pistols: 8, shotgun: 2 },
+                vehicles: { bicycle: 2 },
+                netWorth: 31000
+            },
+            respect: 10,
+            territory: "Backstreets",
+            personality: "territorial",
+            taunt: "This is Westside territory!"
+        },
+        {
+            id: "r021",
+            name: "Rookie Ron",
+            title: "Tutorial Boss",
+            stats: {
+                hoes: 12,
+                thugs: 6,
+                cash: 5000,
+                crack: 100,
+                weapons: { pistols: 4, glock: 2 },
+                vehicles: { lowrider: 1 },
+                netWorth: 38000
+            },
+            respect: 1,
+            territory: "Tutorial Zone",
+            personality: "educational",
+            taunt: "Let me teach you a lesson!"
+        }
+    ],
+
+    // MID-TIER (15 NPCs) - District Level
+    midTier: [
+        {
+            id: "m001",
+            name: "Diamond Dallas",
+            title: "District King",
+            stats: {
+                hoes: 50,
+                thugs: 30,
+                cash: 25000,
+                crack: 500,
+                weapons: { pistols: 10, glock: 10, uzi: 10 },
+                vehicles: { lowrider: 3, escalade: 1 },
+                netWorth: 180000
+            },
+            respect: 50,
+            territory: "Midtown Central",
+            personality: "calculating",
+            taunt: "You're playing checkers, I'm playing chess!"
+        },
+        {
+            id: "m002",
+            name: "Silk Santana",
+            title: "Smooth Operator",
+            stats: {
+                hoes: 65,
+                thugs: 25,
+                cash: 35000,
+                crack: 300,
+                weapons: { glock: 15, uzi: 10 },
+                vehicles: { lowrider: 4, escalade: 1 },
+                netWorth: 220000
+            },
+            respect: 60,
+            territory: "Uptown Heights",
+            personality: "sophisticated",
+            taunt: "Class always beats crass!"
+        },
+        {
+            id: "m003",
+            name: "Big Bear",
+            title: "The Enforcer",
+            stats: {
+                hoes: 40,
+                thugs: 45,
+                cash: 20000,
+                crack: 800,
+                weapons: { pistols: 5, shotgun: 20, uzi: 20 },
+                vehicles: { lowrider: 5 },
+                netWorth: 195000
+            },
+            respect: 75,
+            territory: "Backstreets Central",
+            personality: "brutal",
+            taunt: "Bear gonna maul you!"
+        },
+        {
+            id: "m004",
+            name: "Miami Vice",
+            title: "Beach Boss",
+            stats: {
+                hoes: 75,
+                thugs: 20,
+                cash: 45000,
+                crack: 250,
+                weapons: { glock: 10, uzi: 10 },
+                vehicles: { escalade: 2, lowrider: 2 },
+                netWorth: 250000
+            },
+            respect: 55,
+            territory: "Beach District",
+            personality: "flashy",
+            taunt: "Welcome to paradise, chump!"
+        },
+        {
+            id: "m005",
+            name: "Shadow Fox",
+            title: "Night Stalker",
+            stats: {
+                hoes: 55,
+                thugs: 35,
+                cash: 30000,
+                crack: 600,
+                weapons: { pistols: 10, glock: 10, uzi: 10, ak47: 5 },
+                vehicles: { lowrider: 4 },
+                netWorth: 210000
+            },
+            respect: 70,
+            territory: "Underground",
+            personality: "stealthy",
+            taunt: "You never see the shadows coming..."
+        },
+        {
+            id: "m006",
+            name: "Gold Chains Gary",
+            title: "Bling King",
+            stats: {
+                hoes: 60,
+                thugs: 28,
+                cash: 50000,
+                crack: 400,
+                weapons: { glock: 20, uzi: 8 },
+                vehicles: { escalade: 3 },
+                netWorth: 280000
+            },
+            respect: 65,
+            territory: "Jewelry District",
+            personality: "ostentatious",
+            taunt: "My chains worth more than your life!"
+        },
+        {
+            id: "m007",
+            name: "Viper Valentine",
+            title: "Heartbreaker",
+            stats: {
+                hoes: 80,
+                thugs: 22,
+                cash: 38000,
+                crack: 350,
+                weapons: { glock: 12, uzi: 10 },
+                vehicles: { lowrider: 6 },
+                netWorth: 245000
+            },
+            respect: 58,
+            territory: "Red Light Central",
+            personality: "seductive",
+            taunt: "Love hurts, baby!"
+        },
+        {
+            id: "m008",
+            name: "Tommy Tsunami",
+            title: "Wave Maker",
+            stats: {
+                hoes: 45,
+                thugs: 40,
+                cash: 28000,
+                crack: 700,
+                weapons: { shotgun: 15, uzi: 15, ak47: 10 },
+                vehicles: { lowrider: 3, escalade: 1 },
+                netWorth: 205000
+            },
+            respect: 80,
+            territory: "Docks District",
+            personality: "overwhelming",
+            taunt: "Tsunami coming through!"
+        },
+        {
+            id: "m009",
+            name: "Ice Box Ivan",
+            title: "Cold Blooded",
+            stats: {
+                hoes: 52,
+                thugs: 38,
+                cash: 32000,
+                crack: 550,
+                weapons: { pistols: 8, glock: 15, uzi: 12, ak47: 3 },
+                vehicles: { lowrider: 4, escalade: 1 },
+                netWorth: 215000
+            },
+            respect: 72,
+            territory: "North Side",
+            personality: "emotionless",
+            taunt: "Cold as ice..."
+        },
+        {
+            id: "m010",
+            name: "Razor Ramon",
+            title: "The Cutter",
+            stats: {
+                hoes: 58,
+                thugs: 32,
+                cash: 35000,
+                crack: 450,
+                weapons: { glock: 18, uzi: 12, ak47: 2 },
+                vehicles: { lowrider: 5 },
+                netWorth: 225000
+            },
+            respect: 68,
+            territory: "Blade District",
+            personality: "sharp",
+            taunt: "Razor sharp, baby!"
+        },
+        {
+            id: "m011",
+            name: "Platinum Pete",
+            title: "High Roller",
+            stats: {
+                hoes: 70,
+                thugs: 26,
+                cash: 60000,
+                crack: 300,
+                weapons: { glock: 16, uzi: 10 },
+                vehicles: { escalade: 4 },
+                netWorth: 300000
+            },
+            respect: 62,
+            territory: "Casino Row",
+            personality: "gambler",
+            taunt: "All in, baby!"
+        },
+        {
+            id: "m012",
+            name: "Black Mamba",
+            title: "Strike Fast",
+            stats: {
+                hoes: 48,
+                thugs: 42,
+                cash: 26000,
+                crack: 750,
+                weapons: { shotgun: 10, uzi: 20, ak47: 12 },
+                vehicles: { lowrider: 4, escalade: 1 },
+                netWorth: 200000
+            },
+            respect: 85,
+            territory: "Venom Valley",
+            personality: "deadly",
+            taunt: "One strike, you're done!"
+        },
+        {
+            id: "m013",
+            name: "Neon Nick",
+            title: "Night Light",
+            stats: {
+                hoes: 62,
+                thugs: 30,
+                cash: 40000,
+                crack: 420,
+                weapons: { glock: 15, uzi: 15 },
+                vehicles: { lowrider: 3, escalade: 2 },
+                netWorth: 240000
+            },
+            respect: 64,
+            territory: "Neon Strip",
+            personality: "electric",
+            taunt: "Lit up like Vegas!"
+        },
+        {
+            id: "m014",
+            name: "Storm Surge",
+            title: "Force of Nature",
+            stats: {
+                hoes: 55,
+                thugs: 36,
+                cash: 33000,
+                crack: 580,
+                weapons: { pistols: 6, glock: 14, uzi: 14, ak47: 2 },
+                vehicles: { lowrider: 5 },
+                netWorth: 220000
+            },
+            respect: 76,
+            territory: "Storm District",
+            personality: "unpredictable",
+            taunt: "Weather the storm!"
+        },
+        {
+            id: "m015",
+            name: "King Cobra",
+            title: "District Overlord",
+            stats: {
+                hoes: 68,
+                thugs: 34,
+                cash: 48000,
+                crack: 480,
+                weapons: { glock: 14, uzi: 12, ak47: 8 },
+                vehicles: { lowrider: 4, escalade: 2 },
+                netWorth: 260000
+            },
+            respect: 78,
+            territory: "Central Empire",
+            personality: "commanding",
+            taunt: "Bow to the King!"
+        }
+    ],
+
+    // BOSS TIER (6 NPCs) - City Level Kingpins
+    bosses: [
+        {
+            id: "b001",
+            name: "Don Valentino",
+            title: "The Godfather",
+            stats: {
+                hoes: 500,
+                thugs: 300,
+                cash: 500000,
+                crack: 10000,
+                weapons: { glock: 50, uzi: 100, ak47: 150 },
+                vehicles: { lowrider: 20, escalade: 10 },
+                netWorth: 5000000
+            },
+            respect: 500,
+            territory: "Little Italy Empire",
+            personality: "mafia_boss",
+            taunt: "You come to me on this, the day of my daughter's wedding?",
+            specialAbility: "Call in mob reinforcements"
+        },
+        {
+            id: "b002",
+            name: "Emperor X",
+            title: "Supreme Overlord",
+            stats: {
+                hoes: 800,
+                thugs: 400,
+                cash: 750000,
+                crack: 15000,
+                weapons: { uzi: 150, ak47: 250 },
+                vehicles: { lowrider: 15, escalade: 20 },
+                netWorth: 8000000
+            },
+            respect: 750,
+            territory: "Empire City Central",
+            personality: "megalomaniac",
+            taunt: "I am the Empire!",
+            specialAbility: "Territory lockdown"
+        },
+        {
+            id: "b003",
+            name: "The Dragon",
+            title: "Yakuza Boss",
+            stats: {
+                hoes: 600,
+                thugs: 450,
+                cash: 600000,
+                crack: 12000,
+                weapons: { glock: 100, uzi: 150, ak47: 200 },
+                vehicles: { lowrider: 25, escalade: 15 },
+                netWorth: 6500000
+            },
+            respect: 650,
+            territory: "Chinatown Dynasty",
+            personality: "honor_bound",
+            taunt: "The Dragon breathes fire!",
+            specialAbility: "Ninja assassins"
+        },
+        {
+            id: "b004",
+            name: "Scarface Supreme",
+            title: "Cartel King",
+            stats: {
+                hoes: 1000,
+                thugs: 500,
+                cash: 1000000,
+                crack: 25000,
+                weapons: { uzi: 200, ak47: 300 },
+                vehicles: { lowrider: 30, escalade: 25 },
+                netWorth: 10000000
+            },
+            respect: 900,
+            territory: "South Beach Empire",
+            personality: "cocaine_cowboy",
+            taunt: "Say hello to my little friend!",
+            specialAbility: "Cartel supply chain"
+        },
+        {
+            id: "b005",
+            name: "Black Caesar",
+            title: "Street Emperor",
+            stats: {
+                hoes: 750,
+                thugs: 550,
+                cash: 800000,
+                crack: 20000,
+                weapons: { glock: 150, uzi: 200, ak47: 200 },
+                vehicles: { lowrider: 35, escalade: 20 },
+                netWorth: 7500000
+            },
+            respect: 800,
+            territory: "Underground Kingdom",
+            personality: "street_legend",
+            taunt: "Caesar owns these streets!",
+            specialAbility: "Gang alliance"
+        },
+        {
+            id: "b006",
+            name: "The Commissioner",
+            title: "Corrupt Authority",
+            stats: {
+                hoes: 900,
+                thugs: 600,
+                cash: 1500000,
+                crack: 18000,
+                weapons: { glock: 200, uzi: 250, ak47: 150 },
+                vehicles: { escalade: 40 },
+                netWorth: 12000000
+            },
+            respect: 1000,
+            territory: "City Hall District",
+            personality: "corrupt_official",
+            taunt: "I AM the law!",
+            specialAbility: "Police immunity"
+        }
+    ]
+};
+
+// NPC SPAWN SCHEDULE
+const NPC_SPAWN_RULES = {
+    rookies: {
+        spawnRate: 5,           // 5 minutes between spawns
+        maxActive: 10,          // Max 10 rookies at once
+        locations: ["Backstreets", "Midtown"],
+        levelRequirement: 0     // Available from start
+    },
+    
+    midTier: {
+        spawnRate: 15,          // 15 minutes between spawns
+        maxActive: 5,           // Max 5 mid-tiers at once
+        locations: ["All Districts"],
+        levelRequirement: 20,   // Unlock at level 20
+        weekRequirement: 2     // Available week 2+
+    },
+    
+    bosses: {
+        spawnRate: 60,          // 1 hour between spawns
+        maxActive: 1,           // Only 1 boss at a time
+        locations: ["Special Events"],
+        levelRequirement: 50,   // Unlock at level 50
+        weekRequirement: 4,     // Available week 4+
+        announcement: true      // Server-wide announcement
+    }
+};
+
+// LOOT TABLES
+const NPC_LOOT_TABLES = {
+    rookie: {
+        cashMultiplier: 0.8,    // Get 80% of their cash
+        weaponChance: 0.2,      // 20% chance to loot weapons
+        crackSteal: 0.5,        // Steal 50% of their crack
+        respectGain: 5,
+        expGain: 100
+    },
+    
+    midTier: {
+        cashMultiplier: 0.6,    // Get 60% of their cash
+        weaponChance: 0.3,      // 30% chance to loot weapons
+        crackSteal: 0.4,        // Steal 40% of their crack
+        vehicleChance: 0.1,     // 10% chance to jack a vehicle
+        respectGain: 25,
+        expGain: 500,
+        nftFragmentChance: 0.05 // 5% NFT fragment
+    },
+    
+    boss: {
+        cashMultiplier: 0.4,    // Get 40% of their cash
+        weaponChance: 0.5,      // 50% chance to loot weapons
+        crackSteal: 0.3,        // Steal 30% of their crack
+        vehicleChance: 0.3,     // 30% chance to jack vehicles
+        respectGain: 100,
+        expGain: 2000,
+        nftFragmentChance: 0.25,// 25% NFT fragment
+        guaranteedReward: true   // Always drops something special
+    }
+};
