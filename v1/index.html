@@ -8112,7 +8112,11 @@
             if (districtEl) {
                 if (gameState.player.district && DISTRICTS[gameState.player.district]) {
                     const district = DISTRICTS[gameState.player.district];
-                    districtEl.textContent = district.name;
+                    let displayText = district.name;
+                    if (gameState.player.territory) {
+                        displayText += ` - ${gameState.player.territory}`;
+                    }
+                    districtEl.textContent = displayText;
                     districtEl.className = district.color + ' cursor-pointer';
                 } else {
                     districtEl.textContent = 'Choose District';
