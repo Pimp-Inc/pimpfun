@@ -28,7 +28,7 @@ class StoreSystem {
     const currentValue = parseInt(input.value) || 1;
     const newValue = Math.max(1, currentValue + change);
     const maxValue = parseInt(input.max) || 1000;
-    
+
     input.value = Math.min(newValue, maxValue);
     this.updateQuantityDisplays();
   }
@@ -47,7 +47,7 @@ class StoreSystem {
     inputs.forEach(item => {
       const input = document.getElementById(item.id);
       const totalElement = document.getElementById(item.totalId);
-      
+
       if (input && totalElement) {
         const quantity = parseInt(input.value) || 1;
         const total = quantity * item.unitPrice;
@@ -83,7 +83,7 @@ class StoreSystem {
 
     // Process the purchase
     gameState.player.cash -= totalCost;
-    
+
     // Add items to resources
     if (gameState.resources[item] !== undefined) {
       gameState.resources[item] += quantity;
@@ -107,7 +107,7 @@ class StoreSystem {
     const individualTotal = individualPrice * bulkQuantity;
     const savings = individualTotal - bulkPrice;
     const savingsPercent = Math.round((savings / individualTotal) * 100);
-    
+
     return {
       savings,
       savingsPercent,
@@ -128,16 +128,16 @@ class StoreSystem {
     if (quantity < 1) {
       return { valid: false, error: 'Quantity must be at least 1' };
     }
-    
+
     if (quantity > maxQuantity) {
       return { valid: false, error: `Maximum quantity is ${maxQuantity}` };
     }
-    
+
     const totalCost = quantity * unitPrice;
     if (totalCost > availableCash) {
       return { valid: false, error: `Not enough cash. Need $${totalCost.toLocaleString()}` };
     }
-    
+
     return { valid: true, totalCost };
   }
 }

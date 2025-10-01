@@ -104,14 +104,14 @@ describe('GameUtils', () => {
     test('should calculate time difference correctly', () => {
       const now = Date.now();
       const oneHourAgo = now - (60 * 60 * 1000);
-      
+
       expect(GameUtils.minutesDifference(oneHourAgo, now)).toBe(60);
     });
 
     test('should use current time as default', () => {
       const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
       const result = GameUtils.minutesDifference(fiveMinutesAgo);
-      
+
       expect(result).toBeGreaterThanOrEqual(4);
       expect(result).toBeLessThanOrEqual(6);
     });
@@ -119,7 +119,7 @@ describe('GameUtils', () => {
     test('should handle absolute values', () => {
       const now = Date.now();
       const future = now + (30 * 60 * 1000);
-      
+
       expect(GameUtils.minutesDifference(now, future)).toBe(30);
       expect(GameUtils.minutesDifference(future, now)).toBe(30);
     });
@@ -180,7 +180,7 @@ describe('GameUtils', () => {
   describe('validatePassword', () => {
     test('should validate strong passwords', () => {
       const result = GameUtils.validatePassword('StrongPass123!');
-      
+
       expect(result.valid).toBe(true);
       expect(result.strength).toBe('Strong');
       expect(result.score).toBe(5);
@@ -193,7 +193,7 @@ describe('GameUtils', () => {
 
     test('should validate medium passwords', () => {
       const result = GameUtils.validatePassword('password123'); // lowercase + numbers only
-      
+
       expect(result.valid).toBe(true);
       expect(result.strength).toBe('Medium');
       expect(result.score).toBe(3);
@@ -201,7 +201,7 @@ describe('GameUtils', () => {
 
     test('should reject weak passwords', () => {
       const result = GameUtils.validatePassword('weak');
-      
+
       expect(result.valid).toBe(false);
       expect(result.strength).toBe('Weak');
       expect(result.requirements.length).toBe(false);
@@ -257,7 +257,7 @@ describe('GameUtils', () => {
     test('should handle Date objects', () => {
       const date = new Date();
       const cloned = GameUtils.deepClone(date);
-      
+
       expect(cloned).toEqual(date);
       expect(cloned).not.toBe(date);
     });
@@ -284,7 +284,7 @@ describe('GameUtils', () => {
     test('should generate unique IDs', () => {
       const id1 = GameUtils.generateId();
       const id2 = GameUtils.generateId();
-      
+
       expect(id1).not.toBe(id2);
       expect(typeof id1).toBe('string');
       expect(id1.length).toBeGreaterThan(0);

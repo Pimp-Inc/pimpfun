@@ -30,15 +30,15 @@ class MockSimpleWallet {
         throw new Error('Phantom wallet not detected');
       }
 
-      let provider = mockWindow.solana?.isPhantom ? mockWindow.solana : mockWindow.phantom.solana;
-      
+      const provider = mockWindow.solana?.isPhantom ? mockWindow.solana : mockWindow.phantom.solana;
+
       // Simulate connection
       const response = await provider.connect();
-      
+
       this.connected = true;
       this.publicKey = response.publicKey.toString();
       this.walletName = 'Phantom';
-      
+
       return {
         success: true,
         publicKey: this.publicKey,
@@ -72,7 +72,7 @@ describe('SimpleWallet', () => {
 
   beforeEach(() => {
     wallet = new MockSimpleWallet();
-    
+
     // Reset mock window
     mockWindow.solana = {
       isPhantom: true,
@@ -91,7 +91,7 @@ describe('SimpleWallet', () => {
   describe('connectPhantom', () => {
     test('should successfully connect to Phantom wallet', async () => {
       const result = await wallet.connectPhantom();
-      
+
       expect(result.success).toBe(true);
       expect(result.publicKey).toBe('mock-public-key-123');
       expect(result.walletName).toBe('Phantom');
@@ -102,9 +102,9 @@ describe('SimpleWallet', () => {
     test('should handle Phantom not detected', async () => {
       mockWindow.solana = null;
       mockWindow.phantom = null;
-      
+
       const result = await wallet.connectPhantom();
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Phantom wallet not detected');
       expect(wallet.connected).toBe(false);
@@ -121,18 +121,18 @@ describe('SimpleWallet', () => {
           })
         }
       };
-      
+
       const result = await wallet.connectPhantom();
-      
+
       expect(result.success).toBe(true);
       expect(result.publicKey).toBe('phantom-backup-key');
     });
 
     test('should handle connection rejection', async () => {
       mockWindow.solana.connect.mockRejectedValue(new Error('User rejected connection'));
-      
+
       const result = await wallet.connectPhantom();
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('User rejected connection');
       expect(wallet.connected).toBe(false);
@@ -144,10 +144,10 @@ describe('SimpleWallet', () => {
       // First connect
       await wallet.connectPhantom();
       expect(wallet.connected).toBe(true);
-      
+
       // Then disconnect
       wallet.disconnect();
-      
+
       expect(wallet.connected).toBe(false);
       expect(wallet.publicKey).toBe(null);
       expect(wallet.walletName).toBe(null);
@@ -189,13 +189,13 @@ describe('Wallet Connection Flow', () => {
     // Initial state
     expect(wallet.isConnected()).toBe(false);
     expect(wallet.getPublicKey()).toBe(null);
-    
+
     // Connect
     const result = await wallet.connectPhantom();
     expect(result.success).toBe(true);
     expect(wallet.isConnected()).toBe(true);
     expect(wallet.getPublicKey()).toBeTruthy();
-    
+
     // Disconnect
     wallet.disconnect();
     expect(wallet.isConnected()).toBe(false);
@@ -205,7 +205,7 @@ describe('Wallet Connection Flow', () => {
   test('should handle multiple connection attempts', async () => {
     const result1 = await wallet.connectPhantom();
     const result2 = await wallet.connectPhantom();
-    
+
     expect(result1.success).toBe(true);
     expect(result2.success).toBe(true);
     expect(wallet.connected).toBe(true);

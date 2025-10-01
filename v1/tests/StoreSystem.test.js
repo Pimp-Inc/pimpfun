@@ -32,27 +32,27 @@ describe('StoreSystem', () => {
     test('should increase quantity when change is positive', () => {
       const input = document.getElementById('beer_qty');
       input.value = '10';
-      
+
       storeSystem.adjustQuantity('beer_qty', 1);
-      
+
       expect(input.value).toBe('11');
     });
 
     test('should decrease quantity when change is negative', () => {
       const input = document.getElementById('beer_qty');
       input.value = '10';
-      
+
       storeSystem.adjustQuantity('beer_qty', -1);
-      
+
       expect(input.value).toBe('9');
     });
 
     test('should not go below 1', () => {
       const input = document.getElementById('beer_qty');
       input.value = '1';
-      
+
       storeSystem.adjustQuantity('beer_qty', -1);
-      
+
       expect(input.value).toBe('1');
     });
 
@@ -60,9 +60,9 @@ describe('StoreSystem', () => {
       const input = document.getElementById('beer_qty');
       input.value = '1000';
       input.max = '1000';
-      
+
       storeSystem.adjustQuantity('beer_qty', 1);
-      
+
       expect(input.value).toBe('1000');
     });
 
@@ -77,16 +77,16 @@ describe('StoreSystem', () => {
     test('should successfully purchase items when player has enough cash', () => {
       const input = document.getElementById('beer_qty');
       input.value = '10';
-      
+
       const result = storeSystem.buyWithQuantity(
-        'beer', 
-        2, 
-        'beer_qty', 
-        mockGameState, 
-        mockUpdateUI, 
+        'beer',
+        2,
+        'beer_qty',
+        mockGameState,
+        mockUpdateUI,
         mockShowNotification
       );
-      
+
       expect(result).toBe(true);
       expect(mockGameState.player.cash).toBe(980); // 1000 - (10 * 2)
       expect(mockGameState.resources.beer).toBe(10);
@@ -101,16 +101,16 @@ describe('StoreSystem', () => {
       const input = document.getElementById('beer_qty');
       input.value = '1000';
       mockGameState.player.cash = 100;
-      
+
       const result = storeSystem.buyWithQuantity(
-        'beer', 
-        2, 
-        'beer_qty', 
-        mockGameState, 
-        mockUpdateUI, 
+        'beer',
+        2,
+        'beer_qty',
+        mockGameState,
+        mockUpdateUI,
         mockShowNotification
       );
-      
+
       expect(result).toBe(false);
       expect(mockGameState.player.cash).toBe(100); // Should remain unchanged
       expect(mockGameState.resources.beer).toBe(0); // Should remain unchanged
@@ -122,14 +122,14 @@ describe('StoreSystem', () => {
 
     test('should handle missing quantity input', () => {
       const result = storeSystem.buyWithQuantity(
-        'beer', 
-        2, 
-        'nonexistent_qty', 
-        mockGameState, 
-        mockUpdateUI, 
+        'beer',
+        2,
+        'nonexistent_qty',
+        mockGameState,
+        mockUpdateUI,
         mockShowNotification
       );
-      
+
       expect(result).toBe(false);
       expect(mockShowNotification).toHaveBeenCalledWith(
         '❌ Quantity input not found!',
@@ -141,7 +141,7 @@ describe('StoreSystem', () => {
   describe('calculateBulkSavings', () => {
     test('should correctly calculate bulk savings', () => {
       const result = storeSystem.calculateBulkSavings(2, 300, 200);
-      
+
       expect(result.individualTotal).toBe(400); // 2 * 200
       expect(result.bulkPrice).toBe(300);
       expect(result.savings).toBe(100); // 400 - 300
@@ -150,7 +150,7 @@ describe('StoreSystem', () => {
 
     test('should handle no savings scenario', () => {
       const result = storeSystem.calculateBulkSavings(2, 400, 200);
-      
+
       expect(result.savings).toBe(0);
       expect(result.savingsPercent).toBe(0);
     });
@@ -159,28 +159,28 @@ describe('StoreSystem', () => {
   describe('validatePurchase', () => {
     test('should validate successful purchase', () => {
       const result = storeSystem.validatePurchase(10, 2, 1000, 1000);
-      
+
       expect(result.valid).toBe(true);
       expect(result.totalCost).toBe(20);
     });
 
     test('should reject purchase with insufficient cash', () => {
       const result = storeSystem.validatePurchase(100, 2, 50, 1000);
-      
+
       expect(result.valid).toBe(false);
       expect(result.error).toBe('Not enough cash. Need $200');
     });
 
     test('should reject purchase exceeding max quantity', () => {
       const result = storeSystem.validatePurchase(1500, 2, 5000, 1000);
-      
+
       expect(result.valid).toBe(false);
       expect(result.error).toBe('Maximum quantity is 1000');
     });
 
     test('should reject purchase with quantity less than 1', () => {
       const result = storeSystem.validatePurchase(0, 2, 1000, 1000);
-      
+
       expect(result.valid).toBe(false);
       expect(result.error).toBe('Quantity must be at least 1');
     });
@@ -190,17 +190,17 @@ describe('StoreSystem', () => {
     test('should update display elements correctly', () => {
       const beerInput = document.getElementById('beer_qty');
       const beerTotal = document.getElementById('beer_total');
-      
+
       beerInput.value = '10';
-      
+
       storeSystem.updateQuantityDisplays();
-      
+
       expect(beerTotal.textContent).toBe('$20');
     });
 
     test('should handle missing elements gracefully', () => {
       document.body.innerHTML = ''; // Clear DOM
-      
+
       expect(() => {
         storeSystem.updateQuantityDisplays();
       }).not.toThrow();
