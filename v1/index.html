@@ -3852,34 +3852,117 @@
             updateGunDisplays();
         }
         
-        // Enhanced Reggie's Plug (embedded)
+        // Enhanced Reggie's Plug with quantity selectors
         function openReggiesPlug() {
+            console.log('🌿 OPENING ENHANCED REGGIE\'S PLUG with quantity selectors');
+            addConsoleMessage('🌿 Opening enhanced Reggie\'s Plug with quantity selectors', 'cyan');
+            
             const modal = `
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <h3 class="text-xl font-bold cyan-glow mb-2">REGGIE'S PLUG</h3>
                         <p class="text-sm text-gray-400 mb-4">🌿 Premium Weed • Heat +5 per purchase • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                         
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span>Eighth (⅛ oz) - $15</span>
-                                <button onclick="buyWeed(15, 0.125)" class="px-3 py-1 action-btn rounded text-sm">Buy</button>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Quarter (¼ oz) - $28</span>
-                                <button onclick="buyWeed(28, 0.25)" class="px-3 py-1 action-btn rounded text-sm">Buy</button>
-                            </div>
-                            <div class="flex justify-between items-center bg-green-900/50 p-2 rounded">
-                                <span>🔥 QP (4 oz) - $350</span>
-                                <button onclick="buyWeed(350, 4)" class="px-3 py-1 action-btn rounded text-sm">BEST DEAL!</button>
+                        <div class="space-y-4">
+                            <!-- Weed with Quantity Selector -->
+                            <div class="border border-gray-700 rounded p-4 bg-gray-800/30">
+                                <h4 class="font-bold text-green-400 mb-3">🌿 Premium Weed</h4>
+                                
+                                <!-- Eighth -->
+                                <div class="mb-3 p-3 bg-gray-900/50 rounded">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-gray-300">Eighth (⅛ oz)</span>
+                                        <span class="text-green-400">$15 each</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="adjustQuantity('eighth_qty', -1)" class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500">-</button>
+                                            <input type="number" id="eighth_qty" value="5" min="1" max="50" 
+                                                   class="w-20 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
+                                                   oninput="updateWeedDisplays()">
+                                            <button onclick="adjustQuantity('eighth_qty', 1)" class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500">+</button>
+                                        </div>
+                                        <button onclick="buyWeedWithQuantity(15, 0.125, 'eighth_qty')" class="flex-1 action-btn rounded py-2 text-sm">
+                                            Buy <span id="eighth_total">$75</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quarter -->
+                                <div class="mb-3 p-3 bg-gray-900/50 rounded">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-gray-300">Quarter (¼ oz)</span>
+                                        <span class="text-green-400">$28 each</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="adjustQuantity('quarter_qty', -1)" class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500">-</button>
+                                            <input type="number" id="quarter_qty" value="2" min="1" max="20" 
+                                                   class="w-20 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
+                                                   oninput="updateWeedDisplays()">
+                                            <button onclick="adjustQuantity('quarter_qty', 1)" class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500">+</button>
+                                        </div>
+                                        <button onclick="buyWeedWithQuantity(28, 0.25, 'quarter_qty')" class="flex-1 action-btn rounded py-2 text-sm">
+                                            Buy <span id="quarter_total">$56</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- QP Deal (Best Value) -->
+                                <div class="mb-3 p-3 bg-green-900/30 rounded border border-green-500/50">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-green-400">🔥 QP (4 oz) - BEST DEAL!</span>
+                                        <span class="text-green-400">$350 each</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="adjustQuantity('qp_qty', -1)" class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500">-</button>
+                                            <input type="number" id="qp_qty" value="1" min="1" max="10" 
+                                                   class="w-20 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
+                                                   oninput="updateWeedDisplays()">
+                                            <button onclick="adjustQuantity('qp_qty', 1)" class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500">+</button>
+                                        </div>
+                                        <button onclick="buyWeedWithQuantity(350, 4, 'qp_qty')" class="flex-1 bg-green-600 rounded py-2 text-sm hover:bg-green-500">
+                                            Buy <span id="qp_total">$350</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 1LB Deal (Premium) -->
+                                <div class="p-3 bg-purple-900/30 rounded border border-purple-500/50">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-purple-400">💜 1LB (16 oz) - BULK DEAL!</span>
+                                        <span class="text-purple-400">$900 each</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="adjustQuantity('lb_qty', -1)" class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500">-</button>
+                                            <input type="number" id="lb_qty" value="1" min="1" max="5" 
+                                                   class="w-20 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
+                                                   oninput="updateWeedDisplays()">
+                                            <button onclick="adjustQuantity('lb_qty', 1)" class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500">+</button>
+                                        </div>
+                                        <button onclick="buyWeedWithQuantity(900, 16, 'lb_qty')" class="flex-1 bg-purple-600 rounded py-2 text-sm hover:bg-purple-500">
+                                            Buy <span id="lb_total">$900</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <button onclick="closeModal()" class="w-full mt-4 py-2 bg-gray-700 rounded">Close</button>
+                        <div class="mt-4 p-3 bg-yellow-900/30 rounded text-sm">
+                            <p class="text-yellow-400">💡 Pro Tip: 1LB saves $540 vs buying 4 QPs!</p>
+                            <p class="text-gray-400 mt-1">Thugs need 1 oz per 8 thugs daily</p>
+                        </div>
+                        
+                        <button onclick="closeModal()" class="w-full mt-4 py-3 bg-gray-700 rounded font-bold">Close Store</button>
                     </div>
                 </div>
             `;
             document.getElementById('modalContainer').innerHTML = modal;
+            
+            // Initialize weed quantity displays
+            updateWeedDisplays();
         }
         
         // Enhanced Tony's Chop Shop (embedded)  
@@ -4500,6 +4583,79 @@
             updateUI();
             updateSupplyStatus();
             closeModal();
+        }
+
+        // Weed quantity display updates for enhanced interface
+        function updateWeedDisplays() {
+            // Update eighth total
+            const eighthQty = parseInt(document.getElementById('eighth_qty')?.value) || 0;
+            const eighthTotalEl = document.getElementById('eighth_total');
+            if (eighthTotalEl) {
+                eighthTotalEl.textContent = `$${(eighthQty * 15).toLocaleString()}`;
+            }
+            
+            // Update quarter total
+            const quarterQty = parseInt(document.getElementById('quarter_qty')?.value) || 0;
+            const quarterTotalEl = document.getElementById('quarter_total');
+            if (quarterTotalEl) {
+                quarterTotalEl.textContent = `$${(quarterQty * 28).toLocaleString()}`;
+            }
+            
+            // Update QP total
+            const qpQty = parseInt(document.getElementById('qp_qty')?.value) || 0;
+            const qpTotalEl = document.getElementById('qp_total');
+            if (qpTotalEl) {
+                qpTotalEl.textContent = `$${(qpQty * 350).toLocaleString()}`;
+            }
+            
+            // Update 1LB total
+            const lbQty = parseInt(document.getElementById('lb_qty')?.value) || 0;
+            const lbTotalEl = document.getElementById('lb_total');
+            if (lbTotalEl) {
+                lbTotalEl.textContent = `$${(lbQty * 900).toLocaleString()}`;
+            }
+        }
+
+        // Enhanced weed buying with quantity
+        function buyWeedWithQuantity(unitPrice, ouncesPer, qtyInputId) {
+            const qtyInput = document.getElementById(qtyInputId);
+            const quantity = parseInt(qtyInput?.value) || 1;
+            const totalCost = unitPrice * quantity;
+            const totalOunces = ouncesPer * quantity;
+            
+            if (gameState.player.cash < totalCost) {
+                showNotification(`💸 Not enough cash! Need $${totalCost.toLocaleString()}`, 'error');
+                return;
+            }
+            
+            gameState.player.cash -= totalCost;
+            gameState.resources.weed = (gameState.resources.weed || 0) + totalOunces;
+            gameState.player.heat = Math.min(100, (gameState.player.heat || 0) + 5); // +5 heat per purchase
+            
+            // Quality variance
+            const quality = 0.8 + Math.random() * 0.4;
+            const qualityText = quality > 1.1 ? ' (🔥 Fire!)' : quality < 0.9 ? ' (Mid)' : '';
+            
+            const displayText = quantity === 1 ? `${ouncesPer}oz weed` : `${quantity}x ${ouncesPer}oz weed (${totalOunces}oz total)`;
+            showNotification(`🌿 Bought ${displayText} for $${totalCost.toLocaleString()}!${qualityText} Heat +5%`, 'success');
+            addConsoleMessage(`💰 Reggie's Plug: ${displayText} purchased for $${totalCost.toLocaleString()} (+5% heat)${qualityText}`, 'green');
+            
+            updateUI();
+            saveGameState();
+            updateWeedStoreAfterPurchase();
+        }
+
+        function updateWeedStoreAfterPurchase() {
+            // Update cash display in store modal
+            const cashElements = document.querySelectorAll('.gold-text');
+            cashElements.forEach(el => {
+                if (el.textContent.includes('$') && el.textContent.includes(',')) {
+                    el.textContent = `$${gameState.player.cash.toLocaleString()}`;
+                }
+            });
+            
+            // Update all weed quantity displays
+            updateWeedDisplays();
         }
 
         function buyWeapon(weaponType, price) {
