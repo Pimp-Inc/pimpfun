@@ -64,7 +64,7 @@ const DISTRICTS_AND_TERRITORIES = {
 };
 
 // Simple district names array for backward compatibility
-const DISTRICTS = Object.keys(DISTRICTS_AND_TERRITORIES);
+const DISTRICT_NAMES = Object.keys(DISTRICTS_AND_TERRITORIES);
 
 // Get all territories as a flat array
 const ALL_TERRITORIES = Object.values(DISTRICTS_AND_TERRITORIES)
@@ -91,7 +91,7 @@ const RESOURCE_VALUES = {
 };
 
 // Store names
-const STORES = [
+const STORE_NAMES = [
   'Corner Store',
   'Pew Pew Jimmy\'s',
   'Reggie\'s Plug',
@@ -101,11 +101,11 @@ const STORES = [
 // Utility functions
 const GameConstants = {
   DISTRICTS_AND_TERRITORIES,
-  DISTRICTS,
+  DISTRICT_NAMES,
   ALL_TERRITORIES,
   TERRITORY_TO_DISTRICT,
   RESOURCE_VALUES,
-  STORES,
+  STORE_NAMES,
 
   /**
    * Get district info by name

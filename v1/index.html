@@ -8209,12 +8209,14 @@
                 } else {
                     console.error('❌ Supabase connection failed');
                     addConsoleMessage('❌ Database connection failed', 'red');
-                    return;
+                    addConsoleMessage('🚨 Authentication system unavailable - showing local demo', 'yellow');
+                    // Don't return - continue to set up auth landing page
                 }
             } catch (error) {
                 console.error('❌ Supabase init error:', error);
                 addConsoleMessage('❌ Database connection failed: ' + error.message, 'red');
-                return;
+                addConsoleMessage('🚨 Authentication system unavailable - showing local demo', 'yellow');
+                // Don't return - continue to set up auth landing page
             }
             
             // Check for existing auth session
@@ -8255,6 +8257,15 @@
                 addConsoleMessage('👥 Create account to compete and save progress!', 'gold');
                 addConsoleMessage('🏆 Leaderboards, crews, and real competition await!', 'purple');
             }
+            
+            // Ensure correct initial UI state (fallback)
+            setTimeout(() => {
+                if (!isLoggedIn) {
+                    document.getElementById('authLanding').classList.remove('hidden');
+                    document.getElementById('gameContent').classList.add('hidden');
+                    console.log('🔧 Applied fallback UI state: Auth landing visible, game hidden');
+                }
+            }, 1000);
         }
 
         // Load player profile from Supabase (auth-based) - SERVER ONLY
