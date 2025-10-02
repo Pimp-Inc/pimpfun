@@ -16,6 +16,7 @@ describe('GameStateManager', () => {
       const state = gameStateManager.initializeNewGameState();
 
       expect(state).toHaveProperty('player');
+      expect(state).toHaveProperty('territories');
       expect(state).toHaveProperty('resources');
       expect(state).toHaveProperty('supplies');
       expect(state).toHaveProperty('heat');
@@ -29,6 +30,10 @@ describe('GameStateManager', () => {
 
       expect(state.player.cash).toBe(1000);
       expect(state.player.turns).toBe(200);
+      expect(state.player.district).toBe('Midtown Market');
+      expect(state.player.territory).toBe('Times Square Center');
+      expect(state.territories.controlled).toEqual(['Times Square Center']);
+      expect(state.territories.controlCount).toBe(1);
       expect(state.resources.hoes).toBe(0);
       expect(state.supplies.thugHappiness).toBe(70);
     });
@@ -87,6 +92,36 @@ describe('GameStateManager', () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Player data is missing or invalid');
+    });
+
+    test('should reject state with invalid territories data', () => {
+      const invalidState = gameStateManager.initializeNewGameState();
+      invalidState.territories = null;
+
+      const result = gameStateManager.validateGameState(invalidState);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Territories data is missing or invalid');
+    });
+
+    test('should reject state with invalid controlled territories', () => {
+      const invalidState = gameStateManager.initializeNewGameState();
+      invalidState.territories.controlled = 'not an array';
+
+      const result = gameStateManager.validateGameState(invalidState);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Controlled territories must be an array');
+    });
+
+    test('should reject state with negative territory count', () => {
+      const invalidState = gameStateManager.initializeNewGameState();
+      invalidState.territories.controlCount = -1;
+
+      const result = gameStateManager.validateGameState(invalidState);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('Territory control count must be a non-negative number');
     });
   });
 
@@ -261,6 +296,167 @@ describe('GameStateManager', () => {
       const migratedState = gameStateManager.migrateGameState(null);
 
       expect(migratedState).toEqual(gameStateManager.initializeNewGameState());
+    });
+
+    test('should migrate old district names', () => {
+      const oldState = {
+        player: { district: 'Midtown', cash: 1000 }
+      };
+
+      const migratedState = gameStateManager.migrateGameState(oldState);
+
+      expect(migratedState.player.district).toBe('Midtown Market');
+      expect(migratedState.player.territory).toBe('Times Square Center');
+      expect(migratedState.territories.controlled).toEqual(['Times Square Center']);
+    });
+  });
+
+  describe('Territory Management', () => {
+    let state;
+
+    beforeEach(() => {
+      state = gameStateManager.initializeNewGameState();
+    });
+
+    describe('addTerritory', () => {
+      test('should add new territory to control', () => {
+        const result = gameStateManager.addTerritory(state, 'Herald Square');
+
+        expect(result).toBe(true);
+        expect(state.territories.controlled).toContain('Herald Square');
+        expect(state.territories.controlCount).toBe(2);
+      });
+
+      test('should not add duplicate territory', () => {
+        const result = gameStateManager.addTerritory(state, 'Times Square Center');
+
+        expect(result).toBe(false);
+        expect(state.territories.controlCount).toBe(1);
+      });
+
+      test('should handle missing territories object', () => {
+        delete state.territories;
+
+        const result = gameStateManager.addTerritory(state, 'Herald Square');
+
+        expect(result).toBe(true);
+        expect(state.territories.controlled).toEqual(['Herald Square']);
+        expect(state.territories.controlCount).toBe(1);
+      });
+    });
+
+    describe('removeTerritory', () => {
+      test('should remove controlled territory', () => {
+        gameStateManager.addTerritory(state, 'Herald Square');
+
+        const result = gameStateManager.removeTerritory(state, 'Herald Square');
+
+        expect(result).toBe(true);
+        expect(state.territories.controlled).not.toContain('Herald Square');
+        expect(state.territories.controlCount).toBe(1);
+      });
+
+      test('should not remove uncontrolled territory', () => {
+        const result = gameStateManager.removeTerritory(state, 'Unknown Territory');
+
+        expect(result).toBe(false);
+        expect(state.territories.controlCount).toBe(1);
+      });
+
+      test('should handle missing territories object', () => {
+        delete state.territories;
+
+        const result = gameStateManager.removeTerritory(state, 'Any Territory');
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('controlsTerritory', () => {
+      test('should return true for controlled territory', () => {
+        const result = gameStateManager.controlsTerritory(state, 'Times Square Center');
+
+        expect(result).toBe(true);
+      });
+
+      test('should return false for uncontrolled territory', () => {
+        const result = gameStateManager.controlsTerritory(state, 'Unknown Territory');
+
+        expect(result).toBe(false);
+      });
+
+      test('should handle missing territories object', () => {
+        delete state.territories;
+
+        const result = gameStateManager.controlsTerritory(state, 'Any Territory');
+
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('getControlledTerritories', () => {
+      test('should return array of controlled territories', () => {
+        gameStateManager.addTerritory(state, 'Herald Square');
+
+        const territories = gameStateManager.getControlledTerritories(state);
+
+        expect(territories).toEqual(['Times Square Center', 'Herald Square']);
+      });
+
+      test('should return copy of territories array', () => {
+        const territories = gameStateManager.getControlledTerritories(state);
+        territories.push('New Territory');
+
+        expect(state.territories.controlled).not.toContain('New Territory');
+      });
+
+      test('should handle missing territories object', () => {
+        delete state.territories;
+
+        const territories = gameStateManager.getControlledTerritories(state);
+
+        expect(territories).toEqual([]);
+      });
+    });
+
+    describe('getTerritoryCount', () => {
+      test('should return current territory count', () => {
+        const count = gameStateManager.getTerritoryCount(state);
+
+        expect(count).toBe(1);
+      });
+
+      test('should return updated count after adding territory', () => {
+        gameStateManager.addTerritory(state, 'Herald Square');
+
+        const count = gameStateManager.getTerritoryCount(state);
+
+        expect(count).toBe(2);
+      });
+
+      test('should handle missing territories object', () => {
+        delete state.territories;
+
+        const count = gameStateManager.getTerritoryCount(state);
+
+        expect(count).toBe(0);
+      });
+    });
+
+    describe('moveToTerritory', () => {
+      test('should move player to new territory', () => {
+        const result = gameStateManager.moveToTerritory(state, 'Herald Square');
+
+        expect(result).toBe(true);
+        expect(state.player.territory).toBe('Herald Square');
+      });
+
+      test('should accept any territory name when GameConstants not available', () => {
+        const result = gameStateManager.moveToTerritory(state, 'Any Territory Name');
+
+        expect(result).toBe(true);
+        expect(state.player.territory).toBe('Any Territory Name');
+      });
     });
   });
 });

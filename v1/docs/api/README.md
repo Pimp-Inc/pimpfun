@@ -279,8 +279,13 @@ if (turnsAdded > 0) {
     turns: number,         // Available turns
     lastLogin: number,     // Last login timestamp
     district: string,      // Current district
+    territory: string,     // Current territory
     level: number,         // Player level
     experience: number     // Experience points
+  },
+  territories: {
+    controlled: Array,     // Array of controlled territory names
+    controlCount: number   // Number of territories controlled
   },
   resources: {
     hoes: number,          // Number of hoes
@@ -342,12 +347,78 @@ const RESOURCE_VALUES = {
 };
 ```
 
-### Districts
+### Districts and Territories
+```javascript
+const DISTRICTS_AND_TERRITORIES = {
+  'Uptown Plaza': {
+    realWorldName: 'Bronx',
+    territoryCount: 15,
+    territories: [
+      'South Bronx Strip', 'Yankee Stadium Block', 'Grand Concourse North', 'Grand Concourse South',
+      'Bronx River East', 'Bronx River West', 'Mott Haven', 'Melrose Avenue',
+      'Hunts Point Market', 'Port Morris', 'Morrisania', 'Crotona Park',
+      'Tremont Square', 'Fordham Road', 'Belmont Strip'
+    ]
+  },
+  'Midtown Market': {
+    realWorldName: 'Manhattan', 
+    territoryCount: 20,
+    territories: [
+      'Times Square Center', 'Times Square North', 'Times Square South', 'Herald Square',
+      'Penn Station Block', 'Madison Square', 'Garment District', 'Theater District',
+      'Hell\'s Kitchen West', 'Hell\'s Kitchen East', 'Chelsea Market', 'Meatpacking District',
+      'West Village', 'East Village', 'SoHo North', 'SoHo South',
+      'NoLita Strip', 'Little Italy', 'Chinatown', 'Financial Core'
+    ]
+  },
+  'Crooklyn Heights': {
+    realWorldName: 'Brooklyn',
+    territoryCount: 30, 
+    territories: [
+      'Downtown Brooklyn', 'Brooklyn Heights', 'DUMBO', 'Williamsburg North',
+      'Williamsburg South', 'Greenpoint', 'Bushwick North', 'Bushwick South',
+      'Bedford-Stuyvesant North', 'Bedford-Stuyvesant South', 'Crown Heights East', 'Crown Heights West',
+      'Prospect Heights', 'Park Slope', 'Gowanus', 'Red Hook',
+      'Sunset Park', 'Bay Ridge', 'Bensonhurst', 'Coney Island',
+      'Brighton Beach', 'Sheepshead Bay', 'Flatbush North', 'Flatbush South',
+      'East Flatbush', 'Canarsie', 'East New York', 'Brownsville',
+      'Fort Greene', 'Clinton Hill'
+    ]
+  },
+  'Harbor Docks': {
+    realWorldName: 'Staten Island',
+    territoryCount: 6,
+    territories: [
+      'St. George Terminal', 'Port Richmond', 'New Brighton', 
+      'Stapleton Docks', 'South Beach', 'Tottenville'
+    ]
+  },
+  'Financial District': {
+    realWorldName: 'Queens',
+    territoryCount: 28,
+    territories: [
+      'Long Island City', 'Astoria North', 'Astoria South', 'Sunnyside',
+      'Woodside', 'Jackson Heights', 'Corona North', 'Corona South',
+      'Elmhurst', 'Rego Park', 'Forest Hills', 'Kew Gardens',
+      'Richmond Hill', 'Ozone Park', 'Howard Beach', 'JFK Airport Zone',
+      'Jamaica Center', 'Jamaica South', 'Hollis', 'Queens Village',
+      'Bayside', 'Whitestone', 'College Point', 'Flushing Meadows',
+      'Flushing Downtown', 'Murray Hill', 'Beechhurst', 'Far Rockaway'
+    ]
+  }
+};
+
+// Total: 99 territories across 5 districts
+const ALL_TERRITORIES = Object.values(DISTRICTS_AND_TERRITORIES)
+  .flatMap(district => district.territories);
+```
+
+### Legacy District Names (for backward compatibility)
 ```javascript
 const DISTRICTS = [
-  'Uptown',
-  'Midtown', 
-  'Crooklyn',
+  'Uptown Plaza',      // Updated from 'Uptown'
+  'Midtown Market',    // Updated from 'Midtown'
+  'Crooklyn Heights',  // Updated from 'Crooklyn'
   'Harbor Docks',
   'Financial District'
 ];
