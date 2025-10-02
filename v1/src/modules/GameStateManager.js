@@ -13,9 +13,14 @@ class GameStateManager {
         heat: 0,
         turns: 200,
         lastLogin: Date.now(),
-        district: 'Midtown',
+        district: 'Midtown Market',  // Updated to use new district name
+        territory: 'Times Square Center',  // Starting territory
         level: 1,
         experience: 0
+      },
+      territories: {
+        controlled: ['Times Square Center'],  // Array of controlled territories
+        controlCount: 1  // Number of territories controlled
       },
       resources: {
         hoes: 0,
@@ -103,6 +108,18 @@ class GameStateManager {
       });
     }
 
+    // Validate territories section
+    if (!state.territories || typeof state.territories !== 'object') {
+      errors.push('Territories data is missing or invalid');
+    } else {
+      if (!Array.isArray(state.territories.controlled)) {
+        errors.push('Controlled territories must be an array');
+      }
+      if (typeof state.territories.controlCount !== 'number' || state.territories.controlCount < 0) {
+        errors.push('Territory control count must be a non-negative number');
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors
@@ -122,6 +139,29 @@ class GameStateManager {
     // Merge old state into new structure, preserving existing data
     if (oldState.player) {
       Object.assign(newState.player, oldState.player);
+
+      // Migrate old district names to new format if needed
+      if (oldState.player.district === 'Midtown') {
+        newState.player.district = 'Midtown Market';
+        newState.player.territory = 'Times Square Center';
+      } else if (oldState.player.district === 'Uptown') {
+        newState.player.district = 'Uptown Plaza';
+        newState.player.territory = 'South Bronx Strip';
+      } else if (oldState.player.district === 'Crooklyn') {
+        newState.player.district = 'Crooklyn Heights';
+        newState.player.territory = 'Downtown Brooklyn';
+      }
+
+      // Ensure territory is set if district exists
+      if (newState.player.district && !newState.player.territory) {
+        // Import GameConstants if available
+        if (typeof window !== 'undefined' && window.GameConstants) {
+          const territories = window.GameConstants.getTerritoriesForDistrict(newState.player.district);
+          if (territories.length > 0) {
+            newState.player.territory = territories[0];
+          }
+        }
+      }
     }
 
     if (oldState.resources) {
@@ -137,6 +177,15 @@ class GameStateManager {
       newState.heat.level = oldState.heat;
     } else if (oldState.heat && typeof oldState.heat === 'object') {
       Object.assign(newState.heat, oldState.heat);
+    }
+
+    // Handle territories migration
+    if (oldState.territories) {
+      Object.assign(newState.territories, oldState.territories);
+    } else if (newState.player.territory) {
+      // Initialize territories based on current player territory
+      newState.territories.controlled = [newState.player.territory];
+      newState.territories.controlCount = 1;
     }
 
     return newState;
@@ -247,6 +296,102 @@ class GameStateManager {
     }
 
     return turnsToAdd;
+  }
+
+  /**
+   * Add a territory to player control
+   * @param {Object} state - Current game state
+   * @param {string} territoryName - Name of territory to add
+   * @returns {boolean} Success status
+   */
+  addTerritory(state, territoryName) {
+    if (!state.territories) {
+      state.territories = {
+        controlled: [],
+        controlCount: 0
+      };
+    }
+
+    if (!state.territories.controlled.includes(territoryName)) {
+      state.territories.controlled.push(territoryName);
+      state.territories.controlCount = state.territories.controlled.length;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Remove a territory from player control
+   * @param {Object} state - Current game state
+   * @param {string} territoryName - Name of territory to remove
+   * @returns {boolean} Success status
+   */
+  removeTerritory(state, territoryName) {
+    if (!state.territories || !state.territories.controlled) {
+      return false;
+    }
+
+    const index = state.territories.controlled.indexOf(territoryName);
+    if (index > -1) {
+      state.territories.controlled.splice(index, 1);
+      state.territories.controlCount = state.territories.controlled.length;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if player controls a territory
+   * @param {Object} state - Current game state
+   * @param {string} territoryName - Name of territory to check
+   * @returns {boolean} True if controlled
+   */
+  controlsTerritory(state, territoryName) {
+    return !!(state.territories &&
+              state.territories.controlled &&
+              state.territories.controlled.includes(territoryName));
+  }
+
+  /**
+   * Get all territories controlled by player
+   * @param {Object} state - Current game state
+   * @returns {Array} Array of controlled territory names
+   */
+  getControlledTerritories(state) {
+    return state.territories && state.territories.controlled ?
+           [...state.territories.controlled] : [];
+  }
+
+  /**
+   * Get territory count for player
+   * @param {Object} state - Current game state
+   * @returns {number} Number of controlled territories
+   */
+  getTerritoryCount(state) {
+    return state.territories ? state.territories.controlCount : 0;
+  }
+
+  /**
+   * Move player to a new territory
+   * @param {Object} state - Current game state
+   * @param {string} territoryName - Name of new territory
+   * @returns {boolean} Success status
+   */
+  moveToTerritory(state, territoryName) {
+    // Import GameConstants if available to validate territory
+    if (typeof window !== 'undefined' && window.GameConstants) {
+      if (!window.GameConstants.isValidTerritory(territoryName)) {
+        return false;
+      }
+      // Update district based on territory
+      const district = window.GameConstants.getDistrictForTerritory(territoryName);
+      if (district) {
+        state.player.district = district;
+      }
+    }
+
+    state.player.territory = territoryName;
+    return true;
   }
 }
 

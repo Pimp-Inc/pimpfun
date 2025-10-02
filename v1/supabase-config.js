@@ -69,7 +69,7 @@ const SupabaseAPI = {
                     cash: playerData.cash || 10000,
                     respect: playerData.respect || 0,
                     heat: playerData.heat || 0,
-                    territory: playerData.territory || 'Midtown'
+                    territory: playerData.territory || 'Times Square Center'
                     // Removed created_at and last_active - they have DEFAULT values
                 }])
                 .select();
