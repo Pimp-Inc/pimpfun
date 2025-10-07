@@ -5,10 +5,10 @@
 
 // District-Territory mapping with 99 total territories - Enhanced with Mafia-Inspired Structure
 const DISTRICTS_AND_TERRITORIES = {
-  'Uptown High-Rollers': {
+  'Uptown Plaza': {
     realWorldName: 'Bronx',
     territoryCount: 15,
-    vibe: 'A northern enclave of bold gamblers and street kings, where high-stakes bets in coliseums fuel Gotti-era crews and resilient rackets. Uptown High-Rollers pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.',
+    vibe: 'A northern enclave of bold gamblers and street kings, where high-stakes bets in coliseums fuel Gotti-era crews and resilient rackets. Uptown Plaza pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.',
     whyFits: 'Its "Uptown" geography and Yankee Stadium\'s betting lore make it a natural for "High-Rollers," blending gritty ambition with Bronx tenacity.',
     districtBonus: {
       name: 'Gamble\'s Edge',
@@ -32,10 +32,10 @@ const DISTRICTS_AND_TERRITORIES = {
       { name: 'Banana Field', description: 'Pelham Bay\'s green expanse, tied to Joe Bonanno\'s Sicilian roots and park hits.' }
     ]
   },
-  'Midtown Night Strip': {
+  'Midtown Market': {
     realWorldName: 'Manhattan',
     territoryCount: 20,
-    vibe: 'The neon-drenched core of Empire City, where after-dark deals in theaters and bars light up Luciano\'s empire. Midtown Night Strip is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.',
+    vibe: 'The neon-drenched core of Empire City, where after-dark deals in theaters and bars light up Luciano\'s empire. Midtown Market is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.',
     whyFits: 'Midtown\'s Times Square "night strip" vibe (neon lights, nightlife) aligns perfectly with Manhattan\'s commercial heart and mobbed-up entertainment rackets.',
     districtBonus: {
       name: 'Neon Veil',
