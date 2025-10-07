@@ -102,10 +102,12 @@ const STORE_NAMES = [
 const GameConstants = {
   DISTRICTS_AND_TERRITORIES,
   DISTRICT_NAMES,
+  DISTRICTS: DISTRICT_NAMES, // For backward compatibility with tests
   ALL_TERRITORIES,
   TERRITORY_TO_DISTRICT,
   RESOURCE_VALUES,
   STORE_NAMES,
+  STORES: STORE_NAMES, // For backward compatibility with tests
 
   /**
    * Get district info by name
@@ -150,7 +152,7 @@ const GameConstants = {
    * @returns {boolean} True if valid district
    */
   isValidDistrict(districtName) {
-    return DISTRICTS.includes(districtName);
+    return DISTRICT_NAMES.includes(districtName);
   },
 
   /**

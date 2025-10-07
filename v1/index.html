@@ -8114,14 +8114,13 @@
             // Update district display
             const districtEl = document.getElementById('district');
             if (districtEl) {
-                if (gameState.player.district && DISTRICTS[gameState.player.district]) {
-                    const district = DISTRICTS[gameState.player.district];
-                    let displayText = district.name;
+                if (gameState.player.district && window.GameConstants && window.GameConstants.DISTRICTS_AND_TERRITORIES[gameState.player.district]) {
+                    let displayText = gameState.player.district;
                     if (gameState.player.territory) {
                         displayText += ` - ${gameState.player.territory}`;
                     }
                     districtEl.textContent = displayText;
-                    districtEl.className = district.color + ' cursor-pointer';
+                    districtEl.className = 'cyan-glow cursor-pointer';
                 } else {
                     districtEl.textContent = 'Choose District';
                     districtEl.className = 'cyan-glow cursor-pointer';
@@ -9672,61 +9671,60 @@
         }
 
         // District Selection
-        // District Selection with Territory Details
+        // District Selection with Territory Details - Updated to use GameConstants
         function selectDistrict() {
             console.log('🏙️ District selection clicked');
-            console.log('🏙️ DISTRICTS object:', DISTRICTS);
+            console.log('🏙️ GameConstants available:', typeof window.GameConstants !== 'undefined');
+            
+            if (typeof window.GameConstants === 'undefined') {
+                console.error('❌ GameConstants not available');
+                showNotification('❌ Game data not loaded properly. Please refresh the page.', 'error');
+                return;
+            }
+            
+            const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
+            console.log('🏙️ Using GameConstants districts:', Object.keys(districts));
             
             const modal = `
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-4xl w-full my-8 max-h-[85vh] overflow-y-auto">
                         <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">CHOOSE YOUR DISTRICT & TERRITORY</h3>
-                        <p class="text-sm text-gray-400 mb-6 text-center">Each district contains multiple territories with unique benefits and mafia heritage:</p>
+                        <p class="text-sm text-gray-400 mb-6 text-center">Empire City has 5 districts with 99 total territories. Each offers unique opportunities:</p>
                         
                         <div class="space-y-6">
-                            ${Object.entries(DISTRICTS).map(([key, district]) => `
+                            ${Object.entries(districts).map(([districtName, districtData]) => `
                                 <div class="district-section border border-gray-700 rounded-lg p-4 bg-gray-800/30">
                                     <div class="district-header cursor-pointer hover:bg-gray-700/30 p-3 rounded" 
-                                         onclick="toggleDistrict('${key}')">
+                                         onclick="toggleDistrictTerritories('${districtName}')">
                                         <div class="flex justify-between items-center">
                                             <div>
-                                                <h4 class="text-xl font-bold ${district.color} mb-2">${district.name}</h4>
-                                                <p class="text-sm text-gray-400 mb-2">${district.description}</p>
-                                                <p class="text-sm italic text-gray-300">"${district.motto}"</p>
+                                                <h4 class="text-xl font-bold cyan-glow mb-2">${districtName}</h4>
+                                                <p class="text-sm text-gray-400 mb-2">Based on ${districtData.realWorldName}</p>
+                                                <p class="text-sm text-gold-text font-bold">${districtData.territoryCount} Territories Available</p>
                                             </div>
                                             <div class="text-2xl text-gray-400">
-                                                <span id="toggle-${key}">▼</span>
+                                                <span id="toggle-${districtName.replace(/\s+/g, '-')}">▼</span>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="mt-3 text-xs text-cyan-400">
-                                            <strong>District Bonus:</strong> ${Object.entries(district.bonuses)[0][1]}
                                         </div>
                                     </div>
                                     
-                                    <div id="territories-${key}" class="territories-container mt-4 hidden">
+                                    <div id="territories-${districtName.replace(/\s+/g, '-')}" class="territories-container mt-4 hidden">
                                         <div class="mb-3 p-3 bg-gray-900/50 rounded">
-                                            <p class="text-sm text-yellow-400 mb-2"><strong>District Vibe:</strong></p>
-                                            <p class="text-sm text-gray-300">${district.vibe}</p>
-                                        </div>
-                                        
-                                        <div class="grid md:grid-cols-2 gap-3">
-                                            ${district.territories.map((territory, index) => `
-                                                <div class="territory-card border border-gray-600 rounded p-3 cursor-pointer hover:border-${district.color.replace('text-', '').replace('-glow', '').replace('-text', '')}-400 hover:bg-gray-700/30 transition-all"
-                                                     onclick="selectTerritory('${key}', '${territory.name}')">
-                                                    <h5 class="font-bold text-white mb-2">${territory.name}</h5>
-                                                    <p class="text-xs text-gray-400 mb-2">${territory.description}</p>
-                                                    <div class="text-xs text-green-400">
-                                                        <strong>Special:</strong> ${territory.special}
+                                            <p class="text-sm text-yellow-400 mb-2"><strong>All ${districtData.territoryCount} Territories:</strong></p>
+                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-300">
+                                                ${districtData.territories.map(territory => `
+                                                    <div class="territory-item p-2 bg-gray-800/50 rounded cursor-pointer hover:bg-cyan-900/30 transition-all"
+                                                         onclick="selectSpecificTerritory('${districtName}', '${territory}')">
+                                                        ${territory}
                                                     </div>
-                                                </div>
-                                            `).join('')}
+                                                `).join('')}
+                                            </div>
                                         </div>
                                         
                                         <div class="mt-4 text-center">
-                                            <button onclick="chooseDistrict('${key}')" 
+                                            <button onclick="chooseNewDistrict('${districtName}')" 
                                                     class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded font-bold hover:from-purple-500 hover:to-blue-500 transition-all">
-                                                Choose ${district.name}
+                                                Choose ${districtName}
                                             </button>
                                         </div>
                                     </div>
@@ -9736,7 +9734,7 @@
                         
                         ${gameState.player.district ? `
                             <div class="text-center mt-6 p-3 bg-gray-800/50 rounded">
-                                <p class="text-sm text-gray-400">Current District: <span class="${DISTRICTS[gameState.player.district].color}">${DISTRICTS[gameState.player.district].name}</span></p>
+                                <p class="text-sm text-gray-400">Current District: <span class="cyan-glow">${gameState.player.district}</span></p>
                                 ${gameState.player.territory ? `<p class="text-xs text-gray-500">Territory: ${gameState.player.territory}</p>` : ''}
                             </div>
                         ` : ''}
@@ -9748,87 +9746,106 @@
             document.getElementById('modalContainer').innerHTML = modal;
         }
 
-        // Toggle district territory display
-        function toggleDistrict(districtKey) {
-            const territoriesContainer = document.getElementById(`territories-${districtKey}`);
-            const toggleIcon = document.getElementById(`toggle-${districtKey}`);
+        // Toggle district territory display - Updated for GameConstants
+        function toggleDistrictTerritories(districtName) {
+            const safeDistrictId = districtName.replace(/\s+/g, '-');
+            const territoriesContainer = document.getElementById(`territories-${safeDistrictId}`);
+            const toggleIcon = document.getElementById(`toggle-${safeDistrictId}`);
             
-            if (territoriesContainer.classList.contains('hidden')) {
+            if (territoriesContainer && territoriesContainer.classList.contains('hidden')) {
                 // Close all other districts first
-                Object.keys(DISTRICTS).forEach(key => {
-                    if (key !== districtKey) {
-                        document.getElementById(`territories-${key}`).classList.add('hidden');
-                        document.getElementById(`toggle-${key}`).textContent = '▼';
+                Object.keys(window.GameConstants.DISTRICTS_AND_TERRITORIES).forEach(name => {
+                    const safeName = name.replace(/\s+/g, '-');
+                    if (safeName !== safeDistrictId) {
+                        const container = document.getElementById(`territories-${safeName}`);
+                        const icon = document.getElementById(`toggle-${safeName}`);
+                        if (container) container.classList.add('hidden');
+                        if (icon) icon.textContent = '▼';
                     }
                 });
                 
                 territoriesContainer.classList.remove('hidden');
-                toggleIcon.textContent = '▲';
-            } else {
+                if (toggleIcon) toggleIcon.textContent = '▲';
+            } else if (territoriesContainer) {
                 territoriesContainer.classList.add('hidden');
-                toggleIcon.textContent = '▼';
+                if (toggleIcon) toggleIcon.textContent = '▼';
             }
         }
 
-        // Select specific territory within district
-        function selectTerritory(districtKey, territoryName) {
-            const district = DISTRICTS[districtKey];
-            const territory = district.territories.find(t => t.name === territoryName);
+        // Select specific territory within district - Updated for GameConstants
+        function selectSpecificTerritory(districtName, territoryName) {
+            const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
+            const districtData = districts[districtName];
             
-            if (territory) {
-                // Show territory details
-                const detailModal = `
-                    <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4">
-                        <div class="game-panel rounded-lg p-6 max-w-lg w-full">
-                            <h3 class="text-xl font-bold ${district.color} mb-3">${territory.name}</h3>
-                            <p class="text-sm text-gray-400 mb-4">${district.name} Territory</p>
-                            
-                            <div class="space-y-4">
-                                <div class="p-3 bg-gray-800/50 rounded">
-                                    <h4 class="font-bold text-white mb-2">Description</h4>
-                                    <p class="text-sm text-gray-300">${territory.description}</p>
-                                </div>
-                                
-                                <div class="p-3 bg-green-900/30 rounded">
-                                    <h4 class="font-bold text-green-400 mb-2">Special Ability</h4>
-                                    <p class="text-sm text-green-300">${territory.special}</p>
-                                </div>
-                                
-                                <div class="p-3 bg-blue-900/30 rounded">
-                                    <h4 class="font-bold text-blue-400 mb-2">District Bonus</h4>
-                                    <p class="text-sm text-blue-300">${Object.entries(district.bonuses)[0][1]}</p>
-                                </div>
+            if (!districtData) {
+                console.error('District not found:', districtName);
+                return;
+            }
+            
+            if (!districtData.territories.includes(territoryName)) {
+                console.error('Territory not found in district:', territoryName, districtName);
+                return;
+            }
+            
+            // Show territory details
+            const detailModal = `
+                <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+                    <div class="game-panel rounded-lg p-6 max-w-lg w-full">
+                        <h3 class="text-xl font-bold cyan-glow mb-3">${territoryName}</h3>
+                        <p class="text-sm text-gray-400 mb-4">${districtName} Territory</p>
+                        
+                        <div class="space-y-4">
+                            <div class="p-3 bg-gray-800/50 rounded">
+                                <h4 class="font-bold text-white mb-2">District Information</h4>
+                                <p class="text-sm text-gray-300">Based on ${districtData.realWorldName}</p>
+                                <p class="text-sm text-cyan-400">One of ${districtData.territoryCount} territories in ${districtName}</p>
                             </div>
                             
-                            <div class="flex gap-3 mt-6">
-                                <button onclick="confirmTerritorySelection('${districtKey}', '${territoryName}')" 
-                                        class="flex-1 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded font-bold hover:from-green-500 hover:to-emerald-500 transition-all">
-                                    Claim Territory
-                                </button>
-                                <button onclick="selectDistrict()" 
-                                        class="flex-1 py-2 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">
-                                    Back to Districts
-                                </button>
+                            <div class="p-3 bg-green-900/30 rounded">
+                                <h4 class="font-bold text-green-400 mb-2">Territory Benefits</h4>
+                                <p class="text-sm text-green-300">Strategic location in ${territoryName} offers unique opportunities for your empire.</p>
+                            </div>
+                            
+                            <div class="p-3 bg-blue-900/30 rounded">
+                                <h4 class="font-bold text-blue-400 mb-2">Empire Expansion</h4>
+                                <p class="text-sm text-blue-300">Claim this territory to establish your base of operations in ${districtName}.</p>
                             </div>
                         </div>
+                        
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="confirmNewTerritorySelection('${districtName}', '${territoryName}')" 
+                                    class="flex-1 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded font-bold hover:from-green-500 hover:to-emerald-500 transition-all">
+                                Claim Territory
+                            </button>
+                            <button onclick="selectDistrict()" 
+                                    class="flex-1 py-2 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">
+                                Back to Districts
+                            </button>
+                        </div>
                     </div>
-                `;
-                document.getElementById('modalContainer').innerHTML = detailModal;
-            }
+                </div>
+            `;
+            document.getElementById('modalContainer').innerHTML = detailModal;
         }
 
-        // Confirm territory selection
-        function confirmTerritorySelection(districtKey, territoryName) {
-            const district = DISTRICTS[districtKey];
-            const territory = district.territories.find(t => t.name === territoryName);
+        // Choose district without specific territory - Updated for GameConstants
+        function chooseNewDistrict(districtName) {
+            const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
+            const districtData = districts[districtName];
+            
+            if (!districtData) {
+                console.error('District not found:', districtName);
+                return;
+            }
+            
             const isFirstTime = !gameState.player.district;
             
-            gameState.player.district = districtKey;
-            gameState.player.territory = territoryName;
+            gameState.player.district = districtName;
+            gameState.player.territory = null; // No specific territory chosen
             
             // Update UI
-            document.getElementById('district').textContent = `${district.name} - ${territoryName}`;
-            document.getElementById('district').className = district.color + ' cursor-pointer';
+            document.getElementById('district').textContent = districtName;
+            document.getElementById('district').className = 'cyan-glow cursor-pointer';
             
             if (isFirstTime) {
                 // Starter kit for first-time district selection
@@ -9838,31 +9855,33 @@
                 gameState.resources.beer += 200;
                 gameState.player.cash += 5000;
                 
-                addConsoleMessage(`🏙️ Welcome to ${territory.name} in ${district.name}!`, 'cyan');
+                addConsoleMessage(`🏙️ Welcome to ${districtName}!`, 'cyan');
                 addConsoleMessage('🎁 Starter kit received: 10 thugs, 10 pistols, supplies, +$5,000', 'green');
-                addConsoleMessage(`⚡ Territory Special: ${territory.special}`, 'gold');
-                addConsoleMessage(`🎯 District Bonus: ${Object.entries(district.bonuses)[0][1]}`, 'blue');
+                addConsoleMessage(`🗽 Operating in ${districtData.realWorldName} with ${districtData.territoryCount} territories available`, 'blue');
+                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
             } else {
-                addConsoleMessage(`🚚 Moved to ${territory.name} in ${district.name}`, 'cyan');
-                addConsoleMessage(`⚡ New Territory Special: ${territory.special}`, 'gold');
+                addConsoleMessage(`🚚 Moved operations to ${districtName}`, 'cyan');
+                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
             }
             
             updateUI();
             calculateRank();
+            saveGameState();
             closeModal();
         }
 
-        function chooseDistrict(districtKey) {
-            const district = DISTRICTS[districtKey];
+        // Confirm specific territory selection - Updated for GameConstants  
+        function confirmNewTerritorySelection(districtName, territoryName) {
+            const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
+            const districtData = districts[districtName];
             const isFirstTime = !gameState.player.district;
             
-            gameState.player.district = districtKey;
-            // Remove territory when choosing just district (user can select territory separately)
-            delete gameState.player.territory;
+            gameState.player.district = districtName;
+            gameState.player.territory = territoryName;
             
             // Update UI
-            document.getElementById('district').textContent = district.name;
-            document.getElementById('district').className = district.color + ' cursor-pointer';
+            document.getElementById('district').textContent = `${districtName} - ${territoryName}`;
+            document.getElementById('district').className = 'cyan-glow cursor-pointer';
             
             if (isFirstTime) {
                 // Starter kit for first-time district selection
@@ -9872,17 +9891,18 @@
                 gameState.resources.beer += 200;
                 gameState.player.cash += 5000;
                 
-                addConsoleMessage(`🏙️ Welcome to ${district.name}!`, 'cyan');
+                addConsoleMessage(`🏙️ Welcome to ${territoryName} in ${districtName}!`, 'cyan');
                 addConsoleMessage('🎁 Starter kit received: 10 thugs, 10 pistols, supplies, +$5,000', 'green');
-                addConsoleMessage(`🎯 District Bonus: ${Object.entries(district.bonuses)[0][1]}`, 'gold');
-                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
+                addConsoleMessage(`🗽 Based in ${districtData.realWorldName} territory`, 'gold');
+                addConsoleMessage(`📍 Territory ${territoryName} claimed successfully`, 'blue');
             } else {
-                addConsoleMessage(`🚚 Moved to ${district.name}`, 'cyan');
-                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
+                addConsoleMessage(`🚚 Moved to ${territoryName} in ${districtName}`, 'cyan');
+                addConsoleMessage(`📍 New territory claimed: ${territoryName}`, 'gold');
             }
             
             updateUI();
             calculateRank();
+            saveGameState();
             closeModal();
         }
 
@@ -12087,6 +12107,26 @@
         // Start game (simplified)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎮 DOM loaded, waiting for scripts...');
+            
+            // Add robust event listener for district selection as fallback
+            setTimeout(() => {
+                const districtElement = document.getElementById('district');
+                if (districtElement) {
+                    // Add click event listener as backup to onclick attribute
+                    districtElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🏙️ District clicked via event listener');
+                        if (typeof selectDistrict === 'function') {
+                            selectDistrict();
+                        } else {
+                            console.error('❌ selectDistrict function not available');
+                        }
+                    });
+                    console.log('✅ District click listener added as fallback');
+                }
+            }, 100);
+            
             // Give more time for external scripts to load
             setTimeout(async () => {
                 console.log('🔄 Starting game initialization...');
