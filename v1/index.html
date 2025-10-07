@@ -2783,68 +2783,218 @@
             }
         }
 
-        // Empire City districts with bonuses - EXPANDED TO 5 DISTRICTS
+        // Empire City districts with bonuses - EXPANDED TO 5 DISTRICTS WITH TERRITORIES
         const DISTRICTS = {
             uptown: {
                 name: "Uptown High-Rollers",
-                description: "Velvet ropes, skyline penthouses, gold neon.",
+                description: "A northern enclave of bold gamblers and street kings, where high-stakes bets in coliseums fuel Gotti-era crews and resilient rackets.",
                 motto: "Fewer recruits. Bigger money. Keep it classy and paid.",
+                vibe: "Uptown High-Rollers pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.",
                 bonuses: {
+                    "Gamble's Edge": "+20% chance for high-risk/high-reward outcomes"
+                },
+                districtBonus: {
                     scoutRecruits: -0.35,    // -35% recruits
                     scoutQuality: 0.60,      // +60% quality
                     payout: 0.20,            // +20% payout
                     policeHeat: -0.30,       // -30% police heat
                     thugCost: 0.15           // +15% thug cost
                 },
-                color: "gold-text"
+                color: "gold-text",
+                territories: [
+                    {
+                        name: "Bronzini",
+                        description: "South Bronx's hip-hop hub, where rap battles mask drug rackets under neon murals.",
+                        special: "Hip-Hop Cipher: Grants rhythmic codes for encrypted messages (+intelligence bonus)."
+                    },
+                    {
+                        name: "Iron Rastelli", 
+                        description: "Riverdale's wooded estates, a hideout for exiled capos plotting in mansion cellars.",
+                        special: "Elite hideout provides +15% protection from raids."
+                    },
+                    {
+                        name: "Yankee Ward",
+                        description: "Stadium district, where Gambino's betting rackets thrive in roaring coliseums.",
+                        special: "Coliseum Echo: Summons crowd frenzy for morale boosts in turf wars."
+                    },
+                    {
+                        name: "Gotti Crest",
+                        description: "Morrisania's cultural heart, fiercely loyal to the Teflon Don's flashy legacy.",
+                        special: "Teflon Aura: Reduces damage from legal heat or snitches."
+                    },
+                    {
+                        name: "Tweed Bloom",
+                        description: "Highbridge's corrupt blocks, tied to Tammany Hall's bribes and mob fixes.",
+                        special: "Bribe Ledger: Instant access to political favors."
+                    }
+                ]
             },
             midtown: {
                 name: "Midtown Night Strip", 
-                description: "Theater district, club lines, wet asphalt.",
+                description: "The neon-drenched core of Empire City, where after-dark deals in theaters and bars light up Luciano's empire.",
                 motto: "Balanced, busy, and reliable. Grind the core loop here.",
+                vibe: "Midtown Night Strip is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.",
                 bonuses: {
+                    "Neon Veil": "+15% stealth and intrigue boost for espionage operations"
+                },
+                districtBonus: {
                     turnEfficiency: -0.20,   // -1 turn every 5th action
                     income: 0,               // Baseline
                     heat: 0,                 // Stable
                     balanced: true           // No major penalties
                 },
-                color: "cyan-glow"
+                color: "cyan-glow",
+                territories: [
+                    {
+                        name: "Luciano",
+                        description: "Times Square's neon nexus, where Lucky Luciano's Commission brokers city-wide deals.",
+                        special: "Commission Seal: Calls a temporary truce with rival families."
+                    },
+                    {
+                        name: "Lucky Ward",
+                        description: "Financial District's vaults, Luciano's bootleg empire laundering millions.",
+                        special: "Bootleg Vault: Hidden stash for emergency cash infusions."
+                    },
+                    {
+                        name: "Iron Gotti",
+                        description: "Harlem's jazzy streets, ruled by John Gotti's flashy crews and soulful fronts.",
+                        special: "Flash Parade: Distracts enemies with ostentatious displays."
+                    },
+                    {
+                        name: "Tweed Spire",
+                        description: "Tammany's political hive, fixing votes with mob muscle and Boss Tweed's legacy.",
+                        special: "Vote Rig: Manipulates elections for district-wide buffs."
+                    },
+                    {
+                        name: "Verrazzano Veil",
+                        description: "Lower East Side's immigrant alleys, Lansky's hub for smuggling and rackets.",
+                        special: "Smuggling network provides +10% income from drug operations."
+                    }
+                ]
             },
             crooklyn: {
-                name: "Crooklyn",
-                description: "Brooklyn streets, bodega corners, project towers.", 
+                name: "Crooklyn Heights",
+                description: "A sprawling web of street scams and waterfront hustles, where Gambino bosses and stoop enforcers run the show.", 
                 motto: "Real recognize real. Cheap muscle, fat crack yields.",
+                vibe: "Crooklyn Heights is Brooklyn's crooked heartbeat, from carnival cons to bridge-side betrayals.",
                 bonuses: {
+                    "Stoop Network": "+25% defense against raids, plus ally recruitment from diverse ethnic crews"
+                },
+                districtBonus: {
                     crackProduction: 0.35,   // +35% crack production
                     thugCost: -0.20,         // -20% thug cost
                     attackSuccess: 0.10,     // +10% attack success
                     policeHeat: 0.40         // +40% police heat
                 },
-                color: "magenta-glow"
+                color: "magenta-glow",
+                territories: [
+                    {
+                        name: "Gambino",
+                        description: "Brooklyn Heights' waterfront, Carlo Gambino's smuggling empire under the bridge.",
+                        special: "Bridge Toll: Controls chokepoints for toll-based income."
+                    },
+                    {
+                        name: "Iron Castellano",
+                        description: "Williamsburg's artsy lofts, scarred by Paul Castellano's steakhouse betrayal.",
+                        special: "Betrayal Blade: Backstab mechanic for turning enemy spies."
+                    },
+                    {
+                        name: "Corny Island",
+                        description: "Coney Island's carnival rackets, where rigged games and boardwalk stalls hide mob scams.",
+                        special: "Rigged Wheel: Random luck spinner for surprise power-ups."
+                    },
+                    {
+                        name: "Tammany Forge",
+                        description: "Bed-Stuy's resilient blocks, tied to corrupt unions and Tammany's graft.",
+                        special: "Union Hammer: Boosts labor rackets for resource multipliers."
+                    },
+                    {
+                        name: "Ellis Veil",
+                        description: "Bay Ridge's immigrant haunts, Profaci's olive oil scams in old-world taverns.",
+                        special: "Immigrant network provides +15% recruitment success."
+                    }
+                ]
             },
             docks: {
                 name: "Harbor Docks",
-                description: "Brooklyn Navy Yard, shipping containers, fog horns.",
+                description: "A foggy, isolated outpost of pier-side smuggling and exiled capos, where Anastasia's crews stash goods under lighthouses.",
                 motto: "Import/export empire. Big money, big risks.",
+                vibe: "Harbor Docks is Empire City's shadowy edge, perfect for quiet dumps and secret sails.",
                 bonuses: {
+                    "Fog Shroud": "+30% escape/sabotage success, ideal for smuggling or hit-and-runs"
+                },
+                districtBonus: {
                     vehicleAccess: 0.25,     // +25% vehicle availability
                     weaponImports: 0.30,     // +30% weapon variety
                     income: 0.15,            // +15% income
                     policeHeat: 0.25         // +25% police heat
                 },
-                color: "text-blue-400"
+                color: "text-blue-400",
+                territories: [
+                    {
+                        name: "Ferry Hold",
+                        description: "St. George's port, Albert Anastasia's smuggling hub under foggy lighthouses.",
+                        special: "Smuggler's Ghost: Invisible transport for goods or agents."
+                    },
+                    {
+                        name: "Narrows Veil",
+                        description: "Tottenville's quiet shores, tied to Verrazzano's strait and Mangano's dock wars.",
+                        special: "Strait Curse: Hazards enemies crossing into the district."
+                    },
+                    {
+                        name: "Verrazzano",
+                        description: "A coastal cove, early mob dock rackets under the explorer's name.",
+                        special: "Explorer's Cache: Ancient relic for navigation bonuses."
+                    },
+                    {
+                        name: "Lovelace",
+                        description: "Richmondtown's colonial relics, a front for old-money mob operations.",
+                        special: "Colonial Deed: Legal loophole for claiming neutral turf."
+                    }
+                ]
             },
             financial: {
                 name: "Financial District",
-                description: "Wall Street towers, suited businessmen, hidden deals.",
+                description: "A sprawling mosaic of global money flows and airport heists, where Lucchese bosses launder fortunes through markets and skyscrapers.",
                 motto: "Corporate fronts and money laundering. Elite operations.",
+                vibe: "Financial District reimagines Queens as a diverse banking empire of ethnic crews and offshore scams.",
                 bonuses: {
+                    "Launder Flow": "+10% income from all rackets, with global trade links for rare imports"
+                },
+                districtBonus: {
                     moneyLaundering: 0.50,   // +50% cash from drug sales
                     heatReduction: -0.25,    // -25% heat from activities
                     respectGain: 0.20,       // +20% respect gain
                     storePrices: 0.20        // +20% store prices
                 },
-                color: "text-emerald-400"
+                color: "text-emerald-400",
+                territories: [
+                    {
+                        name: "Lucchese",
+                        description: "Flushing's vibrant bazaars, Tommy Lucchese's garment scams weave global deals.",
+                        special: "Garment Web: Global spy network for intel on foreign threats."
+                    },
+                    {
+                        name: "Jade Profaci",
+                        description: "Jackson Heights' cultural mix, Joe Profaci's extortion in South Asian markets.",
+                        special: "Extortion Ledger: Debt collection for passive income."
+                    },
+                    {
+                        name: "Airport Ward",
+                        description: "Long Island City's skyline, Genovese's airport heists via LaGuardia.",
+                        special: "Heist Jet: Fast travel or aerial strikes."
+                    },
+                    {
+                        name: "Wave Gambino",
+                        description: "Rockaway's salty shores, Carlo Gambino's waterfront smuggling drops.",
+                        special: "Waterfront drops provide +20% smuggling success."
+                    },
+                    {
+                        name: "Banana Hold",
+                        description: "Jamaica's reggae markets, Joe Bonanno's fruit racket fronts.",
+                        special: "Fruit Cartel: Exotic goods trade for rare upgrades."
+                    }
+                ]
             }
         };
 
@@ -7966,7 +8116,11 @@
             if (districtEl) {
                 if (gameState.player.district && DISTRICTS[gameState.player.district]) {
                     const district = DISTRICTS[gameState.player.district];
-                    districtEl.textContent = district.name;
+                    let displayText = district.name;
+                    if (gameState.player.territory) {
+                        displayText += ` - ${gameState.player.territory}`;
+                    }
+                    districtEl.textContent = displayText;
                     districtEl.className = district.color + ' cursor-pointer';
                 } else {
                     districtEl.textContent = 'Choose District';
@@ -9518,45 +9672,184 @@
         }
 
         // District Selection
+        // District Selection with Territory Details
         function selectDistrict() {
             console.log('🏙️ District selection clicked');
             console.log('🏙️ DISTRICTS object:', DISTRICTS);
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div class="game-panel rounded-lg p-6 max-w-2xl w-full">
-                        <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">CHOOSE YOUR DISTRICT</h3>
-                        <p class="text-sm text-gray-400 mb-6 text-center">Each district offers different advantages and challenges:</p>
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div class="game-panel rounded-lg p-6 max-w-4xl w-full my-8 max-h-[85vh] overflow-y-auto">
+                        <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">CHOOSE YOUR DISTRICT & TERRITORY</h3>
+                        <p class="text-sm text-gray-400 mb-6 text-center">Each district contains multiple territories with unique benefits and mafia heritage:</p>
                         
-                        <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="space-y-6">
                             ${Object.entries(DISTRICTS).map(([key, district]) => `
-                                <div class="district-card rounded-lg p-4 cursor-pointer border border-gray-600 hover:border-cyan-400 transition-all" 
-                                     onclick="chooseDistrict('${key}')">
-                                    <h4 class="text-lg font-bold ${district.color} mb-2">${district.name}</h4>
-                                    <p class="text-xs text-gray-400 mb-3">${district.description}</p>
-                                    <p class="text-sm mb-3 italic">"${district.motto}"</p>
-                                    <div class="text-xs space-y-1 text-gray-400">
-                                        ${Object.entries(district.bonuses).map(([bonus, value]) => {
-                                            const sign = value > 0 ? '+' : '';
-                                            const percent = Math.abs(value * 100);
-                                            return `<div>• ${bonus}: ${sign}${percent}%</div>`;
-                                        }).join('')}
+                                <div class="district-section border border-gray-700 rounded-lg p-4 bg-gray-800/30">
+                                    <div class="district-header cursor-pointer hover:bg-gray-700/30 p-3 rounded" 
+                                         onclick="toggleDistrict('${key}')">
+                                        <div class="flex justify-between items-center">
+                                            <div>
+                                                <h4 class="text-xl font-bold ${district.color} mb-2">${district.name}</h4>
+                                                <p class="text-sm text-gray-400 mb-2">${district.description}</p>
+                                                <p class="text-sm italic text-gray-300">"${district.motto}"</p>
+                                            </div>
+                                            <div class="text-2xl text-gray-400">
+                                                <span id="toggle-${key}">▼</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3 text-xs text-cyan-400">
+                                            <strong>District Bonus:</strong> ${Object.entries(district.bonuses)[0][1]}
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="territories-${key}" class="territories-container mt-4 hidden">
+                                        <div class="mb-3 p-3 bg-gray-900/50 rounded">
+                                            <p class="text-sm text-yellow-400 mb-2"><strong>District Vibe:</strong></p>
+                                            <p class="text-sm text-gray-300">${district.vibe}</p>
+                                        </div>
+                                        
+                                        <div class="grid md:grid-cols-2 gap-3">
+                                            ${district.territories.map((territory, index) => `
+                                                <div class="territory-card border border-gray-600 rounded p-3 cursor-pointer hover:border-${district.color.replace('text-', '').replace('-glow', '').replace('-text', '')}-400 hover:bg-gray-700/30 transition-all"
+                                                     onclick="selectTerritory('${key}', '${territory.name}')">
+                                                    <h5 class="font-bold text-white mb-2">${territory.name}</h5>
+                                                    <p class="text-xs text-gray-400 mb-2">${territory.description}</p>
+                                                    <div class="text-xs text-green-400">
+                                                        <strong>Special:</strong> ${territory.special}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        
+                                        <div class="mt-4 text-center">
+                                            <button onclick="chooseDistrict('${key}')" 
+                                                    class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded font-bold hover:from-purple-500 hover:to-blue-500 transition-all">
+                                                Choose ${district.name}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                         
                         ${gameState.player.district ? `
-                            <div class="text-center mb-4">
-                                <p class="text-sm text-gray-400">Current: <span class="${DISTRICTS[gameState.player.district].color}">${DISTRICTS[gameState.player.district].name}</span></p>
+                            <div class="text-center mt-6 p-3 bg-gray-800/50 rounded">
+                                <p class="text-sm text-gray-400">Current District: <span class="${DISTRICTS[gameState.player.district].color}">${DISTRICTS[gameState.player.district].name}</span></p>
+                                ${gameState.player.territory ? `<p class="text-xs text-gray-500">Territory: ${gameState.player.territory}</p>` : ''}
                             </div>
                         ` : ''}
                         
-                        <button onclick="closeModal()" class="w-full py-2 bg-gray-700 rounded">Cancel</button>
+                        <button onclick="closeModal()" class="w-full mt-4 py-3 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">Cancel</button>
                     </div>
                 </div>
             `;
             document.getElementById('modalContainer').innerHTML = modal;
+        }
+
+        // Toggle district territory display
+        function toggleDistrict(districtKey) {
+            const territoriesContainer = document.getElementById(`territories-${districtKey}`);
+            const toggleIcon = document.getElementById(`toggle-${districtKey}`);
+            
+            if (territoriesContainer.classList.contains('hidden')) {
+                // Close all other districts first
+                Object.keys(DISTRICTS).forEach(key => {
+                    if (key !== districtKey) {
+                        document.getElementById(`territories-${key}`).classList.add('hidden');
+                        document.getElementById(`toggle-${key}`).textContent = '▼';
+                    }
+                });
+                
+                territoriesContainer.classList.remove('hidden');
+                toggleIcon.textContent = '▲';
+            } else {
+                territoriesContainer.classList.add('hidden');
+                toggleIcon.textContent = '▼';
+            }
+        }
+
+        // Select specific territory within district
+        function selectTerritory(districtKey, territoryName) {
+            const district = DISTRICTS[districtKey];
+            const territory = district.territories.find(t => t.name === territoryName);
+            
+            if (territory) {
+                // Show territory details
+                const detailModal = `
+                    <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4">
+                        <div class="game-panel rounded-lg p-6 max-w-lg w-full">
+                            <h3 class="text-xl font-bold ${district.color} mb-3">${territory.name}</h3>
+                            <p class="text-sm text-gray-400 mb-4">${district.name} Territory</p>
+                            
+                            <div class="space-y-4">
+                                <div class="p-3 bg-gray-800/50 rounded">
+                                    <h4 class="font-bold text-white mb-2">Description</h4>
+                                    <p class="text-sm text-gray-300">${territory.description}</p>
+                                </div>
+                                
+                                <div class="p-3 bg-green-900/30 rounded">
+                                    <h4 class="font-bold text-green-400 mb-2">Special Ability</h4>
+                                    <p class="text-sm text-green-300">${territory.special}</p>
+                                </div>
+                                
+                                <div class="p-3 bg-blue-900/30 rounded">
+                                    <h4 class="font-bold text-blue-400 mb-2">District Bonus</h4>
+                                    <p class="text-sm text-blue-300">${Object.entries(district.bonuses)[0][1]}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3 mt-6">
+                                <button onclick="confirmTerritorySelection('${districtKey}', '${territoryName}')" 
+                                        class="flex-1 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded font-bold hover:from-green-500 hover:to-emerald-500 transition-all">
+                                    Claim Territory
+                                </button>
+                                <button onclick="selectDistrict()" 
+                                        class="flex-1 py-2 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">
+                                    Back to Districts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('modalContainer').innerHTML = detailModal;
+            }
+        }
+
+        // Confirm territory selection
+        function confirmTerritorySelection(districtKey, territoryName) {
+            const district = DISTRICTS[districtKey];
+            const territory = district.territories.find(t => t.name === territoryName);
+            const isFirstTime = !gameState.player.district;
+            
+            gameState.player.district = districtKey;
+            gameState.player.territory = territoryName;
+            
+            // Update UI
+            document.getElementById('district').textContent = `${district.name} - ${territoryName}`;
+            document.getElementById('district').className = district.color + ' cursor-pointer';
+            
+            if (isFirstTime) {
+                // Starter kit for first-time district selection
+                gameState.resources.thugs += 10;
+                gameState.resources.weapons.pistols += 10;
+                gameState.resources.condoms += 500;
+                gameState.resources.beer += 200;
+                gameState.player.cash += 5000;
+                
+                addConsoleMessage(`🏙️ Welcome to ${territory.name} in ${district.name}!`, 'cyan');
+                addConsoleMessage('🎁 Starter kit received: 10 thugs, 10 pistols, supplies, +$5,000', 'green');
+                addConsoleMessage(`⚡ Territory Special: ${territory.special}`, 'gold');
+                addConsoleMessage(`🎯 District Bonus: ${Object.entries(district.bonuses)[0][1]}`, 'blue');
+            } else {
+                addConsoleMessage(`🚚 Moved to ${territory.name} in ${district.name}`, 'cyan');
+                addConsoleMessage(`⚡ New Territory Special: ${territory.special}`, 'gold');
+            }
+            
+            updateUI();
+            calculateRank();
+            closeModal();
         }
 
         function chooseDistrict(districtKey) {
@@ -9564,6 +9857,8 @@
             const isFirstTime = !gameState.player.district;
             
             gameState.player.district = districtKey;
+            // Remove territory when choosing just district (user can select territory separately)
+            delete gameState.player.territory;
             
             // Update UI
             document.getElementById('district').textContent = district.name;
@@ -9577,11 +9872,13 @@
                 gameState.resources.beer += 200;
                 gameState.player.cash += 5000;
                 
-                addConsoleMessage(`Welcome to ${district.name}!`, 'cyan');
-                addConsoleMessage('Starter kit received: 10 thugs, 10 pistols, supplies, +$5,000', 'green');
-                addConsoleMessage(`District bonus: ${district.motto}`, 'gold');
+                addConsoleMessage(`🏙️ Welcome to ${district.name}!`, 'cyan');
+                addConsoleMessage('🎁 Starter kit received: 10 thugs, 10 pistols, supplies, +$5,000', 'green');
+                addConsoleMessage(`🎯 District Bonus: ${Object.entries(district.bonuses)[0][1]}`, 'gold');
+                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
             } else {
-                addConsoleMessage(`Moved to ${district.name}`, 'cyan');
+                addConsoleMessage(`🚚 Moved to ${district.name}`, 'cyan');
+                addConsoleMessage('💡 Tip: Click "Choose District" again to select a specific territory!', 'blue');
             }
             
             updateUI();
