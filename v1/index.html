@@ -12107,6 +12107,26 @@
         // Start game (simplified)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎮 DOM loaded, waiting for scripts...');
+            
+            // Add robust event listener for district selection as fallback
+            setTimeout(() => {
+                const districtElement = document.getElementById('district');
+                if (districtElement) {
+                    // Add click event listener as backup to onclick attribute
+                    districtElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🏙️ District clicked via event listener');
+                        if (typeof selectDistrict === 'function') {
+                            selectDistrict();
+                        } else {
+                            console.error('❌ selectDistrict function not available');
+                        }
+                    });
+                    console.log('✅ District click listener added as fallback');
+                }
+            }, 100);
+            
             // Give more time for external scripts to load
             setTimeout(async () => {
                 console.log('🔄 Starting game initialization...');
