@@ -9,8 +9,8 @@ describe('GameConstants', () => {
     test('should have exactly 5 districts', () => {
       expect(GameConstants.DISTRICTS).toHaveLength(5);
       expect(GameConstants.DISTRICTS).toEqual([
-        'Uptown Plaza',
-        'Midtown Market',
+        'Uptown High-Rollers',
+        'Midtown Night Strip',
         'Crooklyn Heights',
         'Harbor Docks',
         'Financial District'
@@ -23,8 +23,8 @@ describe('GameConstants', () => {
     });
 
     test('should have correct territory counts per district', () => {
-      expect(GameConstants.getTerritoryCountForDistrict('Uptown Plaza')).toBe(15);
-      expect(GameConstants.getTerritoryCountForDistrict('Midtown Market')).toBe(20);
+      expect(GameConstants.getTerritoryCountForDistrict('Uptown High-Rollers')).toBe(15);
+      expect(GameConstants.getTerritoryCountForDistrict('Midtown Night Strip')).toBe(20);
       expect(GameConstants.getTerritoryCountForDistrict('Crooklyn Heights')).toBe(30);
       expect(GameConstants.getTerritoryCountForDistrict('Harbor Docks')).toBe(6);
       expect(GameConstants.getTerritoryCountForDistrict('Financial District')).toBe(28);
@@ -39,10 +39,13 @@ describe('GameConstants', () => {
 
   describe('District Information', () => {
     test('should return correct district info', () => {
-      const uptownInfo = GameConstants.getDistrictInfo('Uptown Plaza');
+      const uptownInfo = GameConstants.getDistrictInfo('Uptown High-Rollers');
       expect(uptownInfo).toEqual({
         realWorldName: 'Bronx',
         territoryCount: 15,
+        vibe: expect.any(String),
+        whyFits: expect.any(String),
+        districtBonus: expect.any(Object),
         territories: expect.any(Array)
       });
       expect(uptownInfo.territories).toHaveLength(15);
@@ -53,8 +56,8 @@ describe('GameConstants', () => {
     });
 
     test('should have correct real world names', () => {
-      expect(GameConstants.getDistrictInfo('Uptown Plaza').realWorldName).toBe('Bronx');
-      expect(GameConstants.getDistrictInfo('Midtown Market').realWorldName).toBe('Manhattan');
+      expect(GameConstants.getDistrictInfo('Uptown High-Rollers').realWorldName).toBe('Bronx');
+      expect(GameConstants.getDistrictInfo('Midtown Night Strip').realWorldName).toBe('Manhattan');
       expect(GameConstants.getDistrictInfo('Crooklyn Heights').realWorldName).toBe('Brooklyn');
       expect(GameConstants.getDistrictInfo('Harbor Docks').realWorldName).toBe('Staten Island');
       expect(GameConstants.getDistrictInfo('Financial District').realWorldName).toBe('Queens');
@@ -63,11 +66,11 @@ describe('GameConstants', () => {
 
   describe('Territory Validation', () => {
     test('should validate known territories', () => {
-      expect(GameConstants.isValidTerritory('South Bronx Strip')).toBe(true);
-      expect(GameConstants.isValidTerritory('Times Square Center')).toBe(true);
-      expect(GameConstants.isValidTerritory('Downtown Brooklyn')).toBe(true);
-      expect(GameConstants.isValidTerritory('St. George Terminal')).toBe(true);
-      expect(GameConstants.isValidTerritory('Long Island City')).toBe(true);
+      expect(GameConstants.isValidTerritory('Bronzini')).toBe(true);
+      expect(GameConstants.isValidTerritory('Luciano')).toBe(true);
+      expect(GameConstants.isValidTerritory('Gambino')).toBe(true);
+      expect(GameConstants.isValidTerritory('Ferry Hold')).toBe(true);
+      expect(GameConstants.isValidTerritory('Lucchese')).toBe(true);
     });
 
     test('should reject invalid territories', () => {
@@ -77,8 +80,8 @@ describe('GameConstants', () => {
     });
 
     test('should validate known districts', () => {
-      expect(GameConstants.isValidDistrict('Uptown Plaza')).toBe(true);
-      expect(GameConstants.isValidDistrict('Midtown Market')).toBe(true);
+      expect(GameConstants.isValidDistrict('Uptown High-Rollers')).toBe(true);
+      expect(GameConstants.isValidDistrict('Midtown Night Strip')).toBe(true);
       expect(GameConstants.isValidDistrict('Crooklyn Heights')).toBe(true);
       expect(GameConstants.isValidDistrict('Harbor Docks')).toBe(true);
       expect(GameConstants.isValidDistrict('Financial District')).toBe(true);
@@ -93,11 +96,11 @@ describe('GameConstants', () => {
 
   describe('Territory-District Mapping', () => {
     test('should correctly map territories to districts', () => {
-      expect(GameConstants.getDistrictForTerritory('South Bronx Strip')).toBe('Uptown Plaza');
-      expect(GameConstants.getDistrictForTerritory('Times Square Center')).toBe('Midtown Market');
-      expect(GameConstants.getDistrictForTerritory('Downtown Brooklyn')).toBe('Crooklyn Heights');
-      expect(GameConstants.getDistrictForTerritory('St. George Terminal')).toBe('Harbor Docks');
-      expect(GameConstants.getDistrictForTerritory('Long Island City')).toBe('Financial District');
+      expect(GameConstants.getDistrictForTerritory('Bronzini')).toBe('Uptown High-Rollers');
+      expect(GameConstants.getDistrictForTerritory('Luciano')).toBe('Midtown Night Strip');
+      expect(GameConstants.getDistrictForTerritory('Gambino')).toBe('Crooklyn Heights');
+      expect(GameConstants.getDistrictForTerritory('Ferry Hold')).toBe('Harbor Docks');
+      expect(GameConstants.getDistrictForTerritory('Lucchese')).toBe('Financial District');
     });
 
     test('should return null for invalid territory', () => {
@@ -105,14 +108,14 @@ describe('GameConstants', () => {
     });
 
     test('should get all territories for a district', () => {
-      const uptownTerritories = GameConstants.getTerritoriesForDistrict('Uptown Plaza');
+      const uptownTerritories = GameConstants.getTerritoriesForDistrict('Uptown High-Rollers');
       expect(uptownTerritories).toHaveLength(15);
-      expect(uptownTerritories).toContain('South Bronx Strip');
-      expect(uptownTerritories).toContain('Yankee Stadium Block');
+      expect(uptownTerritories).toContain('Bronzini');
+      expect(uptownTerritories).toContain('Yankee Ward');
 
       const harborTerritories = GameConstants.getTerritoriesForDistrict('Harbor Docks');
       expect(harborTerritories).toHaveLength(6);
-      expect(harborTerritories).toContain('St. George Terminal');
+      expect(harborTerritories).toContain('Ferry Hold');
     });
 
     test('should return empty array for invalid district', () => {
@@ -121,30 +124,28 @@ describe('GameConstants', () => {
   });
 
   describe('Specific Territory Verification', () => {
-    test('Uptown Plaza should have correct territories', () => {
-      const territories = GameConstants.getTerritoriesForDistrict('Uptown Plaza');
+    test('Uptown High-Rollers should have correct territories', () => {
+      const territories = GameConstants.getTerritoriesForDistrict('Uptown High-Rollers');
       expect(territories).toEqual([
-        'South Bronx Strip', 'Yankee Stadium Block', 'Grand Concourse North', 'Grand Concourse South',
-        'Bronx River East', 'Bronx River West', 'Mott Haven', 'Melrose Avenue',
-        'Hunts Point Market', 'Port Morris', 'Morrisania', 'Crotona Park',
-        'Tremont Square', 'Fordham Road', 'Belmont Strip'
+        'Bronzini', 'Iron Rastelli', 'Yankee Ward', 'Gotti Crest', 'Tweed Bloom',
+        'Galante', 'Massino', 'Basciano', 'Montagna', 'Draft Shadow',
+        'Polito', 'Santapaola', 'Cammarata', 'Cotroni', 'Banana Field'
       ]);
     });
 
     test('Harbor Docks should have correct territories', () => {
       const territories = GameConstants.getTerritoriesForDistrict('Harbor Docks');
       expect(territories).toEqual([
-        'St. George Terminal', 'Port Richmond', 'New Brighton',
-        'Stapleton Docks', 'South Beach', 'Tottenville'
+        'Ferry Hold', 'Narrows Veil', 'Verrazzano', 'Lovelace', 'Colve', 'Nicolls'
       ]);
     });
 
     test('Crooklyn Heights should have 30 territories', () => {
       const territories = GameConstants.getTerritoriesForDistrict('Crooklyn Heights');
       expect(territories).toHaveLength(30);
-      expect(territories).toContain('Downtown Brooklyn');
-      expect(territories).toContain('Coney Island');
-      expect(territories).toContain('Clinton Hill');
+      expect(territories).toContain('Gambino');
+      expect(territories).toContain('Corny Island');
+      expect(territories).toContain('Galante');
     });
   });
 

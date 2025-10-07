@@ -9671,7 +9671,7 @@
         }
 
         // District Selection
-        // District Selection with Territory Details - Updated to use GameConstants
+        // District Selection with Enhanced Mafia-Inspired Details
         function selectDistrict() {
             console.log('🏙️ District selection clicked');
             console.log('🏙️ GameConstants available:', typeof window.GameConstants !== 'undefined');
@@ -9687,59 +9687,169 @@
             
             const modal = `
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div class="game-panel rounded-lg p-6 max-w-4xl w-full my-8 max-h-[85vh] overflow-y-auto">
-                        <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">CHOOSE YOUR DISTRICT & TERRITORY</h3>
-                        <p class="text-sm text-gray-400 mb-6 text-center">Empire City has 5 districts with 99 total territories. Each offers unique opportunities:</p>
+                    <div class="game-panel rounded-lg p-6 max-w-5xl w-full my-8 max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">🏙️ CHOOSE YOUR EMPIRE DISTRICT</h3>
+                        <p class="text-sm text-gray-400 mb-6 text-center">Empire City's five districts each offer unique mafia-inspired advantages. Choose wisely - your empire depends on it.</p>
                         
                         <div class="space-y-6">
                             ${Object.entries(districts).map(([districtName, districtData]) => `
-                                <div class="district-section border border-gray-700 rounded-lg p-4 bg-gray-800/30">
-                                    <div class="district-header cursor-pointer hover:bg-gray-700/30 p-3 rounded" 
-                                         onclick="toggleDistrictTerritories('${districtName}')">
-                                        <div class="flex justify-between items-center">
-                                            <div>
-                                                <h4 class="text-xl font-bold cyan-glow mb-2">${districtName}</h4>
-                                                <p class="text-sm text-gray-400 mb-2">Based on ${districtData.realWorldName}</p>
-                                                <p class="text-sm text-gold-text font-bold">${districtData.territoryCount} Territories Available</p>
+                                <div class="district-card border border-gray-600 rounded-lg p-5 bg-gradient-to-r from-gray-800/40 to-gray-700/40 hover:from-gray-700/50 hover:to-gray-600/50 transition-all">
+                                    <!-- District Header -->
+                                    <div class="district-header mb-4">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex-1">
+                                                <h4 class="text-2xl font-bold cyan-glow mb-2">${districtName}</h4>
+                                                <p class="text-sm text-amber-400 mb-1">🌍 Based on ${districtData.realWorldName} • ${districtData.territoryCount} Territories</p>
+                                                <p class="text-sm text-purple-400 font-semibold">💪 ${districtData.districtBonus.name}</p>
                                             </div>
-                                            <div class="text-2xl text-gray-400">
-                                                <span id="toggle-${districtName.replace(/\s+/g, '-')}">▼</span>
-                                            </div>
+                                            <button onclick="toggleDistrictDetails('${districtName.replace(/\s+/g, '-')}')" 
+                                                    class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 rounded text-sm font-bold transition-all">
+                                                View Details
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Vibe Description -->
+                                        <div class="mb-3 p-3 bg-gray-900/60 rounded border-l-4 border-cyan-500">
+                                            <p class="text-sm text-gray-300 italic">${districtData.vibe}</p>
+                                        </div>
+                                        
+                                        <!-- District Bonus -->
+                                        <div class="mb-4 p-3 bg-purple-900/30 rounded border border-purple-600/30">
+                                            <p class="text-sm text-purple-300">
+                                                <span class="text-purple-400 font-bold">🎯 District Bonus:</span> 
+                                                ${districtData.districtBonus.description}
+                                            </p>
                                         </div>
                                     </div>
                                     
-                                    <div id="territories-${districtName.replace(/\s+/g, '-')}" class="territories-container mt-4 hidden">
-                                        <div class="mb-3 p-3 bg-gray-900/50 rounded">
-                                            <p class="text-sm text-yellow-400 mb-2"><strong>All ${districtData.territoryCount} Territories:</strong></p>
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-300">
-                                                ${districtData.territories.map(territory => `
-                                                    <div class="territory-item p-2 bg-gray-800/50 rounded cursor-pointer hover:bg-cyan-900/30 transition-all"
-                                                         onclick="selectSpecificTerritory('${districtName}', '${territory}')">
-                                                        ${territory}
+                                    <!-- Territory Details (Initially Hidden) -->
+                                    <div id="details-${districtName.replace(/\s+/g, '-')}" class="territory-details hidden">
+                                        <div class="mb-4 p-3 bg-yellow-900/20 rounded border border-yellow-600/30">
+                                            <p class="text-sm text-yellow-300">
+                                                <span class="text-yellow-400 font-bold">🏗️ Why ${districtData.realWorldName}?</span> 
+                                                ${districtData.whyFits}
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Key Territories -->
+                                        <div class="mb-4">
+                                            <h5 class="text-lg font-bold text-cyan-400 mb-3">🏴‍☠️ Key Territories</h5>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                ${districtData.territories.slice(0, 6).map(territory => `
+                                                    <div class="territory-card p-3 bg-gray-800/50 rounded border border-gray-600/50 hover:border-cyan-500/50 transition-all cursor-pointer"
+                                                         onclick="selectSpecificTerritory('${districtName}', '${territory.name}')">
+                                                        <div class="flex justify-between items-start mb-2">
+                                                            <h6 class="font-bold text-gold-text">${territory.name}</h6>
+                                                            ${territory.trait ? `<span class="text-xs text-green-400">⭐</span>` : ''}
+                                                        </div>
+                                                        <p class="text-xs text-gray-400 mb-2">${territory.description}</p>
+                                                        ${territory.trait ? `
+                                                            <div class="text-xs text-green-300 bg-green-900/30 rounded px-2 py-1">
+                                                                <span class="text-green-400 font-bold">Special:</span> ${territory.trait}
+                                                            </div>
+                                                        ` : ''}
                                                     </div>
                                                 `).join('')}
                                             </div>
+                                            
+                                            ${districtData.territories.length > 6 ? `
+                                                <div class="mt-3 text-center">
+                                                    <button onclick="showAllTerritories('${districtName}')" 
+                                                            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm font-bold transition-all">
+                                                        View All ${districtData.territoryCount} Territories
+                                                    </button>
+                                                </div>
+                                            ` : ''}
                                         </div>
-                                        
-                                        <div class="mt-4 text-center">
-                                            <button onclick="chooseNewDistrict('${districtName}')" 
-                                                    class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded font-bold hover:from-purple-500 hover:to-blue-500 transition-all">
-                                                Choose ${districtName}
-                                            </button>
-                                        </div>
+                                    </div>
+                                    
+                                    <!-- Choose District Button -->
+                                    <div class="text-center mt-4">
+                                        <button onclick="chooseNewDistrict('${districtName}')" 
+                                                class="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded font-bold text-lg transition-all transform hover:scale-105">
+                                            ⚡ Claim ${districtName} ⚡
+                                        </button>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                         
                         ${gameState.player.district ? `
-                            <div class="text-center mt-6 p-3 bg-gray-800/50 rounded">
-                                <p class="text-sm text-gray-400">Current District: <span class="cyan-glow">${gameState.player.district}</span></p>
-                                ${gameState.player.territory ? `<p class="text-xs text-gray-500">Territory: ${gameState.player.territory}</p>` : ''}
+                            <div class="text-center mt-6 p-4 bg-gray-800/50 rounded border border-cyan-500/30">
+                                <p class="text-sm text-gray-400">Current District: <span class="cyan-glow font-bold">${gameState.player.district}</span></p>
+                                ${gameState.player.territory ? `<p class="text-xs text-gray-500 mt-1">Territory: <span class="text-gold-text">${gameState.player.territory}</span></p>` : ''}
                             </div>
                         ` : ''}
                         
-                        <button onclick="closeModal()" class="w-full mt-4 py-3 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">Cancel</button>
+                        <button onclick="closeModal()" class="w-full mt-6 py-3 bg-gray-700 hover:bg-gray-600 rounded font-bold transition-all">Close</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalContainer').innerHTML = modal;
+        }
+
+        // Toggle district details display
+        function toggleDistrictDetails(safeDistrictId) {
+            const detailsContainer = document.getElementById(`details-${safeDistrictId}`);
+            const button = event.target;
+            
+            if (detailsContainer && detailsContainer.classList.contains('hidden')) {
+                detailsContainer.classList.remove('hidden');
+                button.textContent = 'Hide Details';
+                button.classList.add('bg-red-600', 'hover:bg-red-500');
+                button.classList.remove('bg-cyan-600', 'hover:bg-cyan-500');
+            } else if (detailsContainer) {
+                detailsContainer.classList.add('hidden');
+                button.textContent = 'View Details';
+                button.classList.remove('bg-red-600', 'hover:bg-red-500');
+                button.classList.add('bg-cyan-600', 'hover:bg-cyan-500');
+            }
+        }
+
+        // Show all territories for a district
+        function showAllTerritories(districtName) {
+            const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
+            const districtData = districts[districtName];
+            
+            if (!districtData) {
+                console.error('District not found:', districtName);
+                return;
+            }
+            
+            const modal = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div class="game-panel rounded-lg p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">🏴‍☠️ ${districtName} - All Territories</h3>
+                        <p class="text-sm text-gray-400 mb-6 text-center">${districtData.territoryCount} mafia-inspired territories await your command</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${districtData.territories.map(territory => `
+                                <div class="territory-card p-4 bg-gray-800/50 rounded border border-gray-600/50 hover:border-cyan-500/50 transition-all cursor-pointer"
+                                     onclick="selectSpecificTerritory('${districtName}', '${territory.name}')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h6 class="font-bold text-gold-text">${territory.name}</h6>
+                                        ${territory.trait ? `<span class="text-sm text-green-400">⭐ Special</span>` : ''}
+                                    </div>
+                                    <p class="text-sm text-gray-400 mb-3">${territory.description}</p>
+                                    ${territory.trait ? `
+                                        <div class="text-xs text-green-300 bg-green-900/30 rounded px-2 py-1">
+                                            <span class="text-green-400 font-bold">Unique Trait:</span> ${territory.trait}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="chooseNewDistrict('${districtName}')" 
+                                    class="flex-1 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded font-bold transition-all">
+                                ⚡ Claim ${districtName} ⚡
+                            </button>
+                            <button onclick="selectDistrict()" 
+                                    class="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded font-bold transition-all">
+                                ← Back to Districts
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -9772,7 +9882,7 @@
             }
         }
 
-        // Select specific territory within district - Updated for GameConstants
+        // Select specific territory within district - Enhanced for Mafia Details
         function selectSpecificTerritory(districtName, territoryName) {
             const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
             const districtData = districts[districtName];
@@ -9782,44 +9892,92 @@
                 return;
             }
             
-            if (!districtData.territories.includes(territoryName)) {
+            // Find the territory object
+            const territory = districtData.territories.find(t => 
+                (typeof t === 'string' ? t : t.name) === territoryName
+            );
+            
+            if (!territory) {
                 console.error('Territory not found in district:', territoryName, districtName);
                 return;
             }
             
-            // Show territory details
+            // Extract territory data (handle both old string format and new object format)
+            const territoryObj = typeof territory === 'string' ? 
+                { name: territory, description: 'A strategic location in your empire.' } : territory;
+            
+            // Show enhanced territory details
             const detailModal = `
                 <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full">
-                        <h3 class="text-xl font-bold cyan-glow mb-3">${territoryName}</h3>
-                        <p class="text-sm text-gray-400 mb-4">${districtName} Territory</p>
+                        <h3 class="text-2xl font-bold cyan-glow mb-3">🏴‍☠️ ${territoryObj.name}</h3>
+                        <p class="text-sm text-amber-400 mb-4">${districtName} • ${districtData.realWorldName}</p>
                         
                         <div class="space-y-4">
-                            <div class="p-3 bg-gray-800/50 rounded">
-                                <h4 class="font-bold text-white mb-2">District Information</h4>
-                                <p class="text-sm text-gray-300">Based on ${districtData.realWorldName}</p>
-                                <p class="text-sm text-cyan-400">One of ${districtData.territoryCount} territories in ${districtName}</p>
+                            <!-- Territory Description -->
+                            <div class="p-4 bg-gray-800/50 rounded border-l-4 border-cyan-500">
+                                <h4 class="font-bold text-cyan-400 mb-2">🏘️ Territory Overview</h4>
+                                <p class="text-sm text-gray-300">${territoryObj.description}</p>
                             </div>
                             
-                            <div class="p-3 bg-green-900/30 rounded">
-                                <h4 class="font-bold text-green-400 mb-2">Territory Benefits</h4>
-                                <p class="text-sm text-green-300">Strategic location in ${territoryName} offers unique opportunities for your empire.</p>
+                            <!-- District Bonus -->
+                            <div class="p-3 bg-purple-900/30 rounded border border-purple-600/30">
+                                <h4 class="font-bold text-purple-400 mb-2">🎯 District Bonus: ${districtData.districtBonus.name}</h4>
+                                <p class="text-sm text-purple-300">${districtData.districtBonus.description}</p>
                             </div>
                             
-                            <div class="p-3 bg-blue-900/30 rounded">
-                                <h4 class="font-bold text-blue-400 mb-2">Empire Expansion</h4>
-                                <p class="text-sm text-blue-300">Claim this territory to establish your base of operations in ${districtName}.</p>
+                            ${territoryObj.trait ? `
+                                <!-- Special Territory Trait -->
+                                <div class="p-3 bg-green-900/30 rounded border border-green-600/30">
+                                    <h4 class="font-bold text-green-400 mb-2">⭐ Unique Territory Trait</h4>
+                                    <p class="text-sm text-green-300">${territoryObj.trait}</p>
+                                </div>
+                            ` : ''}
+                            
+                            <!-- Empire Benefits -->
+                            <div class="p-3 bg-blue-900/30 rounded border border-blue-600/30">
+                                <h4 class="font-bold text-blue-400 mb-2">🏛️ Empire Benefits</h4>
+                                <p class="text-sm text-blue-300">Claiming ${territoryObj.name} will establish your operations in ${districtName}, giving you access to:</p>
+                                <ul class="text-xs text-blue-200 mt-2 space-y-1">
+                                    <li>• District-wide ${districtData.districtBonus.name} bonus</li>
+                                    <li>• Strategic position in ${districtData.realWorldName}</li>
+                                    <li>• Territory-specific opportunities and resources</li>
+                                    ${territoryObj.trait ? '<li>• Unique territory trait advantages</li>' : ''}
+                                </ul>
+                            </div>
+                            
+                            <!-- Territory Stats -->
+                            <div class="p-3 bg-yellow-900/30 rounded border border-yellow-600/30">
+                                <h4 class="font-bold text-yellow-400 mb-2">📊 Territory Stats</h4>
+                                <div class="grid grid-cols-2 gap-3 text-xs">
+                                    <div>
+                                        <span class="text-gray-400">District:</span>
+                                        <span class="text-yellow-300 font-bold">${districtName}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Total Territories:</span>
+                                        <span class="text-yellow-300 font-bold">${districtData.territoryCount}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Special Trait:</span>
+                                        <span class="text-yellow-300 font-bold">${territoryObj.trait ? 'Yes ⭐' : 'Standard'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Based on:</span>
+                                        <span class="text-yellow-300 font-bold">${districtData.realWorldName}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="flex gap-3 mt-6">
-                            <button onclick="confirmNewTerritorySelection('${districtName}', '${territoryName}')" 
-                                    class="flex-1 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded font-bold hover:from-green-500 hover:to-emerald-500 transition-all">
-                                Claim Territory
+                            <button onclick="confirmNewTerritorySelection('${districtName}', '${territoryObj.name}')" 
+                                    class="flex-1 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded font-bold hover:from-green-500 hover:to-emerald-500 transition-all transform hover:scale-105">
+                                ⚡ Claim ${territoryObj.name} ⚡
                             </button>
-                            <button onclick="selectDistrict()" 
-                                    class="flex-1 py-2 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">
-                                Back to Districts
+                            <button onclick="showAllTerritories('${districtName}')" 
+                                    class="flex-1 py-3 bg-gray-700 rounded font-bold hover:bg-gray-600 transition-all">
+                                ← Back to ${districtName}
                             </button>
                         </div>
                     </div>
