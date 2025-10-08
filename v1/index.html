@@ -2783,10 +2783,24 @@
             }
         }
 
+        // Mapping between new district names (from GameConstants) and old district keys
+        const DISTRICT_NAME_TO_KEY = {
+            'Uptown Plaza': 'uptown',
+            'Midtown Market': 'midtown', 
+            'Crooklyn Heights': 'crooklyn',
+            'Harbor Docks': 'docks',
+            'Financial District': 'financial'
+        };
+
+        // Helper function to get old district key from new district name
+        function getDistrictKey(districtName) {
+            return DISTRICT_NAME_TO_KEY[districtName] || null;
+        }
+
         // Empire City districts with bonuses - EXPANDED TO 5 DISTRICTS WITH TERRITORIES
         const DISTRICTS = {
             uptown: {
-                name: "Uptown High-Rollers",
+                name: "Uptown Plaza",
                 description: "A northern enclave of bold gamblers and street kings, where high-stakes bets in coliseums fuel Gotti-era crews and resilient rackets.",
                 motto: "Fewer recruits. Bigger money. Keep it classy and paid.",
                 vibe: "Uptown High-Rollers pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.",
@@ -2830,7 +2844,7 @@
                 ]
             },
             midtown: {
-                name: "Midtown Night Strip", 
+                name: "Midtown Market", 
                 description: "The neon-drenched core of Empire City, where after-dark deals in theaters and bars light up Luciano's empire.",
                 motto: "Balanced, busy, and reliable. Grind the core loop here.",
                 vibe: "Midtown Night Strip is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.",
@@ -3001,11 +3015,17 @@
         // Empire City scouting districts (based on player's district)
         function getScoutingDistricts() {
             if (!gameState.player.district) {
-                return ["Uptown High-Rollers", "Midtown Night Strip", "The Backstreets"];
+                return ["Uptown Plaza", "Midtown Market", "Crooklyn Heights"];
             }
             
-            const district = DISTRICTS[gameState.player.district];
-            return [district.name, "Nearby Blocks", "Underground Scene"];
+            // Get district data using either direct key or mapped key
+            const districtKey = getDistrictKey(gameState.player.district) || gameState.player.district;
+            const district = DISTRICTS[districtKey];
+            if (district) {
+                return [district.name, "Nearby Blocks", "Underground Scene"];
+            } else {
+                return [gameState.player.district, "Nearby Blocks", "Underground Scene"];
+            }
         }
 
         // Scout modal with turn selection
@@ -10141,7 +10161,7 @@
                             <div class="space-y-2">
                                 <button onclick="selectScoutDistrict('uptown')" id="scoutUptown" class="district-btn w-full p-3 border-2 border-transparent rounded hover:border-gold">
                                     <div class="text-left">
-                                        <div class="font-bold gold-text text-base">🏙️ Uptown High-Rollers</div>
+                                        <div class="font-bold gold-text text-base">🏙️ Uptown Plaza</div>
                                         <div class="text-xs text-gray-400">Quality over quantity • Higher income per hoe</div>
                                         <div class="text-xs text-yellow-400">📊 Fewer recruits (-35%) but premium earners (+60%)</div>
                                     </div>
@@ -10149,7 +10169,7 @@
                                 
                                 <button onclick="selectScoutDistrict('midtown')" id="scoutMidtown" class="district-btn w-full p-3 border-2 border-transparent rounded hover:border-cyan-400">
                                     <div class="text-left">
-                                        <div class="font-bold cyan-glow text-base">🌃 Midtown Night Strip</div>
+                                        <div class="font-bold cyan-glow text-base">🌃 Midtown Market</div>
                                         <div class="text-xs text-gray-400">Balanced recruiting • Steady income</div>
                                         <div class="text-xs text-cyan-400">📊 Baseline yields • Recommended for beginners</div>
                                     </div>
@@ -10157,7 +10177,7 @@
                                 
                                 <button onclick="selectScoutDistrict('crooklyn')" id="scoutCrooklyn" class="district-btn w-full p-3 border-2 border-transparent rounded hover:border-magenta">
                                     <div class="text-left">
-                                        <div class="font-bold magenta-glow text-base">🏚️ Crooklyn</div>
+                                        <div class="font-bold magenta-glow text-base">🏚️ Crooklyn Heights</div>
                                         <div class="text-xs text-gray-400">Brooklyn streets • Real recognize real</div>
                                         <div class="text-xs text-purple-400">📊 More recruits (+25%) but lower income (-30%)</div>
                                     </div>
@@ -10641,7 +10661,9 @@
                     if (typeof gameState.player.regenRate !== 'number') gameState.player.regenRate = 0.2;
                     if (typeof gameState.resources.weed !== 'number') gameState.resources.weed = 0;
                     if (!Array.isArray(gameState.crew.thugs)) gameState.crew.thugs = [];
-                    if (!gameState.player.district || !DISTRICTS[gameState.player.district]) gameState.player.district = null;
+                    if (!gameState.player.district || (!DISTRICTS[gameState.player.district] && !DISTRICTS[getDistrictKey(gameState.player.district)])) {
+                        gameState.player.district = null;
+                    }
                     
                     // Sync thugs: If simple count exists but crew array is empty, create crew members
                     const simpleThugCount = gameState.resources.thugs || 0;
