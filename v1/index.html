@@ -2803,7 +2803,7 @@
                 name: "Uptown Plaza",
                 description: "A northern enclave of bold gamblers and street kings, where high-stakes bets in coliseums fuel Gotti-era crews and resilient rackets.",
                 motto: "Fewer recruits. Bigger money. Keep it classy and paid.",
-                vibe: "Uptown High-Rollers pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.",
+                vibe: "Uptown Plaza pulses with cultural pride and mob muscle, from hip-hop fronts to estate hideouts.",
                 bonuses: {
                     "Gamble's Edge": "+20% chance for high-risk/high-reward outcomes"
                 },
@@ -2847,7 +2847,7 @@
                 name: "Midtown Market", 
                 description: "The neon-drenched core of Empire City, where after-dark deals in theaters and bars light up Luciano's empire.",
                 motto: "Balanced, busy, and reliable. Grind the core loop here.",
-                vibe: "Midtown Night Strip is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.",
+                vibe: "Midtown Market is a strip of glamour and grit, with skyscrapers hiding hits and high-society scams.",
                 bonuses: {
                     "Neon Veil": "+15% stealth and intrigue boost for espionage operations"
                 },
@@ -3024,6 +3024,7 @@
             if (district) {
                 return [district.name, "Nearby Blocks", "Underground Scene"];
             } else {
+                // Fallback if district not found in old system
                 return [gameState.player.district, "Nearby Blocks", "Underground Scene"];
             }
         }
