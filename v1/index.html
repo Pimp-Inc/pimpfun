@@ -8382,26 +8382,17 @@
                 
                 addConsoleMessage('🌐 MULTIPLAYER MODE: Connected to shared database', 'green');
                 await loadPlayerProfileFromAuth();
-            
-            // Initialize game systems
-            initializeHoodPimps();
-                setTimeout(() => {
-                    if (ACTIVE_HOOD_PIMPS.size === 0) forceSpawnBasicPimps();
-                }, 1000);
                 
-            updateUI();
-            updateHoodPimpDisplay();
-            updateTurnDisplay();
-            updateSupplyStatus();
-            
-            setInterval(gameLoop, 1000);
-            
+                updateUI();
+                updateTurnDisplay();
+                updateSupplyStatus();
+                
                 addConsoleMessage('✅ Multiplayer game initialized!', 'green');
                 addConsoleMessage('💾 Progress saved to shared database', 'cyan');
                 addConsoleMessage('🚔 Enhanced heat system with charity events loaded!', 'yellow');
                 
             } else {
-                // Show auth landing
+                // Show auth landing but ALSO initialize game systems for demo
                 document.getElementById('authLanding').classList.remove('hidden');
                 document.getElementById('gameContent').classList.add('hidden');
                 
@@ -8409,14 +8400,39 @@
                 addConsoleMessage('🌐 Multiplayer game with shared database for 1000+ players', 'cyan');
                 addConsoleMessage('👥 Create account to compete and save progress!', 'gold');
                 addConsoleMessage('🏆 Leaderboards, crews, and real competition await!', 'purple');
+                
+                // Initialize demo game systems for testing (Hood Pimps visible even without auth)
+                addConsoleMessage('🎮 Initializing demo mode...', 'cyan');
+                document.getElementById('gameContent').classList.remove('hidden');
+                
+                // Initialize basic game state for demo mode
+                if (!gameState.player.username || gameState.player.username === 'Anonymous Pimp') {
+                    addConsoleMessage('🎮 Setting up demo player...', 'cyan');
+                    gameState.player.username = 'Demo Player';
+                    gameState.player.weekNumber = 1; // Ensure week is set for NPC spawning
+                    gameState.player.district = 'Midtown Market'; // Set a district for NPCs
+                }
+                
+                // Initialize demo UI
+                updateUI();
             }
+            
+            // Initialize game systems regardless of auth status (moved outside auth check)
+            initializeHoodPimps();
+            setTimeout(() => {
+                if (ACTIVE_HOOD_PIMPS.size === 0) forceSpawnBasicPimps();
+            }, 1000);
+            
+            updateHoodPimpDisplay();
+            setInterval(gameLoop, 1000);
             
             // Ensure correct initial UI state (fallback)
             setTimeout(() => {
                 if (!isLoggedIn) {
+                    // In demo mode, keep both landing and game content visible
                     document.getElementById('authLanding').classList.remove('hidden');
-                    document.getElementById('gameContent').classList.add('hidden');
-                    console.log('🔧 Applied fallback UI state: Auth landing visible, game hidden');
+                    // Keep game content visible for demo mode
+                    console.log('🔧 Applied fallback UI state: Demo mode with game content visible');
                 }
             }, 1000);
         }
