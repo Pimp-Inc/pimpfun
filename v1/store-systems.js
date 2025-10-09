@@ -13,8 +13,11 @@ function openCornerStore() {
     const store = STORES["Corner Store"];
     const modal = `
         <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8">
-                <h3 class="text-xl font-bold cyan-glow mb-2">CORNER STORE</h3>
+            <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold cyan-glow">CORNER STORE</h3>
+                    <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
+                </div>
                 <p class="text-sm text-gray-400 mb-4">Run by ${store.owner} • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                 
                 <div class="space-y-4">
@@ -323,7 +326,10 @@ function openReggiesPlug() {
     const modal = `
         <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
-                <h3 class="text-xl font-bold cyan-glow mb-2">REGGIE'S PLUG</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold cyan-glow">REGGIE'S PLUG</h3>
+                    <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
+                </div>
                 <p class="text-sm text-gray-400 mb-4">🌿 Premium Weed • Heat +5 per purchase • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                 
                 <div class="space-y-4">
@@ -478,7 +484,10 @@ function openTonysChopShop() {
     const modal = `
         <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
-                <h3 class="text-xl font-bold cyan-glow mb-2">TONY'S CHOP SHOP</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold cyan-glow">TONY'S CHOP SHOP</h3>
+                    <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
+                </div>
                 <p class="text-sm text-gray-400 mb-4">🚗 Premium Rides • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                 
                 <div class="space-y-4">
