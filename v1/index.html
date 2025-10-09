@@ -5254,6 +5254,8 @@
         }
 
         // Enhanced Crack Economics Functions
+        const CRACK_INCREMENT = 100; // Standard increment/decrement amount
+        
         function getCrackPrice(amount) {
             let pricePerRock;
             if (amount >= 10000) pricePerRock = 12; // Best bulk rate
@@ -5275,6 +5277,7 @@
             if (amount <= 10000) return 51;
             
             // For amounts > 10000, continue with square root scaling
+            // Multiplier 0.51 chosen to provide smooth progression from the tiered values
             const heatGain = Math.floor(Math.sqrt(amount) * 0.51) + 1;
             return Math.min(heatGain, 100); // Cap at 100%
         }
@@ -7069,12 +7072,12 @@
                                   <!-- Custom Amount Input with Slider -->
                                   <div class="mb-4">
                                       <div class="flex items-center gap-2 mb-2">
-                                          <button onclick="setSellAmount(Math.max(1, parseInt(document.getElementById('crackSellAmount').value) - 100))" 
+                                          <button onclick="setSellAmount(Math.max(1, parseInt(document.getElementById('crackSellAmount').value) - CRACK_INCREMENT))" 
                                                   class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500 text-sm">-</button>
                                           <input type="number" id="crackSellAmount" value="100" min="1" max="${crackCount}" 
                                                  class="flex-1 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
                                                  oninput="updateSellEstimate()" placeholder="Amount">
-                                          <button onclick="setSellAmount(Math.min(${crackCount}, parseInt(document.getElementById('crackSellAmount').value) + 100))" 
+                                          <button onclick="setSellAmount(Math.min(${crackCount}, parseInt(document.getElementById('crackSellAmount').value) + CRACK_INCREMENT))" 
                                                   class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500 text-sm">+</button>
                                       </div>
                                       
@@ -7127,7 +7130,9 @@
                                   <div><span class="text-gray-400">100-999:</span> <span class="text-yellow-400">$9/rock</span></div>
                                   <div><span class="text-gray-400">1K-4,999:</span> <span class="text-blue-400">$10/rock</span></div>
                                   <div><span class="text-gray-400">5K-9,999:</span> <span class="text-green-400">$11/rock</span></div>
-                                  <div colspan="2"><span class="text-gray-400">10K+:</span> <span class="text-purple-400">$12/rock</span> <span class="text-green-400">🔥 BEST</span></div>
+                                      <div class="text-gray-400 col-span-2">10K+:</div>
+                                      <div class="text-purple-400 col-span-2">$12/rock</div>
+                                      <div class="text-green-400 col-span-2">🔥 BEST</div>
                               </div>
                               <p class="text-cyan-400 text-xs mt-2">💡 Heat scales with √quantity - bulk is safer!</p>
                           </div>
