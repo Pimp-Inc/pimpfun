@@ -204,6 +204,9 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
+                        <button onclick="showEconomicDashboard()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-medium shadow-lg text-white">
+                            📊 Economic Dashboard
+                        </button>
                         <button id="authButton" class="px-4 py-2 action-btn rounded font-medium shadow-lg">
                             <span id="authStatus">Sign In</span>
                         </button>
@@ -455,47 +458,57 @@
 
             <!-- Column 3: Quick Actions + Console -->
             <div class="space-y-4">
-                <!-- Quick Actions -->
+                <!-- Turn Actions -->
                 <div class="game-panel rounded-lg p-4">
-                    <h2 class="text-lg font-bold mb-3 cyan-glow">QUICK ACTIONS</h2>
+                    <h2 class="text-lg font-bold mb-3 cyan-glow">TURN ACTIONS</h2>
                     <div class="space-y-2">
-                                            <button onclick="showScoutOptions()" class="w-full action-btn rounded py-2 text-sm">
-                        🔍 Scout Districts
-                    </button>
-                    <button onclick="showCrackAndDrugs()" class="w-full action-btn rounded py-2 text-sm">
-                        💎 Crack & Drug Dealing
-                    </button>
-                    <button onclick="visitCornerStore()" class="w-full action-btn rounded py-2 text-sm">
-                        🍺 Corner Store
-                    </button>
-                    <button onclick="visitReggiesPlug()" class="w-full action-btn rounded py-2 text-sm">
-                        🌿 Reggie's Plug
-                    </button>
-                    <button onclick="visitPewPewJimmys()" class="w-full action-btn rounded py-2 text-sm">
-                        🔫 Pew Pew Jimmy's
-                    </button>
-                    <button onclick="visitTonysChopShop()" class="w-full action-btn rounded py-2 text-sm">
-                        🚗 Tony's Chop Shop
-                    </button>
-                    <button onclick="adjustPayout()" class="w-full action-btn rounded py-2 text-sm">
-                        💰 Adjust Payout (30%)
-                    </button>
-                    <button onclick="showHeatReductionServices()" class="w-full action-btn rounded py-2 text-sm bg-red-600">
-                        🚔 Heat Management
-                    </button>
-                    <!-- Debug buttons removed for stable v3 release -->
-                    <button onclick="showEconomicDashboard()" class="w-full action-btn rounded py-2 text-sm bg-blue-600">
-                        📊 Economic Dashboard
-                    </button>
-                    <button onclick="testDailyPayout()" class="w-full action-btn rounded py-2 text-sm bg-green-600">
-                        💰 Test Daily Payout
-                    </button>
-                    <button onclick="completeGameReset()" class="w-full action-btn rounded py-2 text-sm bg-orange-600">
-                        🔄 Complete Game Reset
-                    </button>
-                    <button onclick="showSeasonResetInfo()" class="w-full action-btn rounded py-2 text-sm bg-purple-600">
-                        🏆 Season Reset Info
-                    </button>
+                        <button onclick="showScoutOptions()" class="w-full action-btn rounded py-2 text-sm">
+                            🔍 SCOUT DISTRICTS
+                        </button>
+                        <button onclick="showCrackAndDrugs()" class="w-full action-btn rounded py-2 text-sm">
+                            💎 CRACK & DRUG DEALING
+                        </button>
+                        <button onclick="showHeatReductionServices()" class="w-full action-btn rounded py-2 text-sm bg-red-600">
+                            🔥 HEAT MANAGEMENT
+                        </button>
+                        <button onclick="adjustPayout()" class="w-full action-btn rounded py-2 text-sm">
+                            💃 ADJUST HO $ PAYOUT
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Buy Shit -->
+                <div class="game-panel rounded-lg p-4">
+                    <h2 class="text-lg font-bold mb-3 cyan-glow">BUY SHIT</h2>
+                    <div class="space-y-2">
+                        <button onclick="visitCornerStore()" class="w-full action-btn rounded py-2 text-sm">
+                            🍺 CORNER STORE
+                        </button>
+                        <button onclick="visitReggiesPlug()" class="w-full action-btn rounded py-2 text-sm">
+                            🌳 REGGIE'S PLUG
+                        </button>
+                        <button onclick="visitPewPewJimmys()" class="w-full action-btn rounded py-2 text-sm">
+                            💥 PEW PEW JIMMY'S
+                        </button>
+                        <button onclick="visitTonysChopShop()" class="w-full action-btn rounded py-2 text-sm">
+                            🚗 TONY'S CHOP SHOP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Tests (only visible to admin) -->
+                <div id="adminPanel" class="game-panel rounded-lg p-4" style="display: none;">
+                    <h2 class="text-lg font-bold mb-3 cyan-glow">ADMIN TESTS</h2>
+                    <div class="space-y-2">
+                        <button onclick="testDailyPayout()" class="w-full action-btn rounded py-2 text-sm bg-green-600">
+                            💰 Test Daily Payout
+                        </button>
+                        <button onclick="completeGameReset()" class="w-full action-btn rounded py-2 text-sm bg-orange-600">
+                            🔄 Complete Game Reset
+                        </button>
+                        <button onclick="showSeasonResetInfo()" class="w-full action-btn rounded py-2 text-sm bg-purple-600">
+                            🏆 Season Reset Info
+                        </button>
                     </div>
                 </div>
 
@@ -3930,7 +3943,7 @@
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold cyan-glow">PEW PEW JIMMY'S</h3>
+                            <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
                             <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                         </div>
                         <p class="text-sm text-gray-400 mb-4">🔫 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
@@ -4495,7 +4508,7 @@
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold cyan-glow">PEW PEW JIMMY'S</h3>
+                            <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
                             <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                         </div>
                         <p class="text-sm text-gray-400 mb-4">🔫 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
@@ -8172,8 +8185,11 @@
             // Update payout button text
             const payoutButton = document.querySelector('button[onclick="adjustPayout()"]');
             if (payoutButton) {
-                payoutButton.innerHTML = `Adjust Payout (${gameState.player.payoutPercentage}%)`;
+                payoutButton.innerHTML = `💃 ADJUST HO $ PAYOUT`;
             }
+            
+            // Update admin panel visibility
+            updateAdminPanelVisibility();
         }
 
         // Hood Pimp respawn and refresh
@@ -12241,7 +12257,23 @@
             }
         }
 
-        // Simplified page handling - no obnoxious tracking
+        // Check if user is admin (add your admin check logic here)
+        function isAdminUser() {
+            // For now, check if username contains "admin" or specific admin emails
+            const adminUsers = ['admin', 'pimp_admin', 'dev', 'test_admin'];
+            const currentUser = gameState?.player?.username?.toLowerCase() || '';
+            return adminUsers.some(admin => currentUser.includes(admin)) || 
+                   currentUser.includes('@pimp.fun') || 
+                   currentUser === 'Anonymous Pimp'; // For testing purposes
+        }
+
+        // Show/hide admin panel based on user permissions
+        function updateAdminPanelVisibility() {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel) {
+                adminPanel.style.display = isAdminUser() ? 'block' : 'none';
+            }
+        }
 
         // Season reset information modal
         function showSeasonResetInfo() {
