@@ -199,7 +199,7 @@
                                 <span class="cyan-glow" style="text-shadow: 0 0 30px rgba(0, 229, 255, 1), 0 2px 4px rgba(0,0,0,0.8);">Empire City</span>
                             </h1>
                             <p class="text-sm md:text-base text-gray-300 font-medium drop-shadow-lg">
-                                Week <span id="weekNumber" class="gold-text">1</span> • Three districts. One crown.
+                                Pimp to Earn. 5 Districts. One Crown.
                             </p>
                         </div>
                     </div>
@@ -302,8 +302,8 @@
                             <span id="district" class="cyan-glow cursor-pointer" onclick="selectDistrict()">Choose District</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-400">Rank:</span>
-                            <span id="rank" class="text-amber-400">Unranked</span>
+                            <span class="text-gray-400">Crew:</span>
+                            <span id="crewName" class="text-purple-400">None</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">Level:</span>
@@ -8384,6 +8384,18 @@
                 }
             }
             
+            // Update crew name display
+            const crewNameEl = document.getElementById('crewName');
+            if (crewNameEl) {
+                if (gameState.crew?.name) {
+                    crewNameEl.textContent = gameState.crew.name;
+                    crewNameEl.className = 'text-purple-400';
+                } else {
+                    crewNameEl.textContent = 'None';
+                    crewNameEl.className = 'text-gray-500';
+                }
+            }
+            
             // Update payout button text
             const payoutButton = document.querySelector('button[onclick="adjustPayout()"]');
             if (payoutButton) {
@@ -8750,7 +8762,8 @@
                         heat: player.heat || 0,
                         respect: player.respect || 0,
                         payoutPercentage: player.payout_percentage || 30,
-                        district: player.territory || null,
+                        district: player.district || null,
+                        territory: player.territory || null,
                         rank: 'Unranked',
                         localRank: null,
                         nationalRank: null,
@@ -9962,8 +9975,8 @@
             console.log('🏙️ Using GameConstants districts:', Object.keys(districts));
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div class="game-panel rounded-lg p-6 max-w-5xl w-full my-8 max-h-[90vh] overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+                    <div class="game-panel rounded-lg p-3 sm:p-6 max-w-5xl w-full my-4 sm:my-8 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
                         <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">🏙️ CHOOSE YOUR EMPIRE DISTRICT</h3>
                         <p class="text-sm text-gray-400 mb-6 text-center">Empire City's five districts each offer unique mafia-inspired advantages. Choose wisely - your empire depends on it.</p>
                         
@@ -10010,7 +10023,7 @@
                                         <!-- Key Territories -->
                                         <div class="mb-4">
                                             <h5 class="text-lg font-bold text-cyan-400 mb-3">🏴‍☠️ Key Territories</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 ${districtData.territories.slice(0, 6).map(territory => `
                                                     <div class="territory-card p-3 bg-gray-800/50 rounded border border-gray-600/50 hover:border-cyan-500/50 transition-all cursor-pointer"
                                                          onclick="selectSpecificTerritory('${districtName}', '${territory.name}')">
@@ -11123,6 +11136,8 @@
                         thugs: gameState.resources.thugs || 0,
                         crack: gameState.resources.crack || 0,
                         weed: gameState.resources.weed || 0,
+                        territory: gameState.player.territory || 'Times Square Center',
+                        district: gameState.player.district || null,
                         resources: JSON.stringify(gameState.resources),
                         supplies: JSON.stringify(gameState.supplies),
                         crew_data: JSON.stringify(gameState.crew),
