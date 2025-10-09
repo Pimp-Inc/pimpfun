@@ -8185,7 +8185,7 @@
             // Update crew name display
             const crewNameEl = document.getElementById('crewName');
             if (crewNameEl) {
-                if (gameState.crew && gameState.crew.name) {
+                if (gameState.crew?.name) {
                     crewNameEl.textContent = gameState.crew.name;
                     crewNameEl.className = 'text-purple-400';
                 } else {
