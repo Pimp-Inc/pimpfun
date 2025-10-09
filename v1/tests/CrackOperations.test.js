@@ -53,14 +53,17 @@ describe('Enhanced Crack Operations', () => {
     }
 
     function calculateHeatGain(amount) {
-        // Reasonable tiered heat scaling - not too punitive for bulk sales
+        // User-specified heat scaling - balanced for 1985 game setting
         if (amount <= 0) return 1;   // Minimum heat
         if (amount <= 50) return 2;  // Very small sales - minimal heat
-        if (amount <= 200) return 4; // Small sales
-        if (amount <= 1000) return 8; // Medium sales  
-        if (amount <= 5000) return 15; // Large sales
-        if (amount <= 15000) return 25; // Very large sales
-        return 35; // Cap for massive sales - still manageable
+        if (amount <= 100) return 3; // Small sales - target: 3% for 100
+        if (amount <= 500) return 6; // Medium-small sales
+        if (amount <= 1000) return 9; // Medium sales - target: 9% for 1000
+        if (amount <= 2500) return 15; // Large sales
+        if (amount <= 5000) return 21; // Large sales - target: 21% for 5000
+        if (amount <= 10000) return 36; // Very large sales - target: 36% for 10000
+        if (amount <= 25000) return 52; // Massive sales
+        return 69; // Cap for extremely massive sales - target: 69% for 50000
     }
 
     describe('getCrackPrice', () => {
@@ -90,26 +93,27 @@ describe('Enhanced Crack Operations', () => {
     });
 
     describe('calculateHeatGain', () => {
-        test('should use reasonable tiered heat scaling', () => {
-            // Test the new reasonable heat tiers
+        test('should use user-specified heat scaling for 1985 setting', () => {
+            // Test the new user-specified heat values
             expect(calculateHeatGain(10)).toBe(2);   // Very small - minimal heat
             expect(calculateHeatGain(50)).toBe(2);   // Still very small
-            expect(calculateHeatGain(100)).toBe(4);  // Small sales
-            expect(calculateHeatGain(500)).toBe(8);  // Medium sales
-            expect(calculateHeatGain(1000)).toBe(8); // Still medium
+            expect(calculateHeatGain(100)).toBe(3);  // Target: 3% for 100
+            expect(calculateHeatGain(500)).toBe(6);  // Medium-small sales
+            expect(calculateHeatGain(1000)).toBe(9); // Target: 9% for 1000
             expect(calculateHeatGain(2500)).toBe(15); // Large sales
-            expect(calculateHeatGain(5000)).toBe(15); // Still large
-            expect(calculateHeatGain(10000)).toBe(25); // Very large
-            expect(calculateHeatGain(25000)).toBe(35); // Massive - capped
+            expect(calculateHeatGain(5000)).toBe(21); // Target: 21% for 5000
+            expect(calculateHeatGain(10000)).toBe(36); // Target: 36% for 10000
+            expect(calculateHeatGain(25000)).toBe(52); // Massive sales
+            expect(calculateHeatGain(50000)).toBe(69); // Target: 69% for 50000
         });
 
-        test('should verify heat values are reasonable for gameplay', () => {
-            // Verify the new reasonable heat system
-            expect(calculateHeatGain(10)).toBe(2);   // +2% heat - very manageable
-            expect(calculateHeatGain(100)).toBe(4);  // +4% heat - reasonable
-            expect(calculateHeatGain(1000)).toBe(8); // +8% heat - fair for large sales
-            expect(calculateHeatGain(5000)).toBe(15); // +15% heat - still reasonable
-            expect(calculateHeatGain(50000)).toBe(35); // +35% heat - capped at manageable level
+        test('should verify heat values match user specifications', () => {
+            // Verify the specific target values requested by user
+            expect(calculateHeatGain(100)).toBe(3);   // User target: 3% heat
+            expect(calculateHeatGain(1000)).toBe(9);  // User target: 9% heat
+            expect(calculateHeatGain(5000)).toBe(21); // User target: 21% heat
+            expect(calculateHeatGain(10000)).toBe(36); // User target: 36% heat
+            expect(calculateHeatGain(50000)).toBe(69); // User target: 69% heat
         });
 
         test('should cap heat at 100%', () => {

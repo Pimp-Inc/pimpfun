@@ -4778,14 +4778,14 @@
             
             gameState.player.cash -= price;
             gameState.resources.weed += ounces;
-            gameState.player.heat = Math.min(100, gameState.player.heat + 5);
+            gameState.player.heat = Math.min(100, gameState.player.heat + (3 * ounces));
             
             // Quality variance
             const quality = 0.8 + Math.random() * 0.4;
             const qualityText = quality > 1.1 ? ' (🔥 Fire!)' : quality < 0.9 ? ' (Mid)' : '';
             
-            showNotification(`✅ Bought ${ounces}oz weed for $${price}!${qualityText} Heat +5%`, 'success');
-            addConsoleMessage(`🌿 Reggie's: ${ounces}oz weed for $${price} (+5% heat)${qualityText}`, 'green');
+            showNotification(`✅ Bought ${ounces}oz weed for $${price}!${qualityText} Heat +${3 * ounces}%`, 'success');
+            addConsoleMessage(`🌿 Reggie's: ${ounces}oz weed for $${price} (+${3 * ounces}% heat)${qualityText}`, 'green');
             updateUI();
             updateSupplyStatus();
             closeModal();
@@ -4836,15 +4836,15 @@
             
             gameState.player.cash -= totalCost;
             gameState.resources.weed = (gameState.resources.weed || 0) + totalOunces;
-            gameState.player.heat = Math.min(100, (gameState.player.heat || 0) + 5); // +5 heat per purchase
+            gameState.player.heat = Math.min(100, (gameState.player.heat || 0) + (3 * totalOunces)); // +3% heat per ounce
             
             // Quality variance
             const quality = 0.8 + Math.random() * 0.4;
             const qualityText = quality > 1.1 ? ' (🔥 Fire!)' : quality < 0.9 ? ' (Mid)' : '';
             
             const displayText = quantity === 1 ? `${ouncesPer}oz weed` : `${quantity}x ${ouncesPer}oz weed (${totalOunces}oz total)`;
-            showNotification(`🌿 Bought ${displayText} for $${totalCost.toLocaleString()}!${qualityText} Heat +5%`, 'success');
-            addConsoleMessage(`💰 Reggie's Plug: ${displayText} purchased for $${totalCost.toLocaleString()} (+5% heat)${qualityText}`, 'green');
+            showNotification(`🌿 Bought ${displayText} for $${totalCost.toLocaleString()}!${qualityText} Heat +${3 * totalOunces}%`, 'success');
+            addConsoleMessage(`💰 Reggie's Plug: ${displayText} purchased for $${totalCost.toLocaleString()} (+${3 * totalOunces}% heat)${qualityText}`, 'green');
             
             updateUI();
             saveGameState();
@@ -5269,14 +5269,17 @@
         }
 
         function calculateHeatGain(amount) {
-            // Reasonable tiered heat scaling - not too punitive for bulk sales
+            // User-specified heat scaling - balanced for 1985 game setting
             if (amount <= 0) return 1;   // Minimum heat
             if (amount <= 50) return 2;  // Very small sales - minimal heat
-            if (amount <= 200) return 4; // Small sales
-            if (amount <= 1000) return 8; // Medium sales  
-            if (amount <= 5000) return 15; // Large sales
-            if (amount <= 15000) return 25; // Very large sales
-            return 35; // Cap for massive sales - still manageable
+            if (amount <= 100) return 3; // Small sales - target: 3% for 100
+            if (amount <= 500) return 6; // Medium-small sales
+            if (amount <= 1000) return 9; // Medium sales - target: 9% for 1000
+            if (amount <= 2500) return 15; // Large sales
+            if (amount <= 5000) return 21; // Large sales - target: 21% for 5000
+            if (amount <= 10000) return 36; // Very large sales - target: 36% for 10000
+            if (amount <= 25000) return 52; // Massive sales
+            return 69; // Cap for extremely massive sales - target: 69% for 50000
         }
 
         function updateSellEstimate() {
