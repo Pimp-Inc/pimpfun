@@ -11427,9 +11427,18 @@
                 
                 // Calculate expenses with safe defaults
                 const thugs = (gameState.crew && gameState.crew.thugs) ? gameState.crew.thugs : [];
+                const defaultRookieSalary = 250; // Fallback if THUG_RANKS is unavailable
                 const weeklyPayroll = thugs.reduce((total, thug) => {
-                    const rank = (THUG_RANKS && THUG_RANKS[thug.rank]) ? THUG_RANKS[thug.rank] : THUG_RANKS.rookie;
-                    return total + (rank.salary || 250);
+                    let rank = null;
+                    if (THUG_RANKS && THUG_RANKS[thug.rank]) {
+                        rank = THUG_RANKS[thug.rank];
+                    } else if (THUG_RANKS && THUG_RANKS.rookie) {
+                        rank = THUG_RANKS.rookie;
+                    } else {
+                        // Ultimate fallback if THUG_RANKS is completely unavailable
+                        rank = { salary: defaultRookieSalary };
+                    }
+                    return total + (rank.salary || defaultRookieSalary);
                 }, 0);
                 const dailyPayroll = weeklyPayroll / 7;
                 
@@ -11443,7 +11452,7 @@
                         <div class="game-panel rounded-lg p-4 sm:p-6 max-w-lg w-full my-4 max-h-[90vh] overflow-y-auto">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg sm:text-xl font-bold cyan-glow">📊 ECONOMIC DASHBOARD</h3>
-                                <button onclick="closeModal()" 
+                                <button type="button" onclick="closeModal()" 
                                         class="text-red-400 hover:text-red-300 text-2xl font-bold min-w-[44px] min-h-[44px] flex items-center justify-center"
                                         aria-label="Close Economic Dashboard">&times;</button>
                             </div>
@@ -11511,7 +11520,7 @@
                                 </div>
                             </div>
                             
-                            <button onclick="closeModal()" 
+                            <button type="button" onclick="closeModal()" 
                                     class="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded font-bold transition-colors min-h-[44px]"
                                     aria-label="Close Economic Dashboard">
                                 Close Dashboard
