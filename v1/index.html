@@ -3946,7 +3946,7 @@
                             <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
                             <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                         </div>
-                        <p class="text-sm text-gray-400 mb-4">🔫 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
+                        <p class="text-sm text-gray-400 mb-4">💥 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                         
                         <div class="space-y-4">
                             <!-- Thugs -->
@@ -4511,7 +4511,7 @@
                             <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
                             <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                         </div>
-                        <p class="text-sm text-gray-400 mb-4">🔫 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
+                        <p class="text-sm text-gray-400 mb-4">💥 Premium Firepower • Cash: <span class="gold-text">$${gameState.player.cash.toLocaleString()}</span></p>
                         
                         ${respectReq ? '<div class="mb-4 p-3 bg-red-900/50 rounded text-red-400">⚠️ Need 10+ respect for better weapons!</div>' : ''}
                         
@@ -8185,7 +8185,7 @@
             // Update payout button text
             const payoutButton = document.querySelector('button[onclick="adjustPayout()"]');
             if (payoutButton) {
-                payoutButton.innerHTML = `💃 ADJUST HO $ PAYOUT`;
+                payoutButton.innerHTML = `💃 ADJUST HO $ PAYOUT (${gameState.player.payoutPercentage}%)`;
             }
             
             // Update admin panel visibility
@@ -12263,8 +12263,7 @@
             const adminUsers = ['admin', 'pimp_admin', 'dev', 'test_admin'];
             const currentUser = gameState?.player?.username?.toLowerCase() || '';
             return adminUsers.some(admin => currentUser.includes(admin)) || 
-                   currentUser.includes('@pimp.fun') || 
-                   currentUser === 'Anonymous Pimp'; // For testing purposes
+                   currentUser.includes('@pimp.fun');
         }
 
         // Show/hide admin panel based on user permissions
