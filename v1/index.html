@@ -199,7 +199,7 @@
                                 <span class="cyan-glow" style="text-shadow: 0 0 30px rgba(0, 229, 255, 1), 0 2px 4px rgba(0,0,0,0.8);">Empire City</span>
                             </h1>
                             <p class="text-sm md:text-base text-gray-300 font-medium drop-shadow-lg">
-                                Week <span id="weekNumber" class="gold-text">1</span> • Three districts. One crown.
+                                Pimp to Earn. 5 Districts. One Crown.
                             </p>
                         </div>
                     </div>
@@ -302,8 +302,8 @@
                             <span id="district" class="cyan-glow cursor-pointer" onclick="selectDistrict()">Choose District</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-400">Rank:</span>
-                            <span id="rank" class="text-amber-400">Unranked</span>
+                            <span class="text-gray-400">Crew:</span>
+                            <span id="crewName" class="text-purple-400">None</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">Level:</span>
@@ -8182,6 +8182,18 @@
                 }
             }
             
+            // Update crew name display
+            const crewNameEl = document.getElementById('crewName');
+            if (crewNameEl) {
+                if (gameState.crew && gameState.crew.name) {
+                    crewNameEl.textContent = gameState.crew.name;
+                    crewNameEl.className = 'text-purple-400';
+                } else {
+                    crewNameEl.textContent = 'None';
+                    crewNameEl.className = 'text-gray-500';
+                }
+            }
+            
             // Update payout button text
             const payoutButton = document.querySelector('button[onclick="adjustPayout()"]');
             if (payoutButton) {
@@ -8548,7 +8560,8 @@
                         heat: player.heat || 0,
                         respect: player.respect || 0,
                         payoutPercentage: player.payout_percentage || 30,
-                        district: player.territory || null,
+                        district: player.district || null,
+                        territory: player.territory || null,
                         rank: 'Unranked',
                         localRank: null,
                         nationalRank: null,
@@ -10921,6 +10934,8 @@
                         thugs: gameState.resources.thugs || 0,
                         crack: gameState.resources.crack || 0,
                         weed: gameState.resources.weed || 0,
+                        territory: gameState.player.territory || 'Times Square Center',
+                        district: gameState.player.district || null,
                         resources: JSON.stringify(gameState.resources),
                         supplies: JSON.stringify(gameState.supplies),
                         crew_data: JSON.stringify(gameState.crew),
