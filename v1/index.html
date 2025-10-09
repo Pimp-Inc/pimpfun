@@ -5269,19 +5269,14 @@
         }
 
         function calculateHeatGain(amount) {
-            // Square root scaling - more forgiving for bulk sales
-            // Fine-tuned to match the examples in the issue
+            // Reasonable tiered heat scaling - not too punitive for bulk sales
             if (amount <= 0) return 1;   // Minimum heat
-            if (amount <= 10) return 3;
-            if (amount <= 100) return 6;
-            if (amount <= 1000) return 17;
-            if (amount <= 5000) return 36;
-            if (amount <= 10000) return 51;
-            
-            // For amounts > 10000, continue with square root scaling
-            // Multiplier 0.51 chosen to provide smooth progression from the tiered values
-            const heatGain = Math.floor(Math.sqrt(amount) * 0.51) + 1;
-            return Math.min(heatGain, 100); // Cap at 100%
+            if (amount <= 50) return 2;  // Very small sales - minimal heat
+            if (amount <= 200) return 4; // Small sales
+            if (amount <= 1000) return 8; // Medium sales  
+            if (amount <= 5000) return 15; // Large sales
+            if (amount <= 15000) return 25; // Very large sales
+            return 35; // Cap for massive sales - still manageable
         }
 
         function updateSellEstimate() {

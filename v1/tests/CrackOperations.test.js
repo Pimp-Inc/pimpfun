@@ -53,18 +53,14 @@ describe('Enhanced Crack Operations', () => {
     }
 
     function calculateHeatGain(amount) {
-        // Square root scaling - more forgiving for bulk sales
-        // Fine-tuned to match the examples in the issue
+        // Reasonable tiered heat scaling - not too punitive for bulk sales
         if (amount <= 0) return 1;   // Minimum heat
-        if (amount <= 10) return 3;
-        if (amount <= 100) return 6;
-        if (amount <= 1000) return 17;
-        if (amount <= 5000) return 36;
-        if (amount <= 10000) return 51;
-        
-        // For amounts > 10000, continue with square root scaling
-        const heatGain = Math.floor(Math.sqrt(amount) * 0.51) + 1;
-        return Math.min(heatGain, 100); // Cap at 100%
+        if (amount <= 50) return 2;  // Very small sales - minimal heat
+        if (amount <= 200) return 4; // Small sales
+        if (amount <= 1000) return 8; // Medium sales  
+        if (amount <= 5000) return 15; // Large sales
+        if (amount <= 15000) return 25; // Very large sales
+        return 35; // Cap for massive sales - still manageable
     }
 
     describe('getCrackPrice', () => {
@@ -94,22 +90,26 @@ describe('Enhanced Crack Operations', () => {
     });
 
     describe('calculateHeatGain', () => {
-        test('should use square root scaling for diminishing returns', () => {
-            // Test the specific tiers from the issue description
-            expect(calculateHeatGain(10)).toBe(3);   // +3% heat
-            expect(calculateHeatGain(100)).toBe(6);  // +6% heat
-            expect(calculateHeatGain(1000)).toBe(17); // +17% heat
-            expect(calculateHeatGain(5000)).toBe(36); // +36% heat
-            expect(calculateHeatGain(10000)).toBe(51); // +51% heat
+        test('should use reasonable tiered heat scaling', () => {
+            // Test the new reasonable heat tiers
+            expect(calculateHeatGain(10)).toBe(2);   // Very small - minimal heat
+            expect(calculateHeatGain(50)).toBe(2);   // Still very small
+            expect(calculateHeatGain(100)).toBe(4);  // Small sales
+            expect(calculateHeatGain(500)).toBe(8);  // Medium sales
+            expect(calculateHeatGain(1000)).toBe(8); // Still medium
+            expect(calculateHeatGain(2500)).toBe(15); // Large sales
+            expect(calculateHeatGain(5000)).toBe(15); // Still large
+            expect(calculateHeatGain(10000)).toBe(25); // Very large
+            expect(calculateHeatGain(25000)).toBe(35); // Massive - capped
         });
 
-        test('should verify specific heat values match requirements', () => {
-            // Verify the examples from the issue
-            expect(calculateHeatGain(10)).toBe(3);   // +3% heat
-            expect(calculateHeatGain(100)).toBe(6);  // +6% heat
-            expect(calculateHeatGain(1000)).toBe(17); // +17% heat
-            expect(calculateHeatGain(5000)).toBe(36); // +36% heat
-            expect(calculateHeatGain(10000)).toBe(51); // +51% heat
+        test('should verify heat values are reasonable for gameplay', () => {
+            // Verify the new reasonable heat system
+            expect(calculateHeatGain(10)).toBe(2);   // +2% heat - very manageable
+            expect(calculateHeatGain(100)).toBe(4);  // +4% heat - reasonable
+            expect(calculateHeatGain(1000)).toBe(8); // +8% heat - fair for large sales
+            expect(calculateHeatGain(5000)).toBe(15); // +15% heat - still reasonable
+            expect(calculateHeatGain(50000)).toBe(35); // +35% heat - capped at manageable level
         });
 
         test('should cap heat at 100%', () => {
@@ -119,7 +119,7 @@ describe('Enhanced Crack Operations', () => {
 
         test('should handle edge cases', () => {
             expect(calculateHeatGain(0)).toBe(1);
-            expect(calculateHeatGain(1)).toBe(3);  // 1 is still in the <= 10 range
+            expect(calculateHeatGain(1)).toBe(2);  // 1 is in the <= 50 range (very small sales)
         });
     });
 
