@@ -5257,12 +5257,14 @@
         const CRACK_INCREMENT = 100; // Standard increment/decrement amount
         
         function getCrackPrice(amount) {
+            // Authentic 1991 NYC crack prices - bulk gets CHEAPER per unit
             let pricePerRock;
-            if (amount >= 10000) pricePerRock = 12; // Best bulk rate
-            else if (amount >= 5000) pricePerRock = 11;
-            else if (amount >= 1000) pricePerRock = 10;
-            else if (amount >= 100) pricePerRock = 9;
-            else pricePerRock = 8; // Worst rate for small amounts
+            if (amount >= 10000) pricePerRock = 6;   // Deep wholesale - $6/rock (~$6,000/kg equivalent)
+            else if (amount >= 5000) pricePerRock = 7;   // Large wholesale - $7/rock  
+            else if (amount >= 1000) pricePerRock = 9;   // Mid-level bulk - $9/rock
+            else if (amount >= 100) pricePerRock = 12;   // Small bulk - $12/rock
+            else if (amount >= 10) pricePerRock = 15;    // Street level - $15/rock
+            else pricePerRock = 18; // Single rock street price - $18/rock
             return pricePerRock;
         }
 
@@ -5303,20 +5305,35 @@
                 const totalRevenue = maxAmount * pricePerRock;
                 const heatGain = calculateHeatGain(maxAmount);
                 
-                priceDisplay.textContent = `$${pricePerRock}/rock${maxAmount >= 1000 ? ' (bulk discount!)' : ''}`;
+                // Show appropriate pricing context
+                let priceText = `$${pricePerRock}/rock`;
+                if (maxAmount >= 10000) priceText += ' (deep wholesale!)';
+                else if (maxAmount >= 5000) priceText += ' (wholesale!)';
+                else if (maxAmount >= 1000) priceText += ' (dealer rate!)';
+                else if (maxAmount >= 100) priceText += ' (bulk discount!)';
+                else if (maxAmount >= 10) priceText += ' (street rate)';
+                else priceText += ' (single rock)';
+                
+                priceDisplay.textContent = priceText;
                 totalDisplay.textContent = `$${totalRevenue.toLocaleString()}`;
                 heatDisplay.textContent = `+${heatGain}%`;
                 
-                // Update display color based on bulk discount
-                if (maxAmount >= 1000) {
-                    priceDisplay.className = 'text-green-400 font-bold';
+                // Update display color based on pricing tier
+                if (maxAmount >= 10000) {
+                    priceDisplay.className = 'text-purple-400 font-bold'; // Deep wholesale
+                } else if (maxAmount >= 5000) {
+                    priceDisplay.className = 'text-green-400 font-bold';  // Wholesale
+                } else if (maxAmount >= 1000) {
+                    priceDisplay.className = 'text-blue-400 font-bold';   // Dealer
                 } else if (maxAmount >= 100) {
-                    priceDisplay.className = 'text-blue-400';
+                    priceDisplay.className = 'text-yellow-400';           // Bulk
+                } else if (maxAmount >= 10) {
+                    priceDisplay.className = 'text-orange-400';           // Street
                 } else {
-                    priceDisplay.className = 'text-gray-300';
+                    priceDisplay.className = 'text-red-400';              // Single rock
                 }
             } else {
-                priceDisplay.textContent = '$8/rock';
+                priceDisplay.textContent = '$18/rock';
                 totalDisplay.textContent = '$0';
                 heatDisplay.textContent = '+0%';
                 priceDisplay.className = 'text-gray-300';
@@ -7124,17 +7141,18 @@
                           
                           <!-- Bulk Pricing Info -->
                           <div class="mb-4 p-3 bg-blue-900/30 rounded text-sm">
-                              <h5 class="font-bold text-blue-400 mb-2">📊 Bulk Pricing Tiers</h5>
+                              <h5 class="font-bold text-blue-400 mb-2">📊 Authentic 1991 NYC Crack Prices</h5>
                               <div class="grid grid-cols-2 gap-2 text-xs">
-                                  <div><span class="text-gray-400">1-99:</span> <span class="text-red-400">$8/rock</span></div>
-                                  <div><span class="text-gray-400">100-999:</span> <span class="text-yellow-400">$9/rock</span></div>
-                                  <div><span class="text-gray-400">1K-4,999:</span> <span class="text-blue-400">$10/rock</span></div>
-                                  <div><span class="text-gray-400">5K-9,999:</span> <span class="text-green-400">$11/rock</span></div>
+                                  <div><span class="text-gray-400">1-9:</span> <span class="text-red-400">$18/rock</span> <span class="text-red-300">(Street)</span></div>
+                                  <div><span class="text-gray-400">10-99:</span> <span class="text-orange-400">$15/rock</span> <span class="text-orange-300">(Small)</span></div>
+                                  <div><span class="text-gray-400">100-999:</span> <span class="text-yellow-400">$12/rock</span> <span class="text-yellow-300">(Bulk)</span></div>
+                                  <div><span class="text-gray-400">1K-4,999:</span> <span class="text-blue-400">$9/rock</span> <span class="text-blue-300">(Dealer)</span></div>
+                                  <div><span class="text-gray-400">5K-9,999:</span> <span class="text-green-400">$7/rock</span> <span class="text-green-300">(Wholesale)</span></div>
                                       <div class="text-gray-400 col-span-2">10K+:</div>
-                                      <div class="text-purple-400 col-span-2">$12/rock</div>
-                                      <div class="text-green-400 col-span-2">🔥 BEST</div>
+                                      <div class="text-purple-400 col-span-2">$6/rock</div>
+                                      <div class="text-green-400 col-span-2">🔥 DEEP WHOLESALE</div>
                               </div>
-                              <p class="text-cyan-400 text-xs mt-2">💡 Heat scales with √quantity - bulk is safer!</p>
+                              <p class="text-cyan-400 text-xs mt-2">💡 Bulk discounts = authentic drug economics • Heat scales with √quantity</p>
                           </div>
                           
                           <button onclick="closeModal()" class="w-full py-3 bg-gray-700 rounded font-bold">

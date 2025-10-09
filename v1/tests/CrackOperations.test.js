@@ -41,12 +41,14 @@ describe('Enhanced Crack Operations', () => {
     // For testing, we'll define them here with the same logic
     
     function getCrackPrice(amount) {
+        // Authentic 1991 NYC crack prices - bulk gets CHEAPER per unit
         let pricePerRock;
-        if (amount >= 10000) pricePerRock = 12; // Best bulk rate
-        else if (amount >= 5000) pricePerRock = 11;
-        else if (amount >= 1000) pricePerRock = 10;
-        else if (amount >= 100) pricePerRock = 9;
-        else pricePerRock = 8; // Worst rate for small amounts
+        if (amount >= 10000) pricePerRock = 6;   // Deep wholesale - $6/rock (~$6,000/kg equivalent)
+        else if (amount >= 5000) pricePerRock = 7;   // Large wholesale - $7/rock  
+        else if (amount >= 1000) pricePerRock = 9;   // Mid-level bulk - $9/rock
+        else if (amount >= 100) pricePerRock = 12;   // Small bulk - $12/rock
+        else if (amount >= 10) pricePerRock = 15;    // Street level - $15/rock
+        else pricePerRock = 18; // Single rock street price - $18/rock
         return pricePerRock;
     }
 
@@ -66,25 +68,28 @@ describe('Enhanced Crack Operations', () => {
     }
 
     describe('getCrackPrice', () => {
-        test('should return correct pricing tiers', () => {
-            expect(getCrackPrice(50)).toBe(8);    // Small amount
-            expect(getCrackPrice(100)).toBe(9);   // 100+ tier
-            expect(getCrackPrice(500)).toBe(9);   // Still 100+ tier
-            expect(getCrackPrice(1000)).toBe(10); // 1K+ tier
-            expect(getCrackPrice(2500)).toBe(10); // Still 1K+ tier
-            expect(getCrackPrice(5000)).toBe(11); // 5K+ tier
-            expect(getCrackPrice(7500)).toBe(11); // Still 5K+ tier
-            expect(getCrackPrice(10000)).toBe(12); // 10K+ tier - best rate
-            expect(getCrackPrice(25000)).toBe(12); // Still best rate
+        test('should return correct pricing tiers - cheaper for bulk', () => {
+            expect(getCrackPrice(5)).toBe(18);    // Single rock street price
+            expect(getCrackPrice(10)).toBe(15);   // Small street deals
+            expect(getCrackPrice(50)).toBe(15);   // Still small street
+            expect(getCrackPrice(100)).toBe(12);  // Small bulk
+            expect(getCrackPrice(500)).toBe(12);  // Still small bulk
+            expect(getCrackPrice(1000)).toBe(9);  // Mid-level dealer
+            expect(getCrackPrice(2500)).toBe(9);  // Still dealer level
+            expect(getCrackPrice(5000)).toBe(7);  // Large wholesale
+            expect(getCrackPrice(7500)).toBe(7);  // Still wholesale
+            expect(getCrackPrice(10000)).toBe(6); // Deep wholesale - best rate
+            expect(getCrackPrice(25000)).toBe(6); // Still deep wholesale
         });
 
         test('should handle edge cases', () => {
-            expect(getCrackPrice(0)).toBe(8);
-            expect(getCrackPrice(1)).toBe(8);
-            expect(getCrackPrice(99)).toBe(8);
-            expect(getCrackPrice(999)).toBe(9);
-            expect(getCrackPrice(4999)).toBe(10);
-            expect(getCrackPrice(9999)).toBe(11);
+            expect(getCrackPrice(0)).toBe(18);   // Single rock price for zero
+            expect(getCrackPrice(1)).toBe(18);   // Single rock
+            expect(getCrackPrice(9)).toBe(18);   // Still single rock range
+            expect(getCrackPrice(99)).toBe(15);  // Small street deals
+            expect(getCrackPrice(999)).toBe(12); // Small bulk
+            expect(getCrackPrice(4999)).toBe(9); // Mid-level dealer
+            expect(getCrackPrice(9999)).toBe(7); // Large wholesale
         });
     });
 
@@ -119,15 +124,20 @@ describe('Enhanced Crack Operations', () => {
     });
 
     describe('Bulk Pricing Benefits', () => {
-        test('should provide significant bulk discounts', () => {
-            const small = getCrackPrice(50) * 50;      // $8 * 50 = $400
-            const bulk = getCrackPrice(10000) * 10000; // $12 * 10000 = $120,000
+        test('should provide significant bulk discounts (authentic drug economics)', () => {
+            const singleRock = getCrackPrice(1) * 1;           // $18 * 1 = $18
+            const bulkRocks = getCrackPrice(10000) * 10000;    // $6 * 10000 = $60,000
             
-            const smallPerRock = small / 50;    // $8
-            const bulkPerRock = bulk / 10000;   // $12
+            const singleRockPrice = singleRock / 1;           // $18 per rock
+            const bulkRockPrice = bulkRocks / 10000;          // $6 per rock
             
-            expect(bulkPerRock).toBeGreaterThan(smallPerRock);
-            expect(bulkPerRock / smallPerRock).toBe(1.5); // 50% better pricing
+            expect(bulkRockPrice).toBeLessThan(singleRockPrice); // Bulk should be cheaper
+            expect(singleRockPrice / bulkRockPrice).toBe(3); // Single rocks cost 3x more than bulk
+            
+            // Test the discount progression
+            expect(getCrackPrice(1)).toBeGreaterThan(getCrackPrice(100));    // $18 > $12
+            expect(getCrackPrice(100)).toBeGreaterThan(getCrackPrice(1000)); // $12 > $9  
+            expect(getCrackPrice(1000)).toBeGreaterThan(getCrackPrice(10000)); // $9 > $6
         });
     });
 
