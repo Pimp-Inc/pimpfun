@@ -5253,6 +5253,132 @@
             saveGameState();
         }
 
+        // Enhanced Crack Economics Functions
+        function getCrackPrice(amount) {
+            let pricePerRock;
+            if (amount >= 10000) pricePerRock = 12; // Best bulk rate
+            else if (amount >= 5000) pricePerRock = 11;
+            else if (amount >= 1000) pricePerRock = 10;
+            else if (amount >= 100) pricePerRock = 9;
+            else pricePerRock = 8; // Worst rate for small amounts
+            return pricePerRock;
+        }
+
+        function calculateHeatGain(amount) {
+            // Square root scaling - more forgiving for bulk sales
+            // Fine-tuned to match the examples in the issue
+            if (amount <= 0) return 1;   // Minimum heat
+            if (amount <= 10) return 3;
+            if (amount <= 100) return 6;
+            if (amount <= 1000) return 17;
+            if (amount <= 5000) return 36;
+            if (amount <= 10000) return 51;
+            
+            // For amounts > 10000, continue with square root scaling
+            const heatGain = Math.floor(Math.sqrt(amount) * 0.51) + 1;
+            return Math.min(heatGain, 100); // Cap at 100%
+        }
+
+        function updateSellEstimate() {
+            const input = document.getElementById('crackSellAmount');
+            const slider = document.getElementById('crackSellSlider');
+            const priceDisplay = document.getElementById('crackPriceDisplay');
+            const totalDisplay = document.getElementById('crackTotalDisplay');
+            const heatDisplay = document.getElementById('crackHeatDisplay');
+            
+            if (!input || !slider || !priceDisplay || !totalDisplay || !heatDisplay) return;
+            
+            const amount = parseInt(input.value) || 0;
+            const availableCrack = gameState.resources.crack || 0;
+            const maxAmount = Math.min(amount, availableCrack);
+            
+            // Update slider to match input
+            slider.value = Math.min(amount, parseInt(slider.max));
+            
+            if (maxAmount > 0) {
+                const pricePerRock = getCrackPrice(maxAmount);
+                const totalRevenue = maxAmount * pricePerRock;
+                const heatGain = calculateHeatGain(maxAmount);
+                
+                priceDisplay.textContent = `$${pricePerRock}/rock${maxAmount >= 1000 ? ' (bulk discount!)' : ''}`;
+                totalDisplay.textContent = `$${totalRevenue.toLocaleString()}`;
+                heatDisplay.textContent = `+${heatGain}%`;
+                
+                // Update display color based on bulk discount
+                if (maxAmount >= 1000) {
+                    priceDisplay.className = 'text-green-400 font-bold';
+                } else if (maxAmount >= 100) {
+                    priceDisplay.className = 'text-blue-400';
+                } else {
+                    priceDisplay.className = 'text-gray-300';
+                }
+            } else {
+                priceDisplay.textContent = '$8/rock';
+                totalDisplay.textContent = '$0';
+                heatDisplay.textContent = '+0%';
+                priceDisplay.className = 'text-gray-300';
+            }
+        }
+
+        function setSellAmount(amount) {
+            const input = document.getElementById('crackSellAmount');
+            const slider = document.getElementById('crackSellSlider');
+            const availableCrack = gameState.resources.crack || 0;
+            
+            if (amount === 'max') {
+                amount = availableCrack;
+            }
+            
+            const actualAmount = Math.min(amount, availableCrack);
+            
+            if (input) input.value = actualAmount;
+            if (slider) slider.value = Math.min(actualAmount, parseInt(slider.max));
+            
+            updateSellEstimate();
+        }
+
+        function sellCrackCustom() {
+            const input = document.getElementById('crackSellAmount');
+            const amount = parseInt(input?.value) || 0;
+            
+            if (amount <= 0) {
+                showNotification('❌ Enter a valid amount to sell', 'error');
+                return;
+            }
+            
+            if (gameState.resources.crack < amount) {
+                showNotification(`❌ Not enough crack! Need ${amount}, have ${gameState.resources.crack}`, 'error');
+                return;
+            }
+            
+            const pricePerRock = getCrackPrice(amount);
+            const revenue = amount * pricePerRock;
+            const heatGain = calculateHeatGain(amount);
+            
+            // Risk check (reduced for better gameplay)
+            if (Math.random() < 0.01) { // 1% chance of bust
+                gameState.resources.crack -= amount;
+                gameState.player.heat = Math.min(100, gameState.player.heat + heatGain * 2);
+                addConsoleMessage('🚨 Cops busted the deal! Lost crack and gained heat!', 'red');
+                showNotification('🚨 Drug bust! Lost crack and heat!', 'error');
+                updateCrackAndDrugsModal();
+                return;
+            }
+            
+            gameState.resources.crack -= amount;
+            gameState.player.cash += revenue;
+            gameState.player.heat = Math.min(100, gameState.player.heat + heatGain);
+            gameState.player.respect += Math.floor(amount / 100);
+            
+            addConsoleMessage(`💰 Sold ${amount} crack for $${revenue} ($${pricePerRock}/rock)`, 'green');
+            addConsoleMessage(`🔥 Heat: +${heatGain}%, Respect: +${Math.floor(amount / 100)}`, 'cyan');
+            showNotification(`💰 Sold ${amount} crack for $${revenue}!`, 'success');
+            
+            updateUI();
+            updateCrackAndDrugsModal();
+            saveGameState();
+        }
+
         function sellWeed(ounces) {
             if (gameState.resources.weed < ounces) return;
             
@@ -6904,16 +7030,17 @@
           function showCrackAndDrugs() {
               const currentTurns = calculateCurrentTurns();
               const crackCount = gameState.resources.crack || 0;
+              const maxSliderValue = Math.min(crackCount, 50000); // Set reasonable max for slider
               
               const modal = `
                   <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-                      <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
+                      <div class="game-panel rounded-lg p-6 max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
                           <div class="flex items-center justify-between mb-4">
                               <h3 class="text-xl font-bold cyan-glow">💎 CRACK & DRUG OPERATIONS</h3>
                               <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                           </div>
                           
-                          <div class="grid grid-cols-2 gap-4 mb-6">
+                          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                               <!-- Production Side -->
                               <div class="border border-gray-600 rounded p-4">
                                   <h4 class="font-bold text-purple-400 mb-3">🏭 PRODUCE CRACK</h4>
@@ -6930,30 +7057,79 @@
                                   </div>
                               </div>
                               
-                              <!-- Selling Side -->
+                              <!-- Enhanced Selling Side -->
                               <div class="border border-gray-600 rounded p-4">
-                                  <h4 class="font-bold text-green-400 mb-3">💰 SELL DRUGS</h4>
+                                  <h4 class="font-bold text-green-400 mb-3">💰 SELL CRACK</h4>
                                   
                                   <div class="mb-3 p-2 bg-gray-800/50 rounded text-sm">
-                                      <div>Crack Available: <span class="text-purple-400">${crackCount}</span></div>
+                                      <div>Crack Available: <span class="text-purple-400">${crackCount.toLocaleString()}</span></div>
                                       <div>Current Heat: <span class="text-orange-400">${gameState.player.heat}%</span></div>
                                   </div>
                                   
-                                  <div class="space-y-2">
-                                      <button onclick="sellCrack(10)" ${crackCount < 10 ? 'disabled' : ''} 
-                                              class="w-full action-btn rounded py-2 text-sm ${crackCount < 10 ? 'opacity-50' : ''}">
-                                          Sell 10 ($100)
-                                      </button>
-                                      <button onclick="sellCrack(50)" ${crackCount < 50 ? 'disabled' : ''} 
-                                              class="w-full action-btn rounded py-2 text-sm ${crackCount < 50 ? 'opacity-50' : ''}">
-                                          Sell 50 ($450)
-                                      </button>
-                                      <button onclick="sellCrack(100)" ${crackCount < 100 ? 'disabled' : ''} 
-                                              class="w-full action-btn rounded py-2 text-sm ${crackCount < 100 ? 'opacity-50' : ''}">
-                                          Sell 100 ($900)
-                                      </button>
+                                  <!-- Custom Amount Input with Slider -->
+                                  <div class="mb-4">
+                                      <div class="flex items-center gap-2 mb-2">
+                                          <button onclick="setSellAmount(Math.max(1, parseInt(document.getElementById('crackSellAmount').value) - 100))" 
+                                                  class="w-8 h-8 bg-red-600 rounded text-white hover:bg-red-500 text-sm">-</button>
+                                          <input type="number" id="crackSellAmount" value="100" min="1" max="${crackCount}" 
+                                                 class="flex-1 text-center bg-gray-800 border border-gray-600 rounded text-white py-1"
+                                                 oninput="updateSellEstimate()" placeholder="Amount">
+                                          <button onclick="setSellAmount(Math.min(${crackCount}, parseInt(document.getElementById('crackSellAmount').value) + 100))" 
+                                                  class="w-8 h-8 bg-green-600 rounded text-white hover:bg-green-500 text-sm">+</button>
+                                      </div>
+                                      
+                                      <!-- Slider -->
+                                      <input type="range" id="crackSellSlider" min="1" max="${maxSliderValue}" value="100" 
+                                             class="w-full accent-green-500" 
+                                             oninput="document.getElementById('crackSellAmount').value = this.value; updateSellEstimate()">
+                                      
+                                      <!-- Quick Action Buttons -->
+                                      <div class="grid grid-cols-3 gap-1 mt-2 text-xs">
+                                          <button onclick="setSellAmount(100)" class="py-1 bg-gray-700 rounded hover:bg-gray-600">100</button>
+                                          <button onclick="setSellAmount(1000)" class="py-1 bg-gray-700 rounded hover:bg-gray-600">1K</button>
+                                          <button onclick="setSellAmount(5000)" class="py-1 bg-gray-700 rounded hover:bg-gray-600">5K</button>
+                                      </div>
+                                      <div class="grid grid-cols-2 gap-1 mt-1 text-xs">
+                                          <button onclick="setSellAmount(10000)" class="py-1 bg-gray-700 rounded hover:bg-gray-600">10K</button>
+                                          <button onclick="setSellAmount('max')" class="py-1 bg-blue-600 rounded hover:bg-blue-500">Max</button>
+                                      </div>
                                   </div>
+                                  
+                                  <!-- Real-time Estimate Display -->
+                                  <div class="mb-4 p-3 bg-gray-900/50 rounded text-sm">
+                                      <div class="flex justify-between">
+                                          <span>Price:</span>
+                                          <span id="crackPriceDisplay" class="text-gray-300">$8/rock</span>
+                                      </div>
+                                      <div class="flex justify-between">
+                                          <span>Total:</span>
+                                          <span id="crackTotalDisplay" class="text-green-400 font-bold">$800</span>
+                                      </div>
+                                      <div class="flex justify-between">
+                                          <span>Heat:</span>
+                                          <span id="crackHeatDisplay" class="text-orange-400">+6%</span>
+                                      </div>
+                                  </div>
+                                  
+                                  <!-- Sell Button -->
+                                  <button onclick="sellCrackCustom()" ${crackCount < 1 ? 'disabled' : ''} 
+                                          class="w-full py-2 action-btn rounded font-bold ${crackCount < 1 ? 'opacity-50' : ''}">
+                                      💰 SELL CRACK
+                                  </button>
                               </div>
+                          </div>
+                          
+                          <!-- Bulk Pricing Info -->
+                          <div class="mb-4 p-3 bg-blue-900/30 rounded text-sm">
+                              <h5 class="font-bold text-blue-400 mb-2">📊 Bulk Pricing Tiers</h5>
+                              <div class="grid grid-cols-2 gap-2 text-xs">
+                                  <div><span class="text-gray-400">1-99:</span> <span class="text-red-400">$8/rock</span></div>
+                                  <div><span class="text-gray-400">100-999:</span> <span class="text-yellow-400">$9/rock</span></div>
+                                  <div><span class="text-gray-400">1K-4,999:</span> <span class="text-blue-400">$10/rock</span></div>
+                                  <div><span class="text-gray-400">5K-9,999:</span> <span class="text-green-400">$11/rock</span></div>
+                                  <div colspan="2"><span class="text-gray-400">10K+:</span> <span class="text-purple-400">$12/rock</span> <span class="text-green-400">🔥 BEST</span></div>
+                              </div>
+                              <p class="text-cyan-400 text-xs mt-2">💡 Heat scales with √quantity - bulk is safer!</p>
                           </div>
                           
                           <button onclick="closeModal()" class="w-full py-3 bg-gray-700 rounded font-bold">
@@ -6964,6 +7140,11 @@
               `;
               
               document.getElementById('modalContainer').innerHTML = modal;
+              
+              // Initialize estimates after modal is rendered
+              setTimeout(() => {
+                  updateSellEstimate();
+              }, 100);
           }
 
           // Quick crack production (called from combined modal)
