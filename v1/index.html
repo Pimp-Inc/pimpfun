@@ -11375,131 +11375,173 @@
             }
                  }
         
-        // ECONOMIC DASHBOARD - Re-implemented
+        // ECONOMIC DASHBOARD - Enhanced with mobile optimization and error handling
         function showEconomicDashboard() {
-            // Calculate income sources
-            const hoeDetails = gameState.resources.hoeDetails || {};
-            const payoutMultiplier = (100 - gameState.player.payoutPercentage) / 100;
+            console.log('📊 Opening Economic Dashboard...');
             
-            const dailyIncomeBreakdown = [
-                {
-                    type: 'Street Workers',
-                    count: hoeDetails.streetWorkers || 0,
-                    baseDaily: 180,
-                    pimpDaily: Math.floor(180 * payoutMultiplier),
-                    total: (hoeDetails.streetWorkers || 0) * Math.floor(180 * payoutMultiplier)
-                },
-                {
-                    type: 'Sugar Babies', 
-                    count: hoeDetails.sugarBabies || 0,
-                    baseDaily: 240,
-                    pimpDaily: Math.floor(240 * payoutMultiplier),
-                    total: (hoeDetails.sugarBabies || 0) * Math.floor(240 * payoutMultiplier)
-                },
-                {
-                    type: 'High-End Escorts',
-                    count: hoeDetails.highEndEscorts || 0,
-                    baseDaily: 350,
-                    pimpDaily: Math.floor(350 * payoutMultiplier),
-                    total: (hoeDetails.highEndEscorts || 0) * Math.floor(350 * payoutMultiplier)
-                },
-                {
-                    type: 'OnlyTramps Models',
-                    count: hoeDetails.onlyTrampsModels || 0,
-                    baseDaily: 1260,
-                    pimpDaily: Math.floor(1260 * payoutMultiplier),
-                    total: (hoeDetails.onlyTrampsModels || 0) * Math.floor(1260 * payoutMultiplier)
+            try {
+                // Defensive programming - ensure all required data exists
+                if (!gameState || !gameState.resources || !gameState.player) {
+                    console.error('❌ Invalid gameState for Economic Dashboard');
+                    showNotification('❌ Cannot load Economic Dashboard - game data missing', 'error');
+                    return;
                 }
-            ];
-            
-            const totalDailyIncome = dailyIncomeBreakdown.reduce((sum, source) => sum + source.total, 0);
-            
-            // Calculate expenses
-            const thugs = gameState.crew.thugs || [];
-            const weeklyPayroll = thugs.reduce((total, thug) => {
-                const rank = THUG_RANKS[thug.rank] || THUG_RANKS.rookie;
-                return total + rank.salary;
-            }, 0);
-            const dailyPayroll = weeklyPayroll / 7;
-            
-            const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div class="game-panel rounded-lg p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold cyan-glow">📊 ECONOMIC DASHBOARD</h3>
-                            <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
-                        </div>
-                        
-                        <!-- Daily Income Summary -->
-                        <div class="mb-4 p-4 bg-green-900/30 rounded border border-green-500/50">
-                            <h4 class="font-bold text-green-400 mb-2">💰 Daily Income</h4>
-                            <div class="text-center mb-3">
-                                <div class="text-2xl font-bold gold-text">$${totalDailyIncome.toLocaleString()}</div>
-                                <div class="text-sm text-gray-400">Per day from all sources</div>
+                
+                // Calculate income sources with safe defaults
+                const hoeDetails = gameState.resources.hoeDetails || {};
+                const payoutPercentage = gameState.player.payoutPercentage || 30;
+                const payoutMultiplier = (100 - payoutPercentage) / 100;
+                
+                const dailyIncomeBreakdown = [
+                    {
+                        type: 'Street Workers',
+                        count: hoeDetails.streetWorkers || 0,
+                        baseDaily: 180,
+                        pimpDaily: Math.floor(180 * payoutMultiplier),
+                        total: (hoeDetails.streetWorkers || 0) * Math.floor(180 * payoutMultiplier)
+                    },
+                    {
+                        type: 'Sugar Babies', 
+                        count: hoeDetails.sugarBabies || 0,
+                        baseDaily: 240,
+                        pimpDaily: Math.floor(240 * payoutMultiplier),
+                        total: (hoeDetails.sugarBabies || 0) * Math.floor(240 * payoutMultiplier)
+                    },
+                    {
+                        type: 'High-End Escorts',
+                        count: hoeDetails.highEndEscorts || 0,
+                        baseDaily: 350,
+                        pimpDaily: Math.floor(350 * payoutMultiplier),
+                        total: (hoeDetails.highEndEscorts || 0) * Math.floor(350 * payoutMultiplier)
+                    },
+                    {
+                        type: 'OnlyTramps Models',
+                        count: hoeDetails.onlyTrampsModels || 0,
+                        baseDaily: 1260,
+                        pimpDaily: Math.floor(1260 * payoutMultiplier),
+                        total: (hoeDetails.onlyTrampsModels || 0) * Math.floor(1260 * payoutMultiplier)
+                    }
+                ];
+                
+                const totalDailyIncome = dailyIncomeBreakdown.reduce((sum, source) => sum + source.total, 0);
+                
+                // Calculate expenses with safe defaults
+                const thugs = (gameState.crew && gameState.crew.thugs) ? gameState.crew.thugs : [];
+                const weeklyPayroll = thugs.reduce((total, thug) => {
+                    const rank = (THUG_RANKS && THUG_RANKS[thug.rank]) ? THUG_RANKS[thug.rank] : THUG_RANKS.rookie;
+                    return total + (rank.salary || 250);
+                }, 0);
+                const dailyPayroll = weeklyPayroll / 7;
+                
+                // Safe access to supplies data
+                const supplies = gameState.supplies || {};
+                const hoeHappiness = supplies.hoeHappiness || 70;
+                const playerHeat = gameState.player.heat || 0;
+                
+                const modal = `
+                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                        <div class="game-panel rounded-lg p-4 sm:p-6 max-w-lg w-full my-4 max-h-[90vh] overflow-y-auto">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg sm:text-xl font-bold cyan-glow">📊 ECONOMIC DASHBOARD</h3>
+                                <button onclick="closeModal()" 
+                                        class="text-red-400 hover:text-red-300 text-2xl font-bold min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                        aria-label="Close Economic Dashboard">&times;</button>
                             </div>
-                        </div>
-                        
-                        <!-- Income Breakdown -->
-                        <div class="mb-4 p-3 bg-gray-800/50 rounded">
-                            <h5 class="font-bold text-white mb-2">📋 Income Sources:</h5>
-                            <div class="space-y-1 text-xs">
-                                ${dailyIncomeBreakdown.filter(source => source.count > 0).map(source => `
+                            
+                            <!-- Daily Income Summary -->
+                            <div class="mb-4 p-3 sm:p-4 bg-green-900/30 rounded border border-green-500/50">
+                                <h4 class="font-bold text-green-400 mb-2 text-sm sm:text-base">💰 Daily Income</h4>
+                                <div class="text-center mb-3">
+                                    <div class="text-xl sm:text-2xl font-bold gold-text">$${totalDailyIncome.toLocaleString()}</div>
+                                    <div class="text-xs sm:text-sm text-gray-400">Per day from all sources</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Income Breakdown -->
+                            <div class="mb-4 p-3 bg-gray-800/50 rounded">
+                                <h5 class="font-bold text-white mb-2 text-sm">📋 Income Sources:</h5>
+                                <div class="space-y-1 text-xs">
+                                    ${dailyIncomeBreakdown.filter(source => source.count > 0).map(source => `
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-300">${source.count} ${source.type}</span>
+                                            <span class="text-green-400">$${source.total.toLocaleString()}/day</span>
+                                        </div>
+                                    `).join('')}
+                                    ${dailyIncomeBreakdown.filter(source => source.count > 0).length === 0 ? 
+                                        '<div class="text-gray-400">No income sources - scout for hoes!</div>' : ''}
+                                </div>
+                            </div>
+                            
+                            <!-- Expenses -->
+                            <div class="mb-4 p-3 bg-red-900/30 rounded border border-red-500/50">
+                                <h5 class="font-bold text-red-400 mb-2 text-sm">💸 Daily Expenses:</h5>
+                                <div class="space-y-1 text-xs">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-gray-300">${source.count} ${source.type}</span>
-                                        <span class="text-green-400">$${source.total.toLocaleString()}/day</span>
+                                        <span class="text-gray-300">Thug Payroll (${thugs.length} thugs)</span>
+                                        <span class="text-red-400">$${dailyPayroll.toFixed(0)}/day</span>
                                     </div>
-                                `).join('')}
-                                ${dailyIncomeBreakdown.filter(source => source.count > 0).length === 0 ? 
-                                    '<div class="text-gray-400">No income sources - scout for hoes!</div>' : ''}
-                            </div>
-                        </div>
-                        
-                        <!-- Expenses -->
-                        <div class="mb-4 p-3 bg-red-900/30 rounded border border-red-500/50">
-                            <h5 class="font-bold text-red-400 mb-2">💸 Daily Expenses:</h5>
-                            <div class="space-y-1 text-xs">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-300">Thug Payroll (${thugs.length} thugs)</span>
-                                    <span class="text-red-400">$${dailyPayroll.toFixed(0)}/day</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-300">Supply Costs (beer, condoms)</span>
-                                    <span class="text-red-400">~$50/day</span>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">Supply Costs (beer, condoms)</span>
+                                        <span class="text-red-400">~$50/day</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Net Profit -->
-                        <div class="mb-4 p-3 bg-blue-900/30 rounded">
-                            <h5 class="font-bold text-blue-400 mb-2">📈 Net Daily Profit:</h5>
-                            <div class="text-center">
-                                <div class="text-xl font-bold ${totalDailyIncome - dailyPayroll > 0 ? 'text-green-400' : 'text-red-400'}">
-                                    $${(totalDailyIncome - dailyPayroll - 50).toFixed(0)}
+                            
+                            <!-- Net Profit -->
+                            <div class="mb-4 p-3 bg-blue-900/30 rounded">
+                                <h5 class="font-bold text-blue-400 mb-2 text-sm">📈 Net Daily Profit:</h5>
+                                <div class="text-center">
+                                    <div class="text-lg sm:text-xl font-bold ${totalDailyIncome - dailyPayroll > 0 ? 'text-green-400' : 'text-red-400'}">
+                                        $${(totalDailyIncome - dailyPayroll - 50).toFixed(0)}
+                                    </div>
+                                    <div class="text-xs text-gray-400">After payroll and supplies</div>
                                 </div>
-                                <div class="text-xs text-gray-400">After payroll and supplies</div>
                             </div>
-                        </div>
-                        
-                        <!-- Economic Advice -->
-                        <div class="p-3 bg-yellow-900/30 rounded">
-                            <h5 class="font-bold text-yellow-400 mb-2">💡 Economic Advice:</h5>
-                            <div class="text-xs text-gray-300 space-y-1">
-                                ${totalDailyIncome === 0 ? '<div>🔍 Scout for hoes to start earning daily income!</div>' : ''}
-                                ${totalDailyIncome > 0 && totalDailyIncome < dailyPayroll ? '<div>⚠️ Income lower than payroll - recruit more hoes or reduce crew!</div>' : ''}
-                                ${gameState.player.payoutPercentage > 40 ? '<div>💡 Consider lowering payout % for more income</div>' : ''}
-                                ${gameState.supplies.hoeHappiness < 70 ? '<div>😞 Improve hoe happiness for better earnings</div>' : ''}
-                                ${gameState.player.heat > 50 ? '<div>🚔 High heat reduces earnings - manage heat levels</div>' : ''}
+                            
+                            <!-- Economic Advice -->
+                            <div class="p-3 bg-yellow-900/30 rounded mb-4">
+                                <h5 class="font-bold text-yellow-400 mb-2 text-sm">💡 Economic Advice:</h5>
+                                <div class="text-xs text-gray-300 space-y-1">
+                                    ${totalDailyIncome === 0 ? '<div>🔍 Scout for hoes to start earning daily income!</div>' : ''}
+                                    ${totalDailyIncome > 0 && totalDailyIncome < dailyPayroll ? '<div>⚠️ Income lower than payroll - recruit more hoes or reduce crew!</div>' : ''}
+                                    ${payoutPercentage > 40 ? '<div>💡 Consider lowering payout % for more income</div>' : ''}
+                                    ${hoeHappiness < 70 ? '<div>😞 Improve hoe happiness for better earnings</div>' : ''}
+                                    ${playerHeat > 50 ? '<div>🚔 High heat reduces earnings - manage heat levels</div>' : ''}
+                                    ${totalDailyIncome > 1000 ? '<div>💰 Great income! Consider expanding to new districts</div>' : ''}
+                                </div>
                             </div>
+                            
+                            <button onclick="closeModal()" 
+                                    class="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded font-bold transition-colors min-h-[44px]"
+                                    aria-label="Close Economic Dashboard">
+                                Close Dashboard
+                            </button>
                         </div>
-                        
-                        <button onclick="closeModal()" class="w-full py-3 bg-gray-700 rounded font-bold mt-4">
-                            Close Dashboard
-                        </button>
                     </div>
-                </div>
-            `;
-            
-            document.getElementById('modalContainer').innerHTML = modal;
+                `;
+                
+                const modalContainer = document.getElementById('modalContainer');
+                if (!modalContainer) {
+                    console.error('❌ Modal container not found');
+                    showNotification('❌ Cannot display Economic Dashboard - modal container missing', 'error');
+                    return;
+                }
+                
+                modalContainer.innerHTML = modal;
+                console.log('✅ Economic Dashboard opened successfully');
+                
+                // Add keyboard accessibility
+                setTimeout(() => {
+                    const closeButton = modalContainer.querySelector('button[onclick="closeModal()"]');
+                    if (closeButton) {
+                        closeButton.focus();
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.error('❌ Error opening Economic Dashboard:', error);
+                showNotification('❌ Failed to load Economic Dashboard', 'error');
+            }
         }
         
         // Test daily payout function
