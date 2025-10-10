@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana Token Checker Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Solana libraries -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js"></script>
+    <script src="simple-wallet.js"></script>
+    <script src="solana-token-checker.js"></script>
+    <script src="solana-token-api.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8">Solana Token Checker Demo</h1>
+        
+        <!-- Wallet Connection Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Wallet Connection</h2>
+            <div class="flex gap-4 items-center">
+                <button id="connectWallet" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg">
+                    Connect Phantom Wallet
+                </button>
+                <span id="walletStatus" class="text-gray-400">Not connected</span>
+            </div>
+            <div id="walletAddress" class="mt-2 text-sm text-gray-300 hidden"></div>
+        </div>
+
+        <!-- Token Check Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Token Ownership Check</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Token Mint Address</label>
+                    <input id="mintAddress" type="text" 
+                           placeholder="Enter SPL token mint address"
+                           class="w-full px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Network</label>
+                    <select id="networkSelect" class="w-full px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none">
+                        <option value="mainnet">Mainnet</option>
+                        <option value="devnet" selected>Devnet</option>
+                        <option value="testnet">Testnet</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-4 mb-4">
+                <button id="checkToken" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg" disabled>
+                    Check Token Ownership
+                </button>
+                <button id="autoDetectCheck" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg" disabled>
+                    Auto-Detect & Check
+                </button>
+                <label class="flex items-center">
+                    <input type="checkbox" id="useToken2022" class="mr-2">
+                    <span class="text-sm">Use Token-2022</span>
+                </label>
+            </div>
+
+            <!-- Quick Test Buttons -->
+            <div class="mb-4">
+                <h3 class="text-sm font-medium mb-2">Quick Tests (Devnet)</h3>
+                <div class="flex gap-2 flex-wrap">
+                    <button class="test-btn bg-gray-600 hover:bg-gray-700 px-3 py-1 text-sm rounded" 
+                            data-mint="So11111111111111111111111111111111111111112">
+                        Test SOL (Wrapped)
+                    </button>
+                    <button class="test-btn bg-gray-600 hover:bg-gray-700 px-3 py-1 text-sm rounded" 
+                            data-mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v">
+                        Test USDC
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="results" class="hidden">
+                <h3 class="text-lg font-medium mb-2">Results</h3>
+                <div id="resultContent" class="bg-gray-900 p-4 rounded-lg"></div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="hidden text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+                <p class="mt-2">Checking token ownership...</p>
+            </div>
+        </div>
+
+        <!-- API Health Section -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">API Health & Cache</h2>
+            <div class="flex gap-4">
+                <button id="checkHealth" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg">
+                    Check Health
+                </button>
+                <button id="clearCache" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">
+                    Clear Cache
+                </button>
+            </div>
+            <div id="healthResults" class="mt-4 hidden">
+                <div id="healthContent" class="bg-gray-900 p-4 rounded-lg"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wallet = new SimpleWallet();
+        let tokenAPI = new SolanaTokenAPI();
+
+        // DOM elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletStatus = document.getElementById('walletStatus');
+        const walletAddress = document.getElementById('walletAddress');
+        const mintAddressInput = document.getElementById('mintAddress');
+        const networkSelect = document.getElementById('networkSelect');
+        const checkTokenBtn = document.getElementById('checkToken');
+        const autoDetectBtn = document.getElementById('autoDetectCheck');
+        const useToken2022Checkbox = document.getElementById('useToken2022');
+        const resultsDiv = document.getElementById('results');
+        const resultContent = document.getElementById('resultContent');
+        const loadingDiv = document.getElementById('loading');
+        const checkHealthBtn = document.getElementById('checkHealth');
+        const clearCacheBtn = document.getElementById('clearCache');
+        const healthResults = document.getElementById('healthResults');
+        const healthContent = document.getElementById('healthContent');
+
+        // Wallet connection
+        connectWalletBtn.addEventListener('click', async () => {
+            connectWalletBtn.disabled = true;
+            connectWalletBtn.textContent = 'Connecting...';
+
+            const result = await wallet.connectPhantom();
+            
+            if (result.success) {
+                walletStatus.textContent = 'Connected';
+                walletStatus.className = 'text-green-400';
+                walletAddress.textContent = `Address: ${result.publicKey}`;
+                walletAddress.classList.remove('hidden');
+                connectWalletBtn.textContent = 'Connected';
+                connectWalletBtn.className = 'bg-green-600 px-6 py-2 rounded-lg';
+                
+                // Enable token check buttons
+                checkTokenBtn.disabled = false;
+                autoDetectBtn.disabled = false;
+            } else {
+                walletStatus.textContent = `Connection failed: ${result.error}`;
+                walletStatus.className = 'text-red-400';
+                connectWalletBtn.disabled = false;
+                connectWalletBtn.textContent = 'Connect Phantom Wallet';
+            }
+        });
+
+        // Network selection
+        networkSelect.addEventListener('change', () => {
+            const network = networkSelect.value;
+            tokenAPI.setNetwork(network);
+            console.log(`Switched to ${network} network`);
+        });
+
+        // Set initial network
+        tokenAPI.setNetwork('devnet');
+
+        // Token checking
+        async function showResults(response, method = 'checkSolanaToken') {
+            loadingDiv.classList.add('hidden');
+            resultsDiv.classList.remove('hidden');
+            
+            let html = `<h4 class="font-bold mb-2">Method: ${method}</h4>`;
+            
+            if (response.success) {
+                html += `
+                    <div class="text-green-400 mb-2">✅ Success</div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong>Has Account:</strong> ${response.hasAccount}</div>
+                        <div><strong>UI Amount:</strong> ${response.uiAmount}</div>
+                        <div><strong>Raw Amount:</strong> ${response.rawAmount || 'N/A'}</div>
+                        <div><strong>Decimals:</strong> ${response.decimals || 'N/A'}</div>
+                        <div><strong>Program Type:</strong> ${response.programType || 'N/A'}</div>
+                        <div><strong>ATA:</strong> ${response.ata || 'N/A'}</div>
+                    </div>
+                `;
+                
+                if (response.warning) {
+                    html += `<div class="text-yellow-400 mt-2">⚠️ Warning: ${response.warning}</div>`;
+                }
+            } else {
+                html += `
+                    <div class="text-red-400 mb-2">❌ Error</div>
+                    <div><strong>Error:</strong> ${response.error}</div>
+                    <div><strong>Status Code:</strong> ${response.statusCode}</div>
+                `;
+            }
+            
+            resultContent.innerHTML = html;
+        }
+
+        checkTokenBtn.addEventListener('click', async () => {
+            if (!wallet.isConnected()) {
+                alert('Please connect your wallet first');
+                return;
+            }
+
+            const mintAddress = mintAddressInput.value.trim();
+            if (!mintAddress) {
+                alert('Please enter a token mint address');
+                return;
+            }
+
+            loadingDiv.classList.remove('hidden');
+            resultsDiv.classList.add('hidden');
+
+            const response = await tokenAPI.checkSolanaToken({
+                walletAddress: wallet.getPublicKey(),
+                mintAddress: mintAddress,
+                useToken2022: useToken2022Checkbox.checked
+            });
+
+            await showResults(response, 'checkSolanaToken');
+        });
+
+        autoDetectBtn.addEventListener('click', async () => {
+            if (!wallet.isConnected()) {
+                alert('Please connect your wallet first');
+                return;
+            }
+
+            const mintAddress = mintAddressInput.value.trim();
+            if (!mintAddress) {
+                alert('Please enter a token mint address');
+                return;
+            }
+
+            loadingDiv.classList.remove('hidden');
+            resultsDiv.classList.add('hidden');
+
+            const response = await tokenAPI.checkSolanaTokenAuto({
+                walletAddress: wallet.getPublicKey(),
+                mintAddress: mintAddress
+            });
+
+            await showResults(response, 'checkSolanaTokenAuto');
+        });
+
+        // Quick test buttons
+        document.querySelectorAll('.test-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                mintAddressInput.value = btn.dataset.mint;
+            });
+        });
+
+        // Health check
+        checkHealthBtn.addEventListener('click', () => {
+            const health = tokenAPI.getHealth();
+            healthResults.classList.remove('hidden');
+            
+            const html = `
+                <h4 class="font-bold mb-2">API Health Status</h4>
+                <div class="text-green-400 mb-2">✅ Healthy: ${health.healthy}</div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><strong>RPC URL:</strong> ${health.connection.rpcUrl}</div>
+                    <div><strong>Connected:</strong> ${health.connection.connected}</div>
+                    <div><strong>Cache Entries:</strong> ${health.cache.totalEntries}</div>
+                    <div><strong>Valid Entries:</strong> ${health.cache.validEntries}</div>
+                    <div><strong>Expired Entries:</strong> ${health.cache.expiredEntries}</div>
+                    <div><strong>Cache Expiry:</strong> ${health.cache.cacheExpiryMs}ms</div>
+                </div>
+                <div class="mt-2 text-xs text-gray-400">Timestamp: ${health.timestamp}</div>
+            `;
+            
+            healthContent.innerHTML = html;
+        });
+
+        // Clear cache
+        clearCacheBtn.addEventListener('click', () => {
+            const response = tokenAPI.clearCache();
+            if (response.success) {
+                alert('Cache cleared successfully!');
+                // Refresh health info if visible
+                if (!healthResults.classList.contains('hidden')) {
+                    checkHealthBtn.click();
+                }
+            }
+        });
+
+        // Initial health check
+        checkHealthBtn.click();
+    </script>
+</body>
+</html>

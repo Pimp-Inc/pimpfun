@@ -4,7 +4,7 @@
 
 **A strategic web-based game where you build your criminal empire across the 5 boroughs of New York City. Manage resources, expand territory, and dominate the streets in this text-based strategy game.**
 
-[![Tests](https://img.shields.io/badge/tests-105%20passing-brightgreen)]() [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)]() [![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Tests](https://img.shields.io/badge/tests-181%20passing-brightgreen)]() [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)]() [![License](https://img.shields.io/badge/license-MIT-blue)]()
 
 ---
 
@@ -32,6 +32,9 @@ pimpfun/v1/
 ├── package.json            # Project configuration and dependencies
 ├── start.bat              # Windows quick-start launcher
 ├── simple-wallet.js        # Phantom wallet integration
+├── solana-token-checker.js  # Solana token ownership verification
+├── solana-token-api.js      # Token checking API wrapper
+├── solana-token-demo.html   # Token checking demo page
 ├── supabase-config.js      # Database configuration
 ├── store-systems.js        # Enhanced store system module
 ├── src/                   # Core game modules
@@ -40,14 +43,16 @@ pimpfun/v1/
 │   │   └── GameStateManager.js # Game state management
 │   └── utils/
 │       └── GameUtils.js        # Utility functions
-├── tests/                 # Comprehensive test suite (105 tests)
+├── tests/                 # Comprehensive test suite (181 tests)
 │   ├── setup.js              # Test configuration
 │   ├── StoreSystem.test.js    # Store system tests
 │   ├── GameStateManager.test.js # Game state tests
-│   └── SimpleWallet.test.js   # Wallet integration tests
+│   ├── SimpleWallet.test.js   # Wallet integration tests
+│   └── SolanaTokenChecker.test.js # Token ownership tests
 ├── docs/                  # Game data and documentation
 │   ├── api/               # API documentation
 │   ├── DEVELOPER_GUIDE.md # Development documentation
+│   ├── SOLANA_TOKEN_INTEGRATION.md # Token gating documentation
 │   ├── heat.JSON          # Heat system configuration
 │   ├── ho_names.JSON      # Character name database
 │   └── NPC_Hood_pimps.JSON # NPC configuration data
@@ -69,9 +74,18 @@ pimpfun/v1/
 - **📱 Cross-Platform**: Responsive design works on desktop, tablet, and mobile
 - **💾 Dual Storage**: Local storage with optional cloud sync via Supabase
 - **🔗 Blockchain Integration**: Optional Phantom wallet support for Web3 features
+- **🪙 Token Gating**: SPL token ownership verification for exclusive access
 - **⚡ Real-Time Updates**: Live resource tracking and instant notifications
 - **🎨 Modern Interface**: Clean, cyberpunk-inspired design with Tailwind CSS
 - **🔒 Secure**: Input validation, state integrity checks, and secure wallet integration
+
+### Web3 Features
+- **🔐 Token Ownership Verification**: Check if wallets own specific SPL tokens
+- **🌐 Multi-Program Support**: Compatible with both Token Program and Token-2022
+- **🤖 Auto-Detection**: Automatically detect token program types
+- **⚡ Performance Optimized**: Built-in caching for mint metadata
+- **🔄 Real-Time Balance**: Live token balance checking with multiple RPC support
+- **🎯 Access Control**: Token-based gating for premium features and content
 
 ## 🛠️ Development
 
@@ -99,7 +113,7 @@ npm run dev
 ### Available Commands
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run the complete test suite (105 tests) |
+| `npm test` | Run the complete test suite (181 tests) |
 | `npm run test:watch` | Run tests in watch mode for development |
 | `npm run test:coverage` | Generate detailed coverage report |
 | `npm run lint` | Check code style and quality |
@@ -108,11 +122,12 @@ npm run dev
 
 ## 🧪 Testing & Quality
 
-The project maintains **94%+ test coverage** with a comprehensive suite of 105 unit tests.
+The project maintains **94%+ test coverage** with a comprehensive suite of 181 unit tests.
 
 ### Test Suites
 - **StoreSystem**: Store functionality, purchase validation, quantity management
-- **GameStateManager**: Game state persistence, calculations, data migration  
+- **GameStateManager**: Game state persistence, calculations, data migration
+- **SolanaTokenChecker**: Token ownership verification, balance checking, program detection  
 - **SimpleWallet**: Wallet connection, authentication, transaction handling
 - **GameUtils**: Utility functions, formatting, validation helpers
 - **SupabaseConfig**: Database integration and configuration
