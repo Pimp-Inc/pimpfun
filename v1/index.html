@@ -141,6 +141,43 @@
             cursor: not-allowed;
         }
         
+        /* Heat Management button - dynamic border color based on heat level */
+        .heat-btn {
+            background: linear-gradient(135deg, rgba(255, 47, 185, 0.2) 0%, rgba(0, 229, 255, 0.2) 100%);
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .heat-btn.heat-low {
+            border-color: #10b981; /* Green for 0-33% heat */
+        }
+        
+        .heat-btn.heat-medium {
+            border-color: #f59e0b; /* Yellow for 34-66% heat */
+        }
+        
+        .heat-btn.heat-high {
+            border-color: #ef4444; /* Red for 67-100% heat */
+        }
+        
+        .heat-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(255, 47, 185, 0.3) 0%, rgba(0, 229, 255, 0.3) 100%);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .heat-btn.heat-low:hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+        
+        .heat-btn.heat-medium:hover {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        
+        .heat-btn.heat-high:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+        
         /* Turn meter */
         .turn-meter {
             background: linear-gradient(90deg, 
@@ -468,11 +505,11 @@
                         <button onclick="showCrackAndDrugs()" class="w-full action-btn rounded py-2 text-sm">
                             💎 CRACK & DRUG DEALING
                         </button>
-                        <button onclick="showHeatReductionServices()" class="w-full action-btn rounded py-2 text-sm bg-red-600">
-                            🔥 HEAT MANAGEMENT
-                        </button>
                         <button onclick="adjustPayout()" class="w-full action-btn rounded py-2 text-sm">
-                            💃 ADJUST HO $ PAYOUT
+                            💃 ADJUST HO $ PAYOUT (30%)
+                        </button>
+                        <button onclick="showHeatReductionServices()" id="heatManagementBtn" class="w-full heat-btn rounded py-2 text-sm">
+                            🔥 HEAT MANAGEMENT
                         </button>
                     </div>
                 </div>
@@ -8274,6 +8311,23 @@
                     heatEl.className = 'text-yellow-500';
                 } else {
                     heatEl.className = 'text-green-400';
+                }
+            }
+            
+            // Update Heat Management button border color based on heat level
+            const heatBtn = document.getElementById('heatManagementBtn');
+            if (heatBtn) {
+                const heat = gameState.player.heat;
+                // Remove existing heat classes
+                heatBtn.classList.remove('heat-low', 'heat-medium', 'heat-high');
+                
+                // Add appropriate heat class based on heat level
+                if (heat <= 33) {
+                    heatBtn.classList.add('heat-low');
+                } else if (heat <= 66) {
+                    heatBtn.classList.add('heat-medium');
+                } else {
+                    heatBtn.classList.add('heat-high');
                 }
             }
             
