@@ -52,4 +52,17 @@
         "backfireChance": 0.15,
         "nftDrop": { "chance": 0.02, "pool": ["bronze_key","silver_key","gold_key","diamond_key"] },
         "events": [
-          { "id": "handjobs_homeless", "title": "Handjobs for the Homeless", "flavor": "Relief work_
+          { "id": "handjobs_homeless", "title": "Handjobs for the Homeless", "flavor": "Relief work at its finest." },
+          { "id": "strip_for_shelter", "title": "Strip for Shelter", "flavor": "Taking it all off to put roofs on heads." },
+          { "id": "thugs_against_hunger", "title": "Thugs Against Hunger Gala", "flavor": "Black-tie muscle serving four-course community love." },
+          { "id": "pimps_and_pancakes", "title": "Pimps & Pancakes Breakfast", "flavor": "Stackin' hotcakes and hope for the homeless." },
+          { "id": "hoes_for_housing", "title": "Hoes for Housing Fund", "flavor": "Building homes one hustle at a time." },
+          { "id": "bling_auction_benefits", "title": "Bling Auction Benefits", "flavor": "Chains, rings, and community gains." },
+          { "id": "escort_literacy_program", "title": "Escort Literacy Program", "flavor": "Teaching ABCs between the sheets of education." },
+          { "id": "thug_life_coaching", "title": "Thug Life Coaching Clinic", "flavor": "Mentoring street skills into legitimate business." },
+          { "id": "pimp_scholarship_fund", "title": "Pimp Scholarship Fund", "flavor": "Educating tomorrow's entrepreneurs in style." }
+        ]
+      }
+    ]
+  }
+}
