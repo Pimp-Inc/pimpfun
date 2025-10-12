@@ -298,7 +298,7 @@ For development-related questions, please review:
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) file for full details.
+MIT License - See package.json for license details.
 
 ---
 
