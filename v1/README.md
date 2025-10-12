@@ -99,7 +99,7 @@ npm run dev
 ### Available Commands
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run the complete test suite (105 tests) |
+| `npm test` | Run the complete test suite (154 tests) |
 | `npm run test:watch` | Run tests in watch mode for development |
 | `npm run test:coverage` | Generate detailed coverage report |
 | `npm run lint` | Check code style and quality |
@@ -108,7 +108,7 @@ npm run dev
 
 ## 🧪 Testing & Quality
 
-The project maintains **94%+ test coverage** with a comprehensive suite of 105 unit tests.
+The project maintains **94%+ test coverage** with a comprehensive suite of 154 unit tests.
 
 ### Test Suites
 - **StoreSystem**: Store functionality, purchase validation, quantity management
@@ -200,7 +200,7 @@ This project uses a **modular architecture** for maintainability and scalability
 
 ### Production Ready
 The application is fully prepared for deployment with:
-- ✅ **Comprehensive testing** - 105 passing tests with 94%+ coverage
+- ✅ **Comprehensive testing** - 154 passing tests with 94%+ coverage
 - ✅ **Performance optimization** - Fast loading and efficient resource usage
 - ✅ **Cross-browser compatibility** - Works on all modern browsers
 - ✅ **Mobile responsive** - Optimized for all screen sizes
