@@ -241,13 +241,13 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="handleEconomicDashboardClick()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-medium shadow-lg text-white">
+                        <button onclick="showEconomicDashboard()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-medium shadow-lg text-white">
                             📊 Economic Dashboard
                         </button>
-                        <button id="authButton" onclick="handleAuthButtonClick()" class="px-4 py-2 action-btn rounded font-medium shadow-lg">
+                        <button id="authButton" class="px-4 py-2 action-btn rounded font-medium shadow-lg">
                             <span id="authStatus">Sign In</span>
                         </button>
-                        <a href="../index.html" onclick="handleExitClick()" class="text-gray-300 hover:text-white transition-colors font-medium drop-shadow-lg">Exit</a>
+                        <a href="../index.html" class="text-gray-300 hover:text-white transition-colors font-medium drop-shadow-lg">Exit</a>
                     </div>
                 </div>
                 
@@ -568,45 +568,6 @@
     <div id="modalContainer"></div>
 
     <script>
-        // Global error handler for debugging button issues
-        window.addEventListener('error', function(event) {
-            console.error('🚨 Global JavaScript Error:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                error: event.error
-            });
-            
-            // Log to console for user debugging
-            if (typeof addConsoleMessage === 'function') {
-                addConsoleMessage(`🚨 Script Error: ${event.message}`, 'red');
-            }
-        });
-
-        // Unhandled promise rejection handler
-        window.addEventListener('unhandledrejection', function(event) {
-            console.error('🚨 Unhandled Promise Rejection:', event.reason);
-            
-            // Log to console for user debugging  
-            if (typeof addConsoleMessage === 'function') {
-                addConsoleMessage(`🚨 Promise Error: ${event.reason}`, 'red');
-            }
-        });
-
-        // Debug function to test button availability
-        function debugButtonStatus() {
-            console.log('🔍 BUTTON DEBUG STATUS:');
-            console.log('📊 Economic Dashboard button exists:', !!document.querySelector('button[onclick*="Economic"]'));
-            console.log('👤 Auth button exists:', !!document.getElementById('authButton'));
-            console.log('🚪 Exit link exists:', !!document.querySelector('a[href*="index.html"]'));
-            console.log('🔍 showEconomicDashboard function:', typeof showEconomicDashboard);
-            console.log('🔍 showEmailAuth function:', typeof showEmailAuth);
-            console.log('🔍 handleAuthButtonClick function:', typeof handleAuthButtonClick);
-            console.log('🔍 handleEconomicDashboardClick function:', typeof handleEconomicDashboardClick);
-            console.log('🔍 gameState availability:', typeof gameState);
-        }
-
         /*
         ====================================================================
         PIMP.FUN EMPIRE CITY - BLOCKCHAIN TRANSITION ARCHITECTURE
@@ -11696,37 +11657,8 @@
             }
         }
 
-        // Auth button onclick handler (primary method)
-        function handleAuthButtonClick() {
-            console.log('🔐 Auth button clicked via onclick handler');
-            try {
-                if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
-                    // Show logout option
-                    if (confirm('Sign out of your account?')) {
-                        if (typeof signOut === 'function') {
-                            signOut();
-                        } else {
-                            console.error('❌ signOut function not available');
-                        }
-                    }
-                } else {
-                    // Show sign in modal
-                    if (typeof showEmailAuth === 'function') {
-                        showEmailAuth();
-                    } else {
-                        console.error('❌ showEmailAuth function not available');
-                        alert('⚠️ Authentication system temporarily unavailable. Please refresh the page.');
-                    }
-                }
-            } catch (error) {
-                console.error('❌ Auth button onclick error:', error);
-                // Ultimate fallback
-                alert('⚠️ Authentication error. Please refresh the page and try again.');
-            }
-        }
-
         // Auth button event
-        // Setup auth button with error handling (backup method)
+        // Setup auth button with error handling
         const authButton = document.getElementById('authButton');
         if (authButton) {
             authButton.addEventListener('click', () => {
@@ -11778,43 +11710,6 @@
             }
                  }
         
-        // Exit link onclick handler (primary method)
-        function handleExitClick() {
-            console.log('🚪 Exit link clicked via onclick handler');
-            console.log('🔍 Exit click timestamp:', new Date().toISOString());
-            console.log('🔍 Attempting to navigate to ../index.html');
-            
-            try {
-                // Let the default href behavior handle the navigation
-                // This onclick is mainly for logging and debugging
-                return true; // Allow default navigation
-            } catch (error) {
-                console.error('❌ Exit link onclick error:', error);
-                // Still allow navigation to proceed
-                return true;
-            }
-        }
-
-        // Economic Dashboard onclick handler (primary method)
-        function handleEconomicDashboardClick() {
-            console.log('📊 Economic Dashboard button clicked via onclick handler');
-            console.log('🔍 Button click timestamp:', new Date().toISOString());
-            console.log('🔍 gameState availability:', typeof gameState);
-            console.log('🔍 showEconomicDashboard function availability:', typeof showEconomicDashboard);
-            
-            try {
-                if (typeof showEconomicDashboard === 'function') {
-                    showEconomicDashboard();
-                } else {
-                    console.error('❌ showEconomicDashboard function not available');
-                    alert('⚠️ Economic Dashboard temporarily unavailable. Please refresh the page.');
-                }
-            } catch (error) {
-                console.error('❌ Economic Dashboard onclick error:', error);
-                alert('⚠️ Economic Dashboard error. Please check the console and refresh the page.');
-            }
-        }
-
         // ECONOMIC DASHBOARD - Enhanced with mobile optimization and error handling
         function showEconomicDashboard() {
             console.log('📊 Opening Economic Dashboard...');
@@ -12879,11 +12774,6 @@
         // Start game (simplified)
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎮 DOM loaded, waiting for scripts...');
-            
-            // Debug button status for troubleshooting
-            setTimeout(() => {
-                debugButtonStatus();
-            }, 1000);
             
             // Add robust event listener for district selection as fallback
             setTimeout(() => {
