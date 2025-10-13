@@ -252,7 +252,7 @@
                 </div>
                 
                 <!-- Animated Glow Effect -->
-                <div class="absolute inset-0 opacity-30">
+                <div class="absolute inset-0 opacity-30 pointer-events-none">
                     <div class="absolute top-4 left-1/4 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
                     <div class="absolute bottom-4 right-1/4 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
                 </div>
@@ -11726,34 +11726,6 @@
         }
         // Ensure function is accessible from inline onclick handlers
         window.handleAuthButtonClick = handleAuthButtonClick;
-
-        // Auth button event
-        // Setup auth button with error handling (backup method)
-        const authButton = document.getElementById('authButton');
-        if (authButton) {
-            authButton.addEventListener('click', () => {
-                try {
-                    if (isLoggedIn) {
-                        // Show logout option
-                        if (confirm('Sign out of your account?')) {
-                            signOut();
-                        }
-                    } else {
-                        showEmailAuth();
-                    }
-                } catch (error) {
-                    console.error('❌ Auth button error:', error);
-                    // Fallback action
-                    if (typeof showEmailAuth === 'function') {
-                        showEmailAuth();
-                    } else {
-                        alert('⚠️ Authentication system temporarily unavailable. Please refresh the page.');
-                    }
-                }
-            });
-        } else {
-            console.error('❌ Auth button not found in DOM');
-        }
 
         // Sign out function
         async function signOut() {
