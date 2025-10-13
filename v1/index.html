@@ -11724,6 +11724,8 @@
                 alert('⚠️ Authentication error. Please refresh the page and try again.');
             }
         }
+        // Ensure function is accessible from inline onclick handlers
+        window.handleAuthButtonClick = handleAuthButtonClick;
 
         // Auth button event
         // Setup auth button with error handling (backup method)
@@ -11783,7 +11785,7 @@
             console.log('🚪 Exit link clicked via onclick handler');
             console.log('🔍 Exit click timestamp:', new Date().toISOString());
             console.log('🔍 Attempting to navigate to ../index.html');
-            
+
             try {
                 // Let the default href behavior handle the navigation
                 // This onclick is mainly for logging and debugging
@@ -11794,6 +11796,8 @@
                 return true;
             }
         }
+        // Ensure function is accessible from inline onclick handlers
+        window.handleExitClick = handleExitClick;
 
         // Economic Dashboard onclick handler (primary method)
         function handleEconomicDashboardClick() {
@@ -11801,7 +11805,7 @@
             console.log('🔍 Button click timestamp:', new Date().toISOString());
             console.log('🔍 gameState availability:', typeof gameState);
             console.log('🔍 showEconomicDashboard function availability:', typeof showEconomicDashboard);
-            
+
             try {
                 if (typeof showEconomicDashboard === 'function') {
                     showEconomicDashboard();
@@ -11814,6 +11818,8 @@
                 alert('⚠️ Economic Dashboard error. Please check the console and refresh the page.');
             }
         }
+        // Ensure function is accessible from inline onclick handlers
+        window.handleEconomicDashboardClick = handleEconomicDashboardClick;
 
         // ECONOMIC DASHBOARD - Enhanced with mobile optimization and error handling
         function showEconomicDashboard() {
