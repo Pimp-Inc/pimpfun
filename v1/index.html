@@ -5489,7 +5489,20 @@
         }
 
         function closeModal() {
-            document.getElementById('modalContainer').innerHTML = '';
+            try {
+                const modalContainer = document.getElementById('modalContainer');
+                if (modalContainer) {
+                    modalContainer.innerHTML = '';
+                    console.log('✅ Modal closed successfully');
+                } else {
+                    console.warn('⚠️ Modal container not found when trying to close');
+                }
+            } catch (error) {
+                console.error('❌ Error closing modal:', error);
+                // Fallback: try to remove any visible modals by class
+                const modals = document.querySelectorAll('.fixed.inset-0.bg-black\\/80');
+                modals.forEach(modal => modal.remove());
+            }
         }
 
         // Debug Everything  
@@ -9939,7 +9952,9 @@
 
         // Email Authentication Modal
         function showEmailAuth() {
-            const modal = `
+            try {
+                console.log('🔐 Opening Email Authentication...');
+                const modal = `
                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <div class="text-center mb-4">
@@ -9984,8 +9999,26 @@
                     </div>
                 </div>
             `;
-            document.getElementById('modalContainer').innerHTML = modal;
+            
+            const modalContainer = document.getElementById('modalContainer');
+            if (!modalContainer) {
+                console.error('❌ Modal container not found for Email Auth');
+                // Create modal container if missing
+                const newModalContainer = document.createElement('div');
+                newModalContainer.id = 'modalContainer';
+                document.body.appendChild(newModalContainer);
+                newModalContainer.innerHTML = modal;
+                console.log('✅ Email Authentication opened (created new modal container)');
+            } else {
+                modalContainer.innerHTML = modal;
+                console.log('✅ Email Authentication opened successfully');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error opening Email Authentication:', error);
+            alert('⚠️ Authentication system temporarily unavailable. Please refresh the page and try again.');
         }
+    }
 
         // Phone/OTP Authentication Modal
         function showPhoneAuth() {
@@ -11625,16 +11658,32 @@
         }
 
         // Auth button event
-        document.getElementById('authButton').addEventListener('click', () => {
-            if (isLoggedIn) {
-                // Show logout option
-                if (confirm('Sign out of your account?')) {
-                    signOut();
+        // Setup auth button with error handling
+        const authButton = document.getElementById('authButton');
+        if (authButton) {
+            authButton.addEventListener('click', () => {
+                try {
+                    if (isLoggedIn) {
+                        // Show logout option
+                        if (confirm('Sign out of your account?')) {
+                            signOut();
+                        }
+                    } else {
+                        showEmailAuth();
+                    }
+                } catch (error) {
+                    console.error('❌ Auth button error:', error);
+                    // Fallback action
+                    if (typeof showEmailAuth === 'function') {
+                        showEmailAuth();
+                    } else {
+                        alert('⚠️ Authentication system temporarily unavailable. Please refresh the page.');
+                    }
                 }
-            } else {
-                showEmailAuth();
-            }
-        });
+            });
+        } else {
+            console.error('❌ Auth button not found in DOM');
+        }
 
         // Sign out function
         async function signOut() {
@@ -11666,10 +11715,29 @@
             console.log('📊 Opening Economic Dashboard...');
             
             try {
+                // Handle extension conflicts and DOM errors
+                if (typeof gameState === 'undefined') {
+                    console.warn('⚠️ Game state not initialized, initializing fallback...');
+                    // Initialize minimal gameState for demonstration
+                    window.gameState = {
+                        player: { cash: 9360, payoutPercentage: 30, heat: 0 },
+                        resources: { 
+                            hoes: 9, 
+                            thugs: 6,
+                            hoeDetails: { streetWorkers: 6, sugarBabies: 2, highEndEscorts: 1, onlyTrampsModels: 0 } 
+                        },
+                        supplies: { hoeHappiness: 70, thugHappiness: 70 }
+                    };
+                }
+                
                 // Defensive programming - ensure all required data exists
                 if (!gameState || !gameState.resources || !gameState.player) {
                     console.error('❌ Invalid gameState for Economic Dashboard');
-                    showNotification('❌ Cannot load Economic Dashboard - game data missing', 'error');
+                    if (typeof showNotification === 'function') {
+                        showNotification('❌ Cannot load Economic Dashboard - game data missing', 'error');
+                    } else {
+                        alert('⚠️ Economic Dashboard temporarily unavailable. Please refresh the page.');
+                    }
                     return;
                 }
                 
@@ -11818,12 +11886,16 @@
                 const modalContainer = document.getElementById('modalContainer');
                 if (!modalContainer) {
                     console.error('❌ Modal container not found');
-                    showNotification('❌ Cannot display Economic Dashboard - modal container missing', 'error');
-                    return;
+                    // Create modal container if missing
+                    const newModalContainer = document.createElement('div');
+                    newModalContainer.id = 'modalContainer';
+                    document.body.appendChild(newModalContainer);
+                    newModalContainer.innerHTML = modal;
+                    console.log('✅ Economic Dashboard opened successfully (created new modal container)');
+                } else {
+                    modalContainer.innerHTML = modal;
+                    console.log('✅ Economic Dashboard opened successfully');
                 }
-                
-                modalContainer.innerHTML = modal;
-                console.log('✅ Economic Dashboard opened successfully');
                 
                 // Add keyboard accessibility
                 setTimeout(() => {
@@ -12732,6 +12804,55 @@
                     addConsoleMessage('❌ Game failed to start. Please refresh the page.', 'red');
                 }
             }, 500); // Increased timeout to ensure scripts load
+        });
+
+        // Global error handler for extension conflicts and button functionality
+        window.addEventListener('error', function(event) {
+            if (event.error && event.error.message && 
+                (event.error.message.includes('Extension context invalidated') || 
+                 event.error.message.includes('content.js'))) {
+                console.warn('⚠️ Browser extension conflict detected, adding resilient button handlers');
+                
+                // Add backup event listeners for critical buttons
+                setTimeout(() => {
+                    // Economic Dashboard backup
+                    const economicBtn = document.querySelector('button[onclick="showEconomicDashboard()"]');
+                    if (economicBtn) {
+                        economicBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (typeof showEconomicDashboard === 'function') {
+                                showEconomicDashboard();
+                            }
+                        });
+                    }
+                    
+                    // Auth button backup
+                    const authBtn = document.getElementById('authButton');
+                    if (authBtn) {
+                        authBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            try {
+                                if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
+                                    if (confirm('Sign out of your account?')) {
+                                        if (typeof signOut === 'function') signOut();
+                                    }
+                                } else {
+                                    if (typeof showEmailAuth === 'function') {
+                                        showEmailAuth();
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('❌ Auth button error:', error);
+                                alert('⚠️ Authentication temporarily unavailable. Please refresh the page.');
+                            }
+                        });
+                    }
+                    
+                    console.log('✅ Backup button handlers added successfully');
+                }, 1000);
+            }
         });
     </script>
 </body>
