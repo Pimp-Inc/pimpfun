@@ -247,7 +247,6 @@
                         <button id="authButton" onclick="handleAuthButtonClick()" class="px-4 py-2 action-btn rounded font-medium shadow-lg">
                             <span id="authStatus">Sign In</span>
                         </button>
-                        <a href="../index.html" onclick="handleExitClick()" class="text-gray-300 hover:text-white transition-colors font-medium drop-shadow-lg">Exit</a>
                     </div>
                 </div>
                 
@@ -9123,6 +9122,11 @@
                 console.error('❌ Error loading player profile:', error);
                 addConsoleMessage('⚠️ Could not load profile from server: ' + error.message, 'red');
             }
+
+            // Update the auth button with pimp name after loading profile
+            if (gameState.player.username) {
+                document.getElementById('authStatus').textContent = `👤 ${gameState.player.username}`;
+            }
         }
 
         // Check for existing auth session on startup
@@ -9138,14 +9142,13 @@
                     console.log('✅ Found existing user session:', user.email);
                     currentUser = user;
                     isLoggedIn = true;
-                    
-                    // Update UI
-                    document.getElementById('authStatus').textContent = 
-                        `👤 ${user.email.split('@')[0]}`;
+
+                    // Update UI with temporary text
+                    document.getElementById('authStatus').textContent = `👤 Loading...`;
                     document.getElementById('authButton').classList.add('bg-green-600');
-                    
+
                     addConsoleMessage(`🔄 Auto-signed in as ${user.email}`, 'green');
-                    
+
                     console.log('✅ Auth session verified - ready for server data load');
                     return true;
                 } else {
@@ -9823,22 +9826,26 @@
         async function handleAuthSuccess(user, identifier) {
             currentUser = user;
             isLoggedIn = true;
-            
-            // Update UI
-            document.getElementById('authStatus').textContent = `👤 ${identifier.split('@')[0]}`;
+
+            // Update UI with temporary text until profile loads
+            document.getElementById('authStatus').textContent = `👤 Loading...`;
             document.getElementById('authButton').classList.add('bg-green-600');
-            
+
             // Hide auth landing, show game
             document.getElementById('authLanding').classList.add('hidden');
             document.getElementById('gameContent').classList.remove('hidden');
-            
+
             closeModal();
-            
+
             addConsoleMessage(`✅ Signed in as ${identifier}`, 'green');
-            addConsoleMessage('💡 Click "Edit" next to your profile to change your pimp name!', 'cyan');
-            
-            // Load player profile
+
+            // Load player profile - this will update the username display
             await loadPlayerProfileFromAuth();
+
+            // Update the profile button with actual pimp name after loading
+            if (gameState.player.username) {
+                document.getElementById('authStatus').textContent = `👤 ${gameState.player.username}`;
+            }
         }
 
         // Sign In
@@ -9863,17 +9870,21 @@
                 
                 currentUser = data.user;
                 isLoggedIn = true;
-                
-                // Update UI
-                document.getElementById('authStatus').textContent = 
-                    `👤 ${email.split('@')[0]}`;
+
+                // Update UI with temporary text
+                document.getElementById('authStatus').textContent = `👤 Loading...`;
                 document.getElementById('authButton').classList.add('bg-green-600');
-                
+
                 addConsoleMessage(`✅ Signed in as ${email}`, 'green');
                 closeModal();
-                
+
                 // Load player profile from database
                 await loadPlayerProfileFromAuth();
+
+                // Update with actual pimp name after loading
+                if (gameState.player.username) {
+                    document.getElementById('authStatus').textContent = `👤 ${gameState.player.username}`;
+                }
                 
             } catch (error) {
                 console.error('Sign in error:', error);
@@ -9947,12 +9958,11 @@
                 if (player) {
                     gameState.player.id = player.id;
                     gameState.player.username = username;
-                    
-                    // Update UI
-                    document.getElementById('authStatus').textContent = 
-                        `👤 ${email.split('@')[0]}`;
+
+                    // Update UI with pimp name
+                    document.getElementById('authStatus').textContent = `👤 ${username}`;
                     document.getElementById('authButton').classList.add('bg-green-600');
-                    
+
                     addConsoleMessage(`✅ Account created! Welcome ${username}`, 'green');
                     closeModal();
                     updateUI();
@@ -11701,12 +11711,16 @@
             console.log('🔐 Auth button clicked via onclick handler');
             try {
                 if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
-                    // Show logout option
-                    if (confirm('Sign out of your account?')) {
-                        if (typeof signOut === 'function') {
-                            signOut();
-                        } else {
-                            console.error('❌ signOut function not available');
+                    // Show profile modal when logged in
+                    if (typeof showProfileModal === 'function') {
+                        showProfileModal();
+                    } else {
+                        console.error('❌ showProfileModal function not available');
+                        // Fallback to logout confirm
+                        if (confirm('Sign out of your account?')) {
+                            if (typeof signOut === 'function') {
+                                signOut();
+                            }
                         }
                     }
                 } else {
@@ -11993,7 +12007,176 @@
                 showNotification('❌ Failed to load Economic Dashboard', 'error');
             }
         }
-        
+
+        // PROFILE MODAL - Show user profile with settings
+        function showProfileModal() {
+            console.log('👤 Opening Profile Modal...');
+
+            try {
+                if (!gameState || !gameState.player) {
+                    console.error('❌ Invalid gameState for Profile');
+                    alert('⚠️ Profile unavailable. Please refresh the page.');
+                    return;
+                }
+
+                const player = gameState.player;
+                const signupDate = currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'Unknown';
+                const userEmail = currentUser?.email || 'Not available';
+
+                const modal = `
+                    <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onclick="closeModal()">
+                        <div class="bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border-2 border-purple-500/30" onclick="event.stopPropagation()">
+                            <!-- Header -->
+                            <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-xl">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                        👤 Profile Settings
+                                    </h2>
+                                    <button type="button" onclick="closeModal()"
+                                            class="text-white hover:text-gray-200 text-2xl font-bold min-w-[44px] min-h-[44px] flex items-center justify-center"
+                                            aria-label="Close Profile">&times;</button>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-6 space-y-6">
+                                <!-- Pimp Name Section -->
+                                <div class="bg-gray-800/50 rounded-lg p-4 border border-purple-500/20">
+                                    <label class="text-sm text-gray-400 block mb-2">Pimp Name</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="profilePimpName" value="${player.username || 'Anonymous Pimp'}"
+                                               class="flex-1 bg-gray-900 text-white px-4 py-2 rounded border border-purple-500/30 focus:border-purple-500 focus:outline-none"
+                                               placeholder="Enter your pimp name">
+                                        <button onclick="updatePimpName()"
+                                                class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded font-medium transition-colors">
+                                            Update
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-2">💡 You can use spaces and emojis in your pimp name!</p>
+                                </div>
+
+                                <!-- Account Info -->
+                                <div class="bg-gray-800/50 rounded-lg p-4 border border-purple-500/20 space-y-3">
+                                    <h3 class="text-lg font-bold text-purple-400 mb-3">Account Information</h3>
+
+                                    <div>
+                                        <label class="text-sm text-gray-400 block">Email</label>
+                                        <p class="text-white font-medium">${userEmail}</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="text-sm text-gray-400 block">Member Since</label>
+                                        <p class="text-white font-medium">${signupDate}</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="text-sm text-gray-400 block">Player ID</label>
+                                        <p class="text-gray-400 text-sm font-mono">${player.id || 'N/A'}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Password Change Section -->
+                                <div class="bg-gray-800/50 rounded-lg p-4 border border-purple-500/20">
+                                    <h3 class="text-lg font-bold text-purple-400 mb-3">Change Password</h3>
+                                    <button onclick="showChangePasswordModal()"
+                                            class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors">
+                                        🔒 Change Password
+                                    </button>
+                                </div>
+
+                                <!-- Logout Button -->
+                                <div class="pt-4 border-t border-gray-700">
+                                    <button onclick="confirmSignOut()"
+                                            class="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold transition-colors">
+                                        🚪 Sign Out
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="bg-gray-800/30 p-4 rounded-b-xl">
+                                <button type="button" onclick="closeModal()"
+                                        class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const modalContainer = document.getElementById('modalContainer');
+                if (!modalContainer) {
+                    const newModalContainer = document.createElement('div');
+                    newModalContainer.id = 'modalContainer';
+                    document.body.appendChild(newModalContainer);
+                    newModalContainer.innerHTML = modal;
+                } else {
+                    modalContainer.innerHTML = modal;
+                }
+
+                console.log('✅ Profile Modal opened successfully');
+
+            } catch (error) {
+                console.error('❌ Error opening Profile Modal:', error);
+                alert('⚠️ Failed to load profile. Please try again.');
+            }
+        }
+        window.showProfileModal = showProfileModal;
+
+        // Update Pimp Name
+        async function updatePimpName() {
+            const newName = document.getElementById('profilePimpName').value.trim();
+
+            if (!newName) {
+                alert('Please enter a pimp name');
+                return;
+            }
+
+            try {
+                // Update in gameState
+                gameState.player.username = newName;
+
+                // Update in database
+                if (window.SupabaseAPI && gameState.player.id) {
+                    await window.supabaseClient
+                        .from('players')
+                        .update({ username: newName })
+                        .eq('id', gameState.player.id);
+                }
+
+                // Update UI
+                document.getElementById('authStatus').textContent = `👤 ${newName}`;
+
+                addConsoleMessage(`✅ Pimp name updated to: ${newName}`, 'green');
+                showNotification('✅ Pimp name updated successfully!', 'success');
+
+                // Close and reopen modal to show updated name
+                closeModal();
+
+            } catch (error) {
+                console.error('Error updating pimp name:', error);
+                alert('Failed to update pimp name: ' + error.message);
+            }
+        }
+        window.updatePimpName = updatePimpName;
+
+        // Confirm Sign Out
+        function confirmSignOut() {
+            if (confirm('Are you sure you want to sign out?')) {
+                signOut();
+            }
+        }
+        window.confirmSignOut = confirmSignOut;
+
+        // Show Change Password Modal (placeholder for now)
+        function showChangePasswordModal() {
+            closeModal();
+            setTimeout(() => {
+                alert('Password change feature coming soon! For now, please use the "Forgot Password" link on the sign-in page.');
+            }, 100);
+        }
+        window.showChangePasswordModal = showChangePasswordModal;
+
         // Test daily payout function
         function testDailyPayout() {
             console.log('🧪 TESTING DAILY PAYOUT SYSTEM...');
