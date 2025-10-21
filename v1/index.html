@@ -8,12 +8,13 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="supabase-config.js"></script>
-    <script src="simple-wallet.js"></script>
-    <script src="src/constants/GameConstants.js"></script>
-    <script src="src/modules/GameStateManager.js"></script>
-    <script src="src/modules/StoreSystem.js"></script>
-    <script src="src/utils/GameUtils.js"></script>
+    <script src="supabase-config.js?v=18"></script>
+    <script src="simple-wallet.js?v=18"></script>
+    <script src="src/constants/GameConstants.js?v=18"></script>
+    <script src="src/modules/GameStateManager.js?v=18"></script>
+    <!-- TurnManager.js disabled - using simple database persistence instead -->
+    <script src="src/modules/StoreSystem.js?v=18"></script>
+    <script src="src/utils/GameUtils.js?v=18"></script>
     <!-- store-systems.js embedded inline to avoid loading issues -->
     <style>
         :root {
@@ -406,8 +407,8 @@
                         </div>
                         <div class="text-xs text-gray-400">
                             <div>Regen: <span id="regenRate" class="text-cyan-400">2</span> turns per 10 min</div>
-                            <div>Full in: <span id="fullIn" class="text-green-400">0:00</span></div>
-                            <div>Next 4:20pm: <span id="nextPayout" class="text-gold">0:00</span></div>
+                            <div>Full in: <span id="fullIn" class="text-green-400">~4h 9m</span></div>
+                            <div>Next 💰 4:20pm: <span id="nextPayout" class="text-gold">~18h</span></div>
                         </div>
                     </div>
                 </div>
@@ -567,6 +568,8 @@
     <div id="modalContainer"></div>
 
     <script>
+        // TurnManager removed - using simple gameState-based turn system
+
         // Global error handler for debugging button issues
         window.addEventListener('error', function(event) {
             console.error('🚨 Global JavaScript Error:', {
@@ -576,7 +579,7 @@
                 colno: event.colno,
                 error: event.error
             });
-            
+
             // Log to console for user debugging
             if (typeof addConsoleMessage === 'function') {
                 addConsoleMessage(`🚨 Script Error: ${event.message}`, 'red');
@@ -2200,54 +2203,48 @@
             console.log('🎯 Active Hood Pimps:', ACTIVE_HOOD_PIMPS.size);
         }
 
-        // Calculate current turns with continuous regeneration (original PimpWar style)
+        // ========================================
+        // SERVER-AUTHORITATIVE TURN SYSTEM
+        // ========================================
+        // All turn calculations now happen on the server
+        // Client just displays the server-provided value
+
+        /**
+         * Get current turns - Uses TurnManager when available
+         */
         function calculateCurrentTurns() {
-            const now = Date.now();
-            const minutesSinceLastAction = (now - gameState.player.lastActionTime) / 60000;
-            const turnsRegenerated = minutesSinceLastAction * gameState.player.regenRate;
-            
-            // Ensure we have valid base values
-            if (typeof gameState.player.turnsWhenLastChecked !== 'number' || gameState.player.turnsWhenLastChecked < 0) {
-                console.log('🔧 Fixing invalid turnsWhenLastChecked, setting to starting turns');
-                gameState.player.turnsWhenLastChecked = TURN_MECHANICS.startingTurns;
+            // Use TurnManager if available
+            if (window.TurnManager && typeof window.TurnManager.getTurns === 'function') {
+                return window.TurnManager.getTurns();
             }
-            
-            if (typeof gameState.player.lastActionTime !== 'number' || gameState.player.lastActionTime > now) {
-                console.log('🔧 Fixing invalid lastActionTime, setting to now');
-                gameState.player.lastActionTime = now;
+
+            // Fallback to gameState
+            if (!gameState.player.turns) {
+                gameState.player.turns = 150; // Initialize if missing
             }
-            
-            if (typeof gameState.player.regenRate !== 'number' || gameState.player.regenRate <= 0) {
-                console.log('🔧 Fixing invalid regenRate, setting to 0.2');
-                gameState.player.regenRate = 0.2;
-            }
-            
-            if (typeof gameState.player.maxTurns !== 'number' || gameState.player.maxTurns <= 0) {
-                console.log('🔧 Fixing invalid maxTurns, setting to 200');
-                gameState.player.maxTurns = 200;
-            }
-            
-            // Removed excessive turn debugging
-            
-            let currentTurns = gameState.player.turnsWhenLastChecked + turnsRegenerated;
-            
-            // 6-hour offline bonus (original PimpWar mechanic)
-            if (minutesSinceLastAction >= 360) { // 6 hours
-                const offlineBonusKey = `offline_bonus_${Math.floor(gameState.player.lastActionTime / (1000 * 60 * 60 * 6))}`;
-                if (!localStorage.getItem(offlineBonusKey)) {
-                    currentTurns += TURN_MECHANICS.bonusAfter6Hours;
-                    localStorage.setItem(offlineBonusKey, 'true');
-                    addConsoleMessage('🎁 6-hour offline bonus: +6 turns!', 'gold');
-                    console.log('🎁 Applied 6-hour offline bonus');
+            return gameState.player.turns;
+        }
+
+        /**
+         * Sync turns from server (pulls latest turn count with accrual)
+         */
+        async function syncTurnsFromServer() {
+            // Use TurnManager if available
+            if (window.TurnManager && typeof window.TurnManager.syncFromServer === 'function') {
+                try {
+                    const turns = await window.TurnManager.syncFromServer();
+                    gameState.player.turns = turns;
+                    updateTurnDisplay();
+                    return turns;
+                } catch (error) {
+                    console.error('❌ Failed to sync from server:', error);
                 }
             }
-            
-            // Cap at max turns
-            const finalTurns = Math.min(currentTurns, gameState.player.maxTurns);
-            
-            // Removed excessive turn result debugging
-            
-            return Math.floor(finalTurns);
+
+            // Fallback to gameState
+            console.log('ℹ️ Using gameState turn system (fallback)');
+            updateTurnDisplay();
+            return gameState.player.turns || 150;
         }
 
         // Update regen rate based on week progression
@@ -2266,46 +2263,46 @@
         function updateTurnDisplay() {
             updateRegenRate(); // Ensure proper regen rate
             const currentTurns = calculateCurrentTurns();
+
+            // Ensure we have valid turn values
+            if (!gameState.player.maxTurns) {
+                gameState.player.maxTurns = 200;
+            }
+
+            // Debug logging
+            console.log('🔄 Update turn display:', {
+                currentTurns: currentTurns,
+                maxTurns: gameState.player.maxTurns,
+                gameStateTurns: gameState.player.turns,
+                hasTurnManager: !!window.TurnManager
+            });
+
             const turnPercentage = (currentTurns / gameState.player.maxTurns) * 100;
-            
+
             // Update current turn display
             const currentTurnsEl = document.getElementById('currentTurns');
             const maxTurnsEl = document.getElementById('maxTurns');
             const turnMeterEl = document.getElementById('turnMeter');
-            
-            if (currentTurnsEl) currentTurnsEl.textContent = currentTurns;
+
+            if (currentTurnsEl) currentTurnsEl.textContent = Math.floor(currentTurns);
             if (maxTurnsEl) maxTurnsEl.textContent = gameState.player.maxTurns;
             if (turnMeterEl) turnMeterEl.style.width = turnPercentage + '%';
-            
-            // Calculate time until next turn (based on 2 turns per 10 minutes)
-            const now = Date.now();
-            const minutesSinceLastAction = (now - gameState.player.lastActionTime) / 60000;
-            const turnsRegeneratedSoFar = minutesSinceLastAction * gameState.player.regenRate;
-            const partialTurn = turnsRegeneratedSoFar % 1;
-            const minutesToNextTurn = (1 - partialTurn) / gameState.player.regenRate;
-            const secondsToNextTurn = Math.floor(minutesToNextTurn * 60);
-            
-            const nextTurnEl = document.getElementById('nextTurnIn');
-            if (nextTurnEl && currentTurns < gameState.player.maxTurns) {
-                const mins = Math.floor(secondsToNextTurn / 60);
-                const secs = secondsToNextTurn % 60;
-                nextTurnEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-            }
-            
-            // Calculate time until full
+
+            // Simple static time estimates (no live countdown, no server pinging)
             const fullInEl = document.getElementById('fullIn');
             if (fullInEl) {
                 if (currentTurns < gameState.player.maxTurns) {
                     const turnsNeeded = gameState.player.maxTurns - currentTurns;
-                    const minutesToFull = turnsNeeded / gameState.player.regenRate;
+                    const intervalsNeeded = Math.ceil(turnsNeeded / 2); // 2 turns per interval
+                    const minutesToFull = intervalsNeeded * 10; // 10 min per interval
                     const hoursToFull = Math.floor(minutesToFull / 60);
-                    const minsToFull = Math.floor(minutesToFull % 60);
-                    fullInEl.textContent = `${hoursToFull}:${minsToFull.toString().padStart(2, '0')}`;
+                    const minsToFull = minutesToFull % 60;
+                    fullInEl.textContent = `~${hoursToFull}h ${minsToFull}m`;
                 } else {
                     fullInEl.textContent = 'FULL';
                 }
             }
-            
+
             // Calculate time until next daily payout
             const nextPayoutEl = document.getElementById('nextPayout');
             if (nextPayoutEl) {
@@ -2313,19 +2310,57 @@
             }
         }
 
-        // Simple turn usage - no excessive logging
-        function useTurns(amount) {
+        /**
+         * Spend turns (with server validation when available)
+         * Falls back to client-side if TurnManager not loaded
+         * @param {number} amount - Number of turns to spend
+         * @param {string} reason - Reason for spending (for audit log)
+         * @param {object} metadata - Optional metadata for audit log
+         * @returns {Promise<boolean>} - True if successful, false if not enough turns
+         */
+        async function useTurns(amount, reason = 'action', metadata = null) {
+            // Check if TurnManager is initialized
+            if (!window.TurnManager || typeof window.TurnManager.spendTurns !== 'function') {
+                console.warn('⚠️ TurnManager not initialized, using fallback');
+                const currentTurns = calculateCurrentTurns();
+                if (currentTurns < amount) {
+                    addConsoleMessage(`❌ Need ${amount} turns, have ${Math.floor(currentTurns)}`, 'red');
+                    return false;
+                }
+                gameState.player.turns = currentTurns - amount;
+                updateTurnDisplay();
+                return true;
+            }
+
+            // Use server-authoritative TurnManager
+            const result = await window.TurnManager.spendTurns(amount, reason, metadata);
+
+            if (result.success) {
+                // Update local gameState to match server
+                gameState.player.turns = result.turns;
+                updateTurnDisplay();
+                console.log(`✅ Spent ${amount} turns (${reason}). New count: ${result.turns}`);
+                return true;
+            } else {
+                addConsoleMessage(`❌ ${result.message || 'Failed to spend turns'}`, 'red');
+                return false;
+            }
+        }
+
+        /**
+         * Legacy synchronous version for backwards compatibility
+         * DEPRECATED - Use async useTurns() instead
+         */
+        function useTurnsSync(amount) {
             const currentTurns = calculateCurrentTurns();
-            
+
             if (currentTurns < amount) {
                 addConsoleMessage(`❌ Need ${amount} turns, have ${Math.floor(currentTurns)}`, 'red');
                 return false;
             }
-            
-            gameState.player.turnsWhenLastChecked = Math.max(0, currentTurns - amount);
-            gameState.player.lastActionTime = Date.now();
-            
-            updateTurnDisplay();
+
+            // This is a fallback - should migrate to async version
+            console.warn('⚠️ Using legacy sync turn spending - migrate to async useTurns()');
             return true;
         }
 
@@ -3166,16 +3201,22 @@
             document.getElementById('scoutTurns').value = turns;
         }
 
-        function executeScout() {
+        async function executeScout() {
             const district = document.getElementById('scoutDistrict').value;
             const turnsToUse = parseInt(document.getElementById('scoutTurns').value) || 30;
-            
-            if (!useTurns(turnsToUse)) {
+
+            // Use server-authoritative turn spending with audit metadata
+            const spent = await useTurns(turnsToUse, 'scout', {
+                district: district,
+                action: 'scout'
+            });
+
+            if (!spent) {
                 showNotification(`❌ Not enough turns! Need ${turnsToUse} turns`, 'error');
                 addConsoleMessage(`Not enough turns! Need ${turnsToUse} turns to scout.`, 'red');
                 return;
             }
-            
+
             // Original scouting formula based on turns used
             const hoesFound = Math.floor(turnsToUse * 0.8 * Math.random()) + Math.floor(turnsToUse * 0.2);
             const thugsFound = Math.floor(turnsToUse * 0.3 * Math.random()) + Math.floor(turnsToUse * 0.1);
@@ -3286,10 +3327,16 @@
             document.getElementById('modalContainer').innerHTML = modal;
         }
 
-        function produceCrack() {
+        async function produceCrack() {
             const turnsToUse = parseInt(document.getElementById('crackTurns').value) || 15;
-            
-            if (!useTurns(turnsToUse)) {
+
+            // Use server-authoritative turn spending with audit metadata
+            const spent = await useTurns(turnsToUse, 'crack_production', {
+                thugs: gameState.resources.thugs,
+                happiness: gameState.supplies.thugHappiness
+            });
+
+            if (!spent) {
                 showNotification(`❌ Not enough turns! Need ${turnsToUse} turns`, 'error');
                 addConsoleMessage('Not enough turns!', 'red');
                 return;
@@ -8549,16 +8596,16 @@
             }
         }
 
-        // Simple game loop - run much less frequently
+        // Simple game loop - run every second (but most things only run occasionally)
         function gameLoop() {
-            // Only update turn display every 10 seconds
-            if (Math.random() < 0.1) { // ~once per 10 seconds
-            updateTurnDisplay();
+            // Update turn display occasionally (every ~30 seconds)
+            if (Math.random() < 0.033) {
+                updateTurnDisplay();
             }
-            
+
             // Only run other systems every 60 seconds to prevent spam
             if (Math.random() < 0.016) { // ~once per 60 seconds
-            updateHoodPimpRespawns();
+                updateHoodPimpRespawns();
                 generateHoeIncome();
                 processPayroll();
                 processDailyPayout();
@@ -8771,14 +8818,25 @@
                 // User is logged in - load from server
                 document.getElementById('authLanding').classList.add('hidden');
                 document.getElementById('gameContent').classList.remove('hidden');
-                
+
                 addConsoleMessage('🌐 MULTIPLAYER MODE: Connected to shared database', 'green');
                 await loadPlayerProfileFromAuth();
-                
+
+                // TurnManager disabled - using simple database persistence
+                // Turns are loaded from database and saved on game actions
+                console.log('🎯 Turn system: Simple database persistence (TurnManager disabled)');
+                console.log('📊 Current turns from database:', gameState.player.turns);
+
+                // Ensure turns are set
+                if (!gameState.player.turns && gameState.player.turns !== 0) {
+                    console.warn('⚠️ Turns not set, using default');
+                    gameState.player.turns = 150;
+                }
+
                 updateUI();
                 updateTurnDisplay();
                 updateSupplyStatus();
-                
+
                 addConsoleMessage('✅ Multiplayer game initialized!', 'green');
                 addConsoleMessage('💾 Progress saved to shared database', 'cyan');
                 addConsoleMessage('🚔 Enhanced heat system with charity events loaded!', 'yellow');
@@ -8853,10 +8911,12 @@
                         thugs: player.thugs,
                         crack: player.crack,
                         weed: player.weed,
+                        turns: player.turns,
+                        maxTurns: player.max_turns,
+                        turnRegenRate: player.turn_regen_rate,
                         hasResources: !!player.resources,
                         hasSupplies: !!player.supplies,
-                        hasCrewData: !!player.crew_data,
-                        turnsWhenLastChecked: player.turns_when_last_checked
+                        hasCrewData: !!player.crew_data
                     });
                     
                     // COMPLETELY RESET gameState from server data - no mixing with defaults
@@ -8872,10 +8932,11 @@
                         expToNext: (player.level || 1) * 1000,
                         cash: player.cash || 10000,
                         lastActionTime: player.last_action_time ? new Date(player.last_action_time).getTime() : Date.now(),
+                        lastTurnUpdate: player.last_turn_update ? new Date(player.last_turn_update).getTime() : Date.now(),
                         lastIncomeTime: Date.now(),
-                        turnsWhenLastChecked: Math.max(0, player.turns_when_last_checked || TURN_MECHANICS.startingTurns),
+                        turns: Math.max(0, player.turns || TURN_MECHANICS.startingTurns),
                         maxTurns: player.max_turns || 200,
-                        regenRate: player.regen_rate || 0.2,
+                        regenRate: player.turn_regen_rate || 0.2,
                         weekNumber: player.week_number || 1,
                         tutorialDay: player.tutorial_day || 1,
                         checkinsToday: 1,
@@ -8892,12 +8953,46 @@
                         joinedDate: null,
                         isOnline: false
                     };
-                    
+
+                    // Calculate and apply turn accrual (DISCRETE: 2 turns every 10 minutes)
+                    if (player.last_turn_update) {
+                        const lastUpdate = new Date(player.last_turn_update).getTime();
+                        const now = Date.now();
+                        const secondsElapsed = (now - lastUpdate) / 1000;
+                        const completeIntervals = Math.floor(secondsElapsed / 600); // 600 seconds = 10 minutes
+                        const turnsAccrued = completeIntervals * 2;
+
+                        if (turnsAccrued > 0) {
+                            const oldTurns = gameState.player.turns;
+                            gameState.player.turns = Math.min(oldTurns + turnsAccrued, gameState.player.maxTurns);
+                            console.log(`⏰ Turn accrual: ${turnsAccrued} turns accrued (${completeIntervals} intervals)`);
+                            console.log(`💫 Turns updated: ${oldTurns} → ${gameState.player.turns}`);
+
+                            // Update database with accrued turns
+                            try {
+                                await window.supabaseClient
+                                    .from('players')
+                                    .update({
+                                        turns: gameState.player.turns,
+                                        last_turn_update: new Date().toISOString()
+                                    })
+                                    .eq('wallet_address', currentUser.id);
+                                console.log('✅ Accrued turns saved to database');
+                            } catch (error) {
+                                console.error('❌ Failed to save accrued turns:', error);
+                            }
+                        } else {
+                            console.log('⏰ No complete 10-minute intervals yet for turn accrual');
+                        }
+                    }
+
                     // Resources data - prioritize JSONB resources over individual columns
                     if (player.resources) {
                         console.log('📦 Loading resources from JSONB field');
+                        console.log('📦 Raw resources data type:', typeof player.resources);
+                        console.log('📦 Raw resources data:', player.resources);
                         try {
-                            const parsedResources = typeof player.resources === 'string' ? 
+                            const parsedResources = typeof player.resources === 'string' ?
                                 JSON.parse(player.resources) : player.resources;
                             gameState.resources = parsedResources;
                             console.log('✅ JSONB resources loaded:', {
@@ -8907,6 +9002,7 @@
                                 weed: parsedResources.weed,
                                 weapons: parsedResources.weapons
                             });
+                            console.log('✅ Full weapons object:', parsedResources.weapons);
                         } catch (error) {
                             console.error('❌ Error parsing JSONB resources:', error);
                             console.log('📦 Falling back to individual columns');
@@ -11277,6 +11373,42 @@
                 try {
                     console.log('🌐 Saving to shared database...');
                     
+                    // Calculate total weapons count (handle if already string)
+                    let weaponsObj = gameState.resources.weapons || {};
+                    if (typeof weaponsObj === 'string') {
+                        try {
+                            weaponsObj = JSON.parse(weaponsObj);
+                        } catch (e) {
+                            console.error('❌ Failed to parse weapons:', weaponsObj);
+                            weaponsObj = {};
+                        }
+                    }
+
+                    // Calculate total vehicles count (handle if object or already string)
+                    let vehiclesObj = gameState.resources.vehicles || {};
+                    if (typeof vehiclesObj === 'string') {
+                        try {
+                            vehiclesObj = JSON.parse(vehiclesObj);
+                        } catch (e) {
+                            console.error('❌ Failed to parse vehicles:', vehiclesObj);
+                            vehiclesObj = {};
+                        }
+                    }
+
+                    // If vehicles is a number (old format), use it directly, otherwise sum the object
+                    const totalWeapons = Object.values(weaponsObj).reduce((sum, count) => sum + (typeof count === 'number' ? count : 0), 0);
+                    const totalVehicles = typeof vehiclesObj === 'number' ? vehiclesObj :
+                        (typeof vehiclesObj === 'object' ? Object.values(vehiclesObj).reduce((sum, count) => sum + (typeof count === 'number' ? count : 0), 0) : 0);
+
+                    console.log('💾 Weapons & Vehicles debug:', {
+                        weaponsRaw: gameState.resources.weapons,
+                        weaponsObj: weaponsObj,
+                        totalWeapons: totalWeapons,
+                        vehiclesRaw: gameState.resources.vehicles,
+                        vehiclesObj: vehiclesObj,
+                        totalVehicles: totalVehicles
+                    });
+
                     const playerData = {
                         username: gameState.player.username,
                         level: gameState.player.level,
@@ -11288,14 +11420,27 @@
                         crack: gameState.resources.crack || 0,
                         weed: gameState.resources.weed || 0,
                         territory: gameState.player.territory || 'Times Square Center',
-                        district: gameState.player.district || null,
+                        district: gameState.player.district || 'None',
+                        weapons: totalWeapons,
+                        vehicles: totalVehicles,
+                        weapons_data: JSON.stringify(weaponsObj),
+                        vehicles_data: JSON.stringify(vehiclesObj),
                         resources: JSON.stringify(gameState.resources),
                         supplies: JSON.stringify(gameState.supplies),
                         crew_data: JSON.stringify(gameState.crew),
-                        turns_when_last_checked: gameState.player.turnsWhenLastChecked,
-                        last_action_time: new Date(gameState.player.lastActionTime).toISOString()
+                        // Use new turn column names (old columns removed)
+                        turns: gameState.player.turns || 150,
+                        last_turn_update: new Date().toISOString()
                     };
-                    
+
+                    // Debug: Log exact data being sent
+                    console.log('📤 About to save playerData:', {
+                        weapons: playerData.weapons,
+                        weaponsType: typeof playerData.weapons,
+                        weapons_data: playerData.weapons_data.substring(0, 100),
+                        weaponsDataType: typeof playerData.weapons_data
+                    });
+
                     const result = await SupabaseAPI.updatePlayer(currentUser.id, playerData);
                     if (result && result.success) {
                         console.log('✅ Saved to shared database!');
@@ -13072,7 +13217,10 @@
                     await initGame();
                 } catch (error) {
                     console.error('❌ Game initialization failed:', error);
+                    console.error('❌ Error stack:', error.stack);
+                    console.error('❌ Error message:', error.message);
                     addConsoleMessage('❌ Game failed to start. Please refresh the page.', 'red');
+                    addConsoleMessage(`❌ Error: ${error.message}`, 'red');
                 }
             }, 500); // Increased timeout to ensure scripts load
         });
