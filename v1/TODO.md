@@ -4,17 +4,18 @@
 **Last Updated**: 2025-10-21
 
 ### What We're Working On Right Now:
-- [x] **COMPLETED**: Turn system refactoring committed (server-authoritative with database persistence)
-- [ ] **READY TO START** - Choose next priority task below
+- [x] **COMPLETED**: Committed turn system work from Oct 13
+- [x] **TESTED**: Game is working correctly
+- [ ] **READY**: Choose next priority task
 
 ### Quick Context (for token limit situations):
-- Recent work: Implemented server-authoritative turn system, added turn audit logging, fixed weapons/vehicles data handling
-- Git status: Working tree clean - all turn system work committed (commit 0f93f11)
+- Recent work: Committed and tested turn system - working correctly
+- Git status: Working tree clean, all changes pushed to GitHub
+- **NEXT STEP**: Choose from priorities below
 - Top priorities waiting:
-  1. Information Architecture (Profile vs Resources separation) - HIGH PRIORITY
-  2. Mobile Redesign (CRITICAL - game unusable on mobile)
+  1. Mobile Redesign (CRITICAL - game unusable on mobile) - 🔴 MOST URGENT
+  2. Information Architecture (Profile vs Resources separation) - HIGH PRIORITY
   3. District/Territory Selection (incomplete flow)
-  4. Fix any turn system bugs in testing
 
 ---
 
@@ -2636,3 +2637,36 @@ LIMIT 100;
   /* Current desktop layout */
 }
 ```
+
+
+---
+
+### 3. Reconfigure Thug Details Modal by Type
+- **Status**: Not Started  
+- **Priority**: HIGH - Improve crew management UX
+- **Description**: Reconfigure the Thug Crew modal to show thugs organized by type/rank (similar to the Hoe modal), instead of showing 333+ individual thugs in a flat list.
+
+#### Current Issues:
+- Shows all thugs as individual crew members (Master, Prime, Baron, Admiral, Boss, etc.)
+- Each shows: Name, Role, Rank (Lieutenant), Salary ($650/week), Loyalty (90%), XP (480/600)
+- No grouping by type or specialization
+- Difficult to manage large crews
+
+#### Proposed Solution - Thug Tiers:
+1. **Street Muscle** (Entry level) - ~$400/week
+2. **Dealers** (Mid-tier) - ~$600/week  
+3. **Enforcers** (Mid-tier) - ~$650/week
+4. **Lieutenants** (High-tier) - ~$800/week
+5. **Elite Guards** (Top-tier) - ~$1000/week
+
+#### Implementation:
+- Add thug type/tier to data model
+- Auto-migrate existing thugs based on stats
+- Update `showThugDetails()` to show categorized view
+- Add drill-down to see individuals within each tier
+- Update payroll to use tier-based salaries  
+- Add promotion system
+
+#### Estimated Time: 6-7 hours
+
+

@@ -321,95 +321,105 @@
         <div class="grid lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
             <!-- Column 1: Profile + Resources + Combat Log -->
             <div class="space-y-4">
-                <!-- Combined Profile & Resources -->
+                <!-- Pimp Profile -->
                 <div class="game-panel rounded-lg p-4">
                     <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-lg font-bold cyan-glow">PIMP PROFILE & RESOURCES</h2>
+                        <h2 class="text-lg font-bold cyan-glow">PIMP PROFILE</h2>
                         <button onclick="editProfile()" class="text-xs px-2 py-1 action-btn rounded">Edit</button>
                     </div>
-                    
-                    <!-- Profile Info -->
-                    <div class="space-y-2 text-sm mb-4">
+
+                    <!-- Identity & Performance Metrics -->
+                    <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span class="text-gray-400">Pimp Name:</span>
-                            <span id="username" class="gold-text cursor-pointer" onclick="editProfile()">Anonymous Pimp</span>
+                            <span id="username" class="gold-text cursor-pointer font-bold" onclick="editProfile()">Anonymous Pimp</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Net Worth:</span>
+                            <span id="netWorth" class="gold-text text-lg font-bold">$27,360</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Crew / Alliance:</span>
+                            <span id="crewName" class="text-purple-400">None</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">District:</span>
                             <span id="district" class="cyan-glow cursor-pointer" onclick="selectDistrict()">Choose District</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-400">Crew:</span>
-                            <span id="crewName" class="text-purple-400">None</span>
+                            <span class="text-gray-400">Territories:</span>
+                            <span id="territories" class="text-cyan-400">None</span>
                         </div>
+                        <div class="pt-2 border-t border-gray-700"></div>
                         <div class="flex justify-between">
                             <span class="text-gray-400">Level:</span>
-                            <span id="level" class="text-white">1</span>
+                            <span id="level" class="text-white font-bold">1</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-gray-400">Net Worth:</span>
-                            <span id="netWorth" class="gold-text">$27,360</span>
+                            <span class="text-gray-400">Respect:</span>
+                            <span id="respect" class="text-purple-400 font-bold">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Heat:</span>
+                            <span id="heat" class="text-red-400 font-bold">0%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Ho Payout %:</span>
+                            <span id="payout" class="text-yellow-400 font-bold">30%</span>
                         </div>
                     </div>
-                    
-                    <!-- Resources Grid -->
-                    <div class="grid grid-cols-2 gap-3 text-sm mb-4">
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Cash:</span>
-                                <span id="money" class="gold-text">$9,360</span>
-                            </div>
+                </div>
+
+                <!-- Resources & Inventory -->
+                <div class="game-panel rounded-lg p-4">
+                    <h2 class="text-lg font-bold cyan-glow mb-3">RESOURCES</h2>
+
+                    <!-- Financial Assets -->
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-500 mb-1">Financial Assets</div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Cash:</span>
+                            <span id="money" class="gold-text font-bold">$9,360</span>
+                        </div>
+                    </div>
+
+                    <!-- Human Resources -->
+                    <div class="pt-2 border-t border-gray-700">
+                        <div class="text-xs text-gray-500 mb-1">Human Resources</div>
+                        <div class="space-y-1 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-gray-400">Hoes:</span>
-                                <span id="hoes" class="text-pink-400 cursor-pointer hover:text-pink-300" onclick="showHoeDetails()">9</span>
+                                <span id="hoes" class="text-pink-400 cursor-pointer hover:text-pink-300 font-bold" onclick="showHoeDetails()">9</span>
+                            </div>
+                            <div class="flex justify-between text-xs pl-4">
+                                <span class="text-gray-500">Happiness:</span>
+                                <span id="hoeHappiness" class="text-pink-400">70%</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-400">Thugs:</span>
-                                <span id="thugs" class="text-blue-400 cursor-pointer hover:text-blue-300" onclick="showThugDetails()">6</span>
+                                <span id="thugs" class="text-blue-400 cursor-pointer hover:text-blue-300 font-bold" onclick="showThugDetails()">6</span>
                             </div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Payout:</span>
-                                <span id="payout" class="text-yellow-400">30%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Respect:</span>
-                                <span id="respect" class="text-purple-400">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">Heat:</span>
-                                <span id="heat" class="text-red-400">0%</span>
+                            <div class="flex justify-between text-xs pl-4">
+                                <span class="text-gray-500">Happiness:</span>
+                                <span id="thugHappiness" class="text-blue-400">70%</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Happiness Status -->
-                    <div class="pt-3 border-t border-gray-700 space-y-2 mb-4">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Hoe Happiness:</span>
-                            <span id="hoeHappiness" class="text-pink-400">70%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Thug Happiness:</span>
-                            <span id="thugHappiness" class="text-blue-400">70%</span>
-                        </div>
+                </div>
+
+                <!-- Turns -->
+                <div class="game-panel rounded-lg p-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-lg font-bold cyan-glow">TURNS</span>
+                        <span class="text-2xl font-bold gold-text" id="currentTurns">200</span>
                     </div>
-                    
-                    <!-- Turns -->
-                    <div class="pt-3 border-t border-gray-700">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-lg font-bold cyan-glow">TURNS</span>
-                            <span class="text-2xl font-bold gold-text" id="currentTurns">200</span>
-                        </div>
-                        <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden mb-2">
-                            <div class="turn-meter h-full rounded-full" id="turnMeter" style="width: 100%"></div>
-                        </div>
-                        <div class="text-xs text-gray-400">
-                            <div>Regen: <span id="regenRate" class="text-cyan-400">2</span> turns per 10 min</div>
-                            <div>Full in: <span id="fullIn" class="text-green-400">~4h 9m</span></div>
-                            <div>Next 💰 4:20pm: <span id="nextPayout" class="text-gold">~18h</span></div>
-                        </div>
+                    <div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden mb-2">
+                        <div class="turn-meter h-full rounded-full" id="turnMeter" style="width: 100%"></div>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        <div>Regen: <span id="regenRate" class="text-cyan-400">2</span> turns per 10 min</div>
+                        <div>Full in: <span id="fullIn" class="text-green-400">~4h 9m</span></div>
+                        <div>Next 💰 4:20pm: <span id="nextPayout" class="text-gold">~18h</span></div>
                     </div>
                 </div>
 
@@ -427,11 +437,22 @@
                 <!-- Resource Status -->
                 <div class="game-panel rounded-lg p-4">
                     <h2 class="text-lg font-bold mb-3 cyan-glow">RESOURCE STATUS</h2>
-                    
-                    <!-- Basic Supplies -->
+
+                    <!-- Drugs & Supplies -->
                     <div class="mb-4">
-                        <h3 class="text-sm font-bold text-gray-300 mb-2">Daily Supplies</h3>
+                        <h3 class="text-sm font-bold text-gray-300 mb-2">Drugs & Supplies</h3>
                         <div class="space-y-2 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">🛡️ Condoms:</span>
+                                <div class="text-right">
+                                    <span id="condomCount" class="text-white">500</span>
+                                    <span id="condomDays" class="text-xs text-green-400 ml-1">(12.5 days)</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">💊 Medicine:</span>
+                                <span id="medicineCount" class="text-white">10</span>
+                            </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-400">🍺 Beer:</span>
                                 <div class="text-right">
@@ -447,27 +468,16 @@
                                 </div>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-400">🛡️ Condoms:</span>
-                                <div class="text-right">
-                                    <span id="condomCount" class="text-white">500</span>
-                                    <span id="condomDays" class="text-xs text-green-400 ml-1">(12.5 days)</span>
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-400">💊 Medicine:</span>
-                                <span id="medicineCount" class="text-white">10</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Drugs & Assets -->
-                    <div class="mb-4 border-t border-gray-700 pt-3">
-                        <h3 class="text-sm font-bold text-gray-300 mb-2">Drugs & Assets</h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between items-center">
                                 <span class="text-gray-400">💎 Crack:</span>
                                 <span id="crackCount" class="text-purple-400">0</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment & Assets -->
+                    <div class="mb-4 border-t border-gray-700 pt-3">
+                        <h3 class="text-sm font-bold text-gray-300 mb-2">Equipment & Assets</h3>
+                        <div class="space-y-2 text-sm">
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-400">🔫 Weapons:</span>
                                 <span id="weaponsCount" class="text-red-400 cursor-pointer hover:text-red-300" onclick="showWeaponDetails()">5</span>
@@ -478,8 +488,9 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div id="supplyWarnings" class="mt-2"></div>
+
+                    <!-- Warnings & Alerts -->
+                    <div id="supplyWarnings" class="border-t border-gray-700 pt-3"></div>
                 </div>
 
                             <!-- Hood Pimps -->
@@ -7976,16 +7987,36 @@
         }
         
         function calculateNetWorth() {
-            return gameState.player.cash + 
-                   (gameState.resources.hoes * 2000) +
-                   (gameState.resources.thugs * 750) +
-                   (gameState.resources.crack * 3) +
+            // Vehicle values based on purchase prices
+            const vehicleValues = {
+                bicycle: 1000,
+                motorcycle: 3500,
+                kia: 8000,
+                lowrider: 15000,
+                escalade: 35000,
+                limo: 80000,
+                bentley: 150000,
+                armoredBeast: 250000
+            };
+
+            // Calculate vehicle total with specific values per type
+            const vehicleTotal = Object.entries(gameState.resources.vehicles || {}).reduce((total, [type, count]) => {
+                const value = vehicleValues[type] || 10000; // Default to $10k if unknown type
+                return total + (count * value);
+            }, 0);
+
+            return gameState.player.cash +
+                   (gameState.resources.hoes * 2000) +     // $2,000 per hoe
+                   (gameState.resources.thugs * 750) +     // $750 per thug
+                   (gameState.resources.crack * 3) +       // $3 per crack rock
+                   (gameState.resources.weed * 100) +      // $100 per oz of weed
+                   (gameState.resources.beer * 1) +        // $1 per beer
+                   (gameState.resources.condoms * 0.10) +  // $0.10 per condom
+                   (gameState.resources.medicine * 5) +    // $5 per medicine
                    Object.values(gameState.resources.weapons || {}).reduce((total, count) => {
-                       return total + (count * 250); // Average weapon value
+                       return total + (count * 250); // $250 average weapon value
                    }, 0) +
-                   Object.values(gameState.resources.vehicles || {}).reduce((total, count) => {
-                       return total + (count * 10000); // Average vehicle value
-                   }, 0);
+                   vehicleTotal; // Vehicles with specific values per type
         }
         
         function getEnhancedHeatAdvice(heat) {
@@ -8508,15 +8539,9 @@
                 console.log('🔫 Updated weapons display:', totalWeapons);
             }
             
-            // Original net worth calculation
-            const netWorth = gameState.player.cash + 
-                            (gameState.resources.hoes * 2000) +     // Original: $2,000 each
-                            (gameState.resources.thugs * 750) +     // Original: $750 each  
-                            (gameState.resources.crack * 3) +       // Original: $3 each
-                            (gameState.resources.condoms * 0.10) +  // Original: $0.10 each
-                            (gameState.resources.medicine * 5) +    // Original: $5 each
-                            (gameState.resources.beer * 0.75);      // Approx beer value
-            
+            // Calculate complete net worth including all assets
+            const netWorth = calculateNetWorth();
+
             const netWorthEl = document.getElementById('netWorth');
             if (netWorthEl) {
                 netWorthEl.textContent = '$' + netWorth.toLocaleString();
@@ -8539,15 +8564,24 @@
             const districtEl = document.getElementById('district');
             if (districtEl) {
                 if (gameState.player.district && window.GameConstants && window.GameConstants.DISTRICTS_AND_TERRITORIES[gameState.player.district]) {
-                    let displayText = gameState.player.district;
-                    if (gameState.player.territory) {
-                        displayText += ` - ${gameState.player.territory}`;
-                    }
-                    districtEl.textContent = displayText;
+                    districtEl.textContent = gameState.player.district;
                     districtEl.className = 'cyan-glow cursor-pointer';
                 } else {
                     districtEl.textContent = 'Choose District';
                     districtEl.className = 'cyan-glow cursor-pointer';
+                }
+            }
+
+            // Update territories display (comma-separated if multiple)
+            const territoriesEl = document.getElementById('territories');
+            if (territoriesEl) {
+                if (gameState.player.territory) {
+                    // For now, single territory. Future: handle multiple territories
+                    territoriesEl.textContent = gameState.player.territory;
+                    territoriesEl.className = 'text-cyan-400';
+                } else {
+                    territoriesEl.textContent = 'None';
+                    territoriesEl.className = 'text-cyan-400';
                 }
             }
             
@@ -8995,14 +9029,41 @@
                             const parsedResources = typeof player.resources === 'string' ?
                                 JSON.parse(player.resources) : player.resources;
                             gameState.resources = parsedResources;
+
+                            // Load weapons_data if available (overrides resources.weapons)
+                            if (player.weapons_data) {
+                                try {
+                                    const weaponsData = typeof player.weapons_data === 'string' ?
+                                        JSON.parse(player.weapons_data) : player.weapons_data;
+                                    gameState.resources.weapons = weaponsData;
+                                    console.log('✅ Loaded weapons from weapons_data:', weaponsData);
+                                } catch (error) {
+                                    console.error('❌ Error parsing weapons_data:', error);
+                                }
+                            }
+
+                            // Load vehicles_data if available (overrides resources.vehicles)
+                            if (player.vehicles_data) {
+                                try {
+                                    const vehiclesData = typeof player.vehicles_data === 'string' ?
+                                        JSON.parse(player.vehicles_data) : player.vehicles_data;
+                                    gameState.resources.vehicles = vehiclesData;
+                                    console.log('✅ Loaded vehicles from vehicles_data:', vehiclesData);
+                                } catch (error) {
+                                    console.error('❌ Error parsing vehicles_data:', error);
+                                }
+                            }
+
                             console.log('✅ JSONB resources loaded:', {
                                 hoes: parsedResources.hoes,
                                 thugs: parsedResources.thugs,
                                 crack: parsedResources.crack,
                                 weed: parsedResources.weed,
-                                weapons: parsedResources.weapons
+                                weapons: gameState.resources.weapons,
+                                vehicles: gameState.resources.vehicles
                             });
-                            console.log('✅ Full weapons object:', parsedResources.weapons);
+                            console.log('✅ Full weapons object:', gameState.resources.weapons);
+                            console.log('✅ Full vehicles object:', gameState.resources.vehicles);
                         } catch (error) {
                             console.error('❌ Error parsing JSONB resources:', error);
                             console.log('📦 Falling back to individual columns');
@@ -10536,10 +10597,12 @@
             
             gameState.player.district = districtName;
             gameState.player.territory = null; // No specific territory chosen
-            
+
             // Update UI
             document.getElementById('district').textContent = districtName;
             document.getElementById('district').className = 'cyan-glow cursor-pointer';
+            document.getElementById('territories').textContent = 'None';
+            document.getElementById('territories').className = 'text-cyan-400';
             
             if (isFirstTime) {
                 // Starter kit for first-time district selection
@@ -10572,10 +10635,12 @@
             
             gameState.player.district = districtName;
             gameState.player.territory = territoryName;
-            
+
             // Update UI
-            document.getElementById('district').textContent = `${districtName} - ${territoryName}`;
+            document.getElementById('district').textContent = districtName;
             document.getElementById('district').className = 'cyan-glow cursor-pointer';
+            document.getElementById('territories').textContent = territoryName;
+            document.getElementById('territories').className = 'text-cyan-400';
             
             if (isFirstTime) {
                 // Starter kit for first-time district selection
