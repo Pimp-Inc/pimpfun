@@ -4,16 +4,17 @@
 **Last Updated**: 2025-10-21
 
 ### What We're Working On Right Now:
-- [ ] **NONE SELECTED** - Review priorities below and choose next task
+- [x] **COMPLETED**: Turn system refactoring committed (server-authoritative with database persistence)
+- [ ] **READY TO START** - Choose next priority task below
 
 ### Quick Context (for token limit situations):
-- Recent work: Fixed profile settings, removed EXIT button, improved nav button reliability
-- Git status: Modified index.html and supabase-config.js, new files for turn system
+- Recent work: Implemented server-authoritative turn system, added turn audit logging, fixed weapons/vehicles data handling
+- Git status: Working tree clean - all turn system work committed (commit 0f93f11)
 - Top priorities waiting:
-  1. Information Architecture (Profile vs Resources separation)
+  1. Information Architecture (Profile vs Resources separation) - HIGH PRIORITY
   2. Mobile Redesign (CRITICAL - game unusable on mobile)
-  3. Turn-Based System Fix (core mechanic broken)
-  4. District/Territory Selection (incomplete flow)
+  3. District/Territory Selection (incomplete flow)
+  4. Fix any turn system bugs in testing
 
 ---
 
