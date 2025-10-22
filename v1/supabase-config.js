@@ -103,6 +103,10 @@ const SupabaseAPI = {
             
             if (error) {
                 console.error('❌ Supabase update error:', error);
+                console.error('❌ Error details:', error.details);
+                console.error('❌ Error hint:', error.hint);
+                console.error('❌ Error code:', error.code);
+                console.error('❌ Data being saved:', updates);
                 return { success: false, error: error.message };
             }
             

@@ -95,7 +95,7 @@
             position: fixed;
             top: 80px;
             right: 20px;
-            z-index: 1000;
+            z-index: 10000;
             padding: 16px 20px;
             border-radius: 8px;
             font-weight: bold;
@@ -2339,7 +2339,9 @@
                     return false;
                 }
                 gameState.player.turns = currentTurns - amount;
+                console.log(`🎯 Spent ${amount} turns (${reason}). New count: ${gameState.player.turns}`);
                 updateTurnDisplay();
+                await saveGameState(); // CRITICAL: Save turns to database
                 return true;
             }
 
@@ -3166,7 +3168,7 @@
         // Scout modal with turn selection
         function showScoutModal() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">SCOUT DISTRICTS</h3>
                         <p class="text-sm text-gray-400 mb-4">Choose district and turns to scout for hoes and thugs:</p>
@@ -3263,7 +3265,7 @@
             
             // Show detailed results modal
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">🔍 SCOUT RESULTS</h3>
                         
@@ -3307,7 +3309,7 @@
 
         function quickCrack() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">PRODUCE CRACK</h3>
@@ -3376,7 +3378,7 @@
         function showStoreMenu() {
             console.log('🛒 Opening store menu');
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">EMPIRE CITY STORES</h3>
                         <p class="text-sm gold-text mb-4">Cash: $${gameState.player.cash.toLocaleString()}</p>
@@ -3423,7 +3425,7 @@
             selectedStoreItem = null; // Reset selection
             
             let storeHTML = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
                         <h3 class="text-xl font-bold cyan-glow mb-2">${storeName.toUpperCase()}</h3>
                         <p class="text-sm text-gray-400 mb-4">Owner: ${store.owner} | Location: ${store.location}</p>
@@ -3751,7 +3753,7 @@
             
             const store = STORES["Corner Store"];
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">CORNER STORE</h3>
@@ -4073,7 +4075,7 @@
         // Enhanced Gun Store (embedded)
         function openGunStore() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
@@ -4188,7 +4190,7 @@
             addConsoleMessage('🌿 Opening enhanced Reggie\'s Plug with quantity selectors', 'cyan');
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">REGGIE'S PLUG</h3>
@@ -4304,7 +4306,7 @@
             addConsoleMessage('🚗 Opening enhanced Tony\'s Chop Shop with quantity selectors', 'cyan');
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">TONY'S CHOP SHOP</h3>
@@ -4590,7 +4592,7 @@
         function openReggiesSpot() {
             const store = STORES["Reggie's Spot"];
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-2">REGGIE'S SPOT</h3>
                         <p class="text-sm text-gray-400 mb-4">🌿 Premium Weed • Heat +5 per purchase</p>
@@ -4638,7 +4640,7 @@
         function openGunStore() {
             const respectReq = gameState.player.respect < 10;
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">💥 PEW PEW JIMMY'S</h3>
@@ -4832,39 +4834,39 @@
             updateGunStoreAfterPurchase();
         }
         
-        function buyWeaponsWithQuantity(weaponType, unitPrice, customQtyId = null) {
+        async function buyWeaponsWithQuantity(weaponType, unitPrice, customQtyId = null) {
             const qtyId = customQtyId || `${weaponType}_qty`;
             const qtyInput = document.getElementById(qtyId);
             const quantity = parseInt(qtyInput?.value) || 1;
             const totalCost = unitPrice * quantity;
-            
+
             if (gameState.player.cash < totalCost) {
                 showNotification(`💸 Not enough cash! Need $${totalCost.toLocaleString()}`, 'error');
                 return;
             }
-            
+
             if (weaponType !== 'pistols' && gameState.player.respect < 10) {
                 showNotification('❌ Need 10+ respect for advanced weapons!', 'error');
                 return;
             }
-            
+
             gameState.player.cash -= totalCost;
-            
+
             // Add weapons to inventory
             if (!gameState.resources.weapons[weaponType]) {
                 gameState.resources.weapons[weaponType] = 0;
             }
-            
+
             const oldWeapons = gameState.resources.weapons[weaponType];
             logResourceChange('weapons', weaponType, oldWeapons, oldWeapons + quantity, 'gun_store_purchase');
             gameState.resources.weapons[weaponType] += quantity;
-            
+
             const displayText = quantity === 1 ? weaponType.slice(0, -1) : `${quantity} ${weaponType}`;
             showNotification(`🔫 Bought ${displayText} for $${totalCost.toLocaleString()}!`, 'success');
             addConsoleMessage(`💰 Pew Pew Jimmy's: ${displayText} purchased for $${totalCost.toLocaleString()}`, 'green');
-            
+
             updateUI();
-            saveGameState();
+            await saveGameState(); // CRITICAL: Wait for save to complete before allowing more actions
             updateGunStoreAfterPurchase();
         }
         
@@ -5304,7 +5306,7 @@
         // Sell drugs modal
         function sellDrugs() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">SELL DRUGS</h3>
                         
@@ -5352,16 +5354,16 @@
             document.getElementById('modalContainer').innerHTML = modal;
         }
 
-        function sellCrack(amount) {
+        async function sellCrack(amount) {
             if (gameState.resources.crack < amount) {
                 showNotification(`❌ Not enough crack! Need ${amount}, have ${gameState.resources.crack}`, 'error');
                 return;
             }
-            
+
             const price = amount >= 100 ? 9 : 10; // Better bulk pricing
             const revenue = amount * price;
             const heatGain = Math.floor(amount / 50) + 1;
-            
+
             // Risk check (reduced for better gameplay)
             if (Math.random() < 0.01) { // Reduced from 2% to 1%
                 gameState.resources.crack -= amount;
@@ -5369,21 +5371,22 @@
                 addConsoleMessage('🚨 Cops busted the deal! Lost crack and gained heat!', 'red');
                 showNotification('🚨 Drug bust! Lost crack and heat!', 'error');
                 updateCrackAndDrugsModal(); // Update modal instead of closing
+                await saveGameState(); // CRITICAL: Save before returning
                 return;
             }
-            
+
             gameState.resources.crack -= amount;
             gameState.player.cash += revenue;
             gameState.player.heat = Math.min(100, gameState.player.heat + heatGain);
             gameState.player.respect += Math.floor(amount / 100);
-            
+
             addConsoleMessage(`💰 Sold ${amount} crack for $${revenue}`, 'green');
             addConsoleMessage(`🔥 Heat: +${heatGain}%, Respect: +${Math.floor(amount / 100)}`, 'cyan');
             showNotification(`💰 Sold ${amount} crack for $${revenue}!`, 'success');
-            
+
             updateUI();
             updateCrackAndDrugsModal(); // Update modal instead of closing
-            saveGameState();
+            await saveGameState(); // CRITICAL: Wait for save to complete before allowing more actions
         }
 
         // Enhanced Crack Economics Functions
@@ -5488,24 +5491,24 @@
             updateSellEstimate();
         }
 
-        function sellCrackCustom() {
+        async function sellCrackCustom() {
             const input = document.getElementById('crackSellAmount');
             const amount = parseInt(input?.value) || 0;
-            
+
             if (amount <= 0) {
                 showNotification('❌ Enter a valid amount to sell', 'error');
                 return;
             }
-            
+
             if (gameState.resources.crack < amount) {
                 showNotification(`❌ Not enough crack! Need ${amount}, have ${gameState.resources.crack}`, 'error');
                 return;
             }
-            
+
             const pricePerRock = getCrackPrice(amount);
             const revenue = amount * pricePerRock;
             const heatGain = calculateHeatGain(amount);
-            
+
             // Risk check (reduced for better gameplay)
             if (Math.random() < 0.01) { // 1% chance of bust
                 gameState.resources.crack -= amount;
@@ -5513,21 +5516,22 @@
                 addConsoleMessage('🚨 Cops busted the deal! Lost crack and gained heat!', 'red');
                 showNotification('🚨 Drug bust! Lost crack and heat!', 'error');
                 updateCrackAndDrugsModal();
+                await saveGameState(); // CRITICAL: Save before returning
                 return;
             }
-            
+
             gameState.resources.crack -= amount;
             gameState.player.cash += revenue;
             gameState.player.heat = Math.min(100, gameState.player.heat + heatGain);
             gameState.player.respect += Math.floor(amount / 100);
-            
+
             addConsoleMessage(`💰 Sold ${amount} crack for $${revenue} ($${pricePerRock}/rock)`, 'green');
             addConsoleMessage(`🔥 Heat: +${heatGain}%, Respect: +${Math.floor(amount / 100)}`, 'cyan');
             showNotification(`💰 Sold ${amount} crack for $${revenue}!`, 'success');
-            
+
             updateUI();
             updateCrackAndDrugsModal();
-            saveGameState();
+            await saveGameState(); // CRITICAL: Wait for save to complete
         }
 
         function sellWeed(ounces) {
@@ -6232,7 +6236,7 @@
         // Show tutorial missions (placeholder)
         function showTutorial() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold gold-text">🎓 TUTORIAL MISSIONS</h3>
@@ -6650,7 +6654,7 @@
             
             // Force show results modal
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: flex !important;">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" style="display: flex !important;">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">🔍 SCOUT RESULTS</h3>
                         
@@ -6725,7 +6729,7 @@
             if (forcedNFT) {
                 // Show the NFT in a modal
                 const modal = `
-                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: flex !important;">
+                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" style="display: flex !important;">
                         <div class="game-panel rounded-lg p-6 max-w-md w-full">
                             <h3 class="text-xl font-bold cyan-glow mb-4">💎 NFT SYSTEM TEST</h3>
                             
@@ -6846,7 +6850,7 @@
              }
              
              const modal = `
-                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                      <div class="game-panel rounded-lg p-6 max-w-md w-full">
                          <div class="flex items-center justify-between mb-4">
                              <h3 class="text-xl font-bold cyan-glow">🔫 WEAPON ARSENAL</h3>
@@ -6922,7 +6926,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">🚗 VEHICLE FLEET</h3>
@@ -6994,7 +6998,7 @@
              }
              
              const modal = `
-                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                      <div class="game-panel rounded-lg p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
                          <div class="flex items-center justify-between mb-4">
                              <h3 class="text-xl font-bold cyan-glow">👥 THUG CREW</h3>
@@ -7133,7 +7137,7 @@
              });
              
              const modal = `
-                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                      <div class="game-panel rounded-lg p-6 max-w-md w-full">
                          <div class="flex items-center justify-between mb-4">
                              <h3 class="text-xl font-bold cyan-glow">👯 HOE ROSTER</h3>
@@ -7197,7 +7201,7 @@
               const maxSliderValue = Math.min(crackCount, 50000); // Set reasonable max for slider
               
               const modal = `
-                  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                       <div class="game-panel rounded-lg p-6 max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
                           <div class="flex items-center justify-between mb-4">
                               <h3 class="text-xl font-bold cyan-glow">💎 CRACK & DRUG OPERATIONS</h3>
@@ -7408,7 +7412,11 @@
             
             // Check if we've already done today's payout
             const lastPayoutDate = gameState.player.lastDailyPayoutDate || '';
-            
+
+            console.log('💰 PAYOUT DEBUG - Today:', today);
+            console.log('💰 PAYOUT DEBUG - Last payout date:', lastPayoutDate);
+            console.log('💰 PAYOUT DEBUG - Are they equal?:', lastPayoutDate === today);
+
             if (lastPayoutDate === today) {
                 console.log('💰 Daily payout already completed for today');
                 return; // Already paid today
@@ -7482,7 +7490,7 @@
         
         function showDailyPayoutModal(totalEarnings, details, happinessBonus, heatPenalty) {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold gold-text mb-4">💰 DAILY 4:20PM PAYOUT</h3>
                         
@@ -7726,7 +7734,7 @@
             const corruption = HEAT_STATE.corruption || 0;
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">🚔 HEAT MANAGEMENT</h3>
@@ -7941,7 +7949,7 @@
         
         function showCharityResultModal(event, tier, backfired, heatChange, cost, nftKey = null) {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">🎭 CHARITY EVENT RESULT</h3>
                         
@@ -8005,18 +8013,27 @@
                 return total + (count * value);
             }, 0);
 
-            return gameState.player.cash +
-                   (gameState.resources.hoes * 2000) +     // $2,000 per hoe
-                   (gameState.resources.thugs * 750) +     // $750 per thug
-                   (gameState.resources.crack * 3) +       // $3 per crack rock
-                   (gameState.resources.weed * 100) +      // $100 per oz of weed
-                   (gameState.resources.beer * 1) +        // $1 per beer
-                   (gameState.resources.condoms * 0.10) +  // $0.10 per condom
-                   (gameState.resources.medicine * 5) +    // $5 per medicine
-                   Object.values(gameState.resources.weapons || {}).reduce((total, count) => {
-                       return total + (count * 250); // $250 average weapon value
-                   }, 0) +
-                   vehicleTotal; // Vehicles with specific values per type
+            const breakdown = {
+                cash: gameState.player.cash || 0,
+                hoes: (gameState.resources.hoes || 0) * 2000,
+                thugs: (gameState.resources.thugs || 0) * 750,
+                crack: (gameState.resources.crack || 0) * 3,
+                weed: Math.floor((gameState.resources.weed || 0) * 100),
+                beer: (gameState.resources.beer || 0) * 1,
+                condoms: Math.floor((gameState.resources.condoms || 0) * 0.10),
+                medicine: (gameState.resources.medicine || 0) * 5,
+                weapons: Object.values(gameState.resources.weapons || {}).reduce((total, count) => {
+                    return total + (count * 250);
+                }, 0),
+                vehicles: vehicleTotal
+            };
+
+            const total = Object.values(breakdown).reduce((sum, val) => sum + val, 0);
+
+            console.log('💰 NET WORTH BREAKDOWN:', breakdown);
+            console.log('💰 TOTAL NET WORTH:', total);
+
+            return total;
         }
         
         function getEnhancedHeatAdvice(heat) {
@@ -8243,8 +8260,8 @@
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
-            
-            // Auto-remove after 3 seconds
+
+            // Auto-remove after 5 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -8252,7 +8269,7 @@
                         notification.remove();
                     }
                 }, 300);
-            }, 3000);
+            }, 5000);
         }
 
         // Detailed action results with NFT potential
@@ -8270,7 +8287,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">${action.toUpperCase()} RESULTS</h3>
                         
@@ -8541,10 +8558,14 @@
             
             // Calculate complete net worth including all assets
             const netWorth = calculateNetWorth();
+            console.log('🔍 updateUI - Net Worth calculated:', netWorth);
 
             const netWorthEl = document.getElementById('netWorth');
             if (netWorthEl) {
                 netWorthEl.textContent = '$' + netWorth.toLocaleString();
+                console.log('🔍 updateUI - Net Worth element updated to:', netWorthEl.textContent);
+            } else {
+                console.warn('⚠️ Net Worth element not found!');
             }
             
             // Turn display
@@ -8979,6 +9000,7 @@
                         payoutPercentage: player.payout_percentage || 30,
                         district: player.district || null,
                         territory: player.territory || null,
+                        lastDailyPayoutDate: player.last_daily_payout_date || null,
                         rank: 'Unranked',
                         localRank: null,
                         nationalRank: null,
@@ -8987,6 +9009,54 @@
                         joinedDate: null,
                         isOnline: false
                     };
+
+                    // MIGRATION: Convert old district/territory names to new district system
+                    const oldToNewDistrictMap = {
+                        // Very old names (from before GameConstants)
+                        'backstreets': { district: 'Crooklyn Heights', territory: 'Gambino' },
+                        'courts': { district: 'Financial District', territory: 'Lucchese' },
+                        'basketball courts': { district: 'Financial District', territory: 'Lucchese' },
+                        'nike courts': { district: 'Financial District', territory: 'Lucchese' },
+                        'orlando courts': { district: 'Financial District', territory: 'Lucchese' },
+                        'backstreets central': { district: 'Crooklyn Heights', territory: 'Gambino' },
+                        'midtown central': { district: 'Midtown Market', territory: 'Luciano' },
+                        'uptown heights': { district: 'Uptown Plaza', territory: 'Bronzini' },
+
+                        // Internal keys to full display names (in case district field has lowercase keys)
+                        'crooklyn': { district: 'Crooklyn Heights', territory: 'Gambino' },
+                        'uptown': { district: 'Uptown Plaza', territory: 'Bronzini' },
+                        'midtown': { district: 'Midtown Market', territory: 'Luciano' },
+                        'docks': { district: 'Harbor Docks', territory: 'Ferry Hold' },
+                        'financial': { district: 'Financial District', territory: 'Lucchese' }
+                    };
+
+                    const oldDistrict = (gameState.player.district || '').toLowerCase();
+                    const oldTerritory = (gameState.player.territory || '').toLowerCase();
+
+                    // Check if either district or territory needs migration
+                    if (oldToNewDistrictMap[oldTerritory] || oldToNewDistrictMap[oldDistrict]) {
+                        const migration = oldToNewDistrictMap[oldTerritory] || oldToNewDistrictMap[oldDistrict];
+                        if (migration) {
+                            console.log(`🔄 Migrating old district/territory "${oldTerritory || oldDistrict}" to new system`);
+                            gameState.player.district = migration.district;
+                            gameState.player.territory = migration.territory;
+                            addConsoleMessage(`🔄 Updated your district to ${migration.district}`, 'cyan');
+
+                            // Save the migration immediately
+                            try {
+                                await window.supabaseClient
+                                    .from('players')
+                                    .update({
+                                        district: gameState.player.district,
+                                        territory: gameState.player.territory
+                                    })
+                                    .eq('wallet_address', currentUser.id);
+                                console.log('✅ District/territory migration saved to database');
+                            } catch (error) {
+                                console.error('❌ Failed to save migration:', error);
+                            }
+                        }
+                    }
 
                     // Calculate and apply turn accrual (DISCRETE: 2 turns every 10 minutes)
                     if (player.last_turn_update) {
@@ -9033,13 +9103,18 @@
                             // Load weapons_data if available (overrides resources.weapons)
                             if (player.weapons_data) {
                                 try {
+                                    console.log('🔍 WEAPONS DEBUG - Raw weapons_data from database:', player.weapons_data);
+                                    console.log('🔍 WEAPONS DEBUG - Weapons from resources JSONB BEFORE override:', parsedResources.weapons);
                                     const weaponsData = typeof player.weapons_data === 'string' ?
                                         JSON.parse(player.weapons_data) : player.weapons_data;
                                     gameState.resources.weapons = weaponsData;
                                     console.log('✅ Loaded weapons from weapons_data:', weaponsData);
+                                    console.log('🔍 WEAPONS DEBUG - Total weapon count:', Object.values(weaponsData).reduce((sum, count) => sum + (typeof count === 'number' ? count : 0), 0));
                                 } catch (error) {
                                     console.error('❌ Error parsing weapons_data:', error);
                                 }
+                            } else {
+                                console.warn('⚠️ NO weapons_data in database! Using weapons from resources field');
                             }
 
                             // Load vehicles_data if available (overrides resources.vehicles)
@@ -9325,7 +9400,7 @@
         // Profile Management
                 function editProfile() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">EDIT PROFILE</h3>
                         
@@ -9472,7 +9547,7 @@
         // Crew & Social Functions
         function showCrewMenu() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full">
                         <h3 class="text-xl font-bold cyan-glow mb-4">CREW & CARTELS</h3>
                         
@@ -9548,7 +9623,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
                         <h3 class="text-xl font-bold cyan-glow mb-4">ACTIVE CREWS</h3>
                         
@@ -9621,7 +9696,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
                         <h3 class="text-xl font-bold cyan-glow mb-4">PIMP DIRECTORY</h3>
                         
@@ -9696,7 +9771,7 @@
             const availableWallets = walletManager.getAvailableWallets();
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">CONNECT WALLET</h3>
@@ -10161,7 +10236,7 @@
             try {
                 console.log('🔐 Opening Email Authentication...');
                 const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <div class="text-center mb-4">
                             <img src="images/pimpfun_logo.png" alt="PIMP.FUN" class="h-12 mx-auto mb-2">
@@ -10229,7 +10304,7 @@
         // Phone/OTP Authentication Modal
         function showPhoneAuth() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full">
                         <div class="text-center mb-4">
                             <img src="images/pimpfun_logo.png" alt="PIMP.FUN" class="h-12 mx-auto mb-2">
@@ -10272,18 +10347,18 @@
         function selectDistrict() {
             console.log('🏙️ District selection clicked');
             console.log('🏙️ GameConstants available:', typeof window.GameConstants !== 'undefined');
-            
+
             if (typeof window.GameConstants === 'undefined') {
                 console.error('❌ GameConstants not available');
                 showNotification('❌ Game data not loaded properly. Please refresh the page.', 'error');
                 return;
             }
-            
+
             const districts = window.GameConstants.DISTRICTS_AND_TERRITORIES;
             console.log('🏙️ Using GameConstants districts:', Object.keys(districts));
-            
+
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-3 sm:p-6 max-w-5xl w-full my-4 sm:my-8 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
                         <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">🏙️ CHOOSE YOUR EMPIRE DISTRICT</h3>
                         <p class="text-sm text-gray-400 mb-6 text-center">Empire City's five districts each offer unique mafia-inspired advantages. Choose wisely - your empire depends on it.</p>
@@ -10414,7 +10489,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
                         <h3 class="text-2xl font-bold cyan-glow mb-4 text-center">🏴‍☠️ ${districtName} - All Territories</h3>
                         <p class="text-sm text-gray-400 mb-6 text-center">${districtData.territoryCount} mafia-inspired territories await your command</p>
@@ -10505,9 +10580,12 @@
             
             // Show enhanced territory details
             const detailModal = `
-                <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4">
-                    <div class="game-panel rounded-lg p-6 max-w-lg w-full">
-                        <h3 class="text-2xl font-bold cyan-glow mb-3">🏴‍☠️ ${territoryObj.name}</h3>
+                <div class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+                    <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[90vh] overflow-y-auto">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-2xl font-bold cyan-glow">🏴‍☠️ ${territoryObj.name}</h3>
+                            <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-3xl font-bold leading-none">&times;</button>
+                        </div>
                         <p class="text-sm text-amber-400 mb-4">${districtName} • ${districtData.realWorldName}</p>
                         
                         <div class="space-y-4">
@@ -10668,7 +10746,7 @@
         // Payout adjustment (original PimpWar mechanic)
         function adjustPayout() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">HOE PAYOUT RATE</h3>
@@ -10731,7 +10809,7 @@
         function showScoutOptions() {
             const currentTurns = calculateCurrentTurns();
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">🔍 SCOUT DISTRICTS</h3>
@@ -10825,7 +10903,7 @@
         function showCrackOptions() {
             const currentTurns = calculateCurrentTurns();
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                     <div class="game-panel rounded-lg p-6 max-w-md w-full my-8 max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold cyan-glow">PRODUCE CRACK</h3>
@@ -11063,7 +11141,7 @@
             // FORCE show the results modal after a brief delay
             setTimeout(() => {
                 const modal = `
-                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: flex !important;">
+                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" style="display: flex !important;">
                         <div class="game-panel rounded-lg p-6 max-w-md w-full">
                             <h3 class="text-xl font-bold cyan-glow mb-4">🔍 SCOUT RESULTS</h3>
                             
@@ -11495,7 +11573,8 @@
                         crew_data: JSON.stringify(gameState.crew),
                         // Use new turn column names (old columns removed)
                         turns: gameState.player.turns || 150,
-                        last_turn_update: new Date().toISOString()
+                        last_turn_update: new Date().toISOString(),
+                        last_daily_payout_date: gameState.player.lastDailyPayoutDate || null
                     };
 
                     // Debug: Log exact data being sent
@@ -11509,6 +11588,7 @@
                     const result = await SupabaseAPI.updatePlayer(currentUser.id, playerData);
                     if (result && result.success) {
                         console.log('✅ Saved to shared database!');
+                        showNotification('💾 Saved', 'success');
                         return true;
                     } else {
                         console.error('❌ Database save failed, using localStorage');
@@ -12109,7 +12189,7 @@
                 const playerHeat = gameState.player.heat || 0;
                 
                 const modal = `
-                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
                         <div class="game-panel rounded-lg p-4 sm:p-6 max-w-lg w-full my-4 max-h-[90vh] overflow-y-auto">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg sm:text-xl font-bold cyan-glow">📊 ECONOMIC DASHBOARD</h3>
@@ -12412,7 +12492,7 @@
             console.log('🔮 FUTURE: All changes will be immutable blockchain transactions');
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold red-glow">🔍 DATA LOSS INVESTIGATION</h3>
@@ -12620,7 +12700,7 @@
             }
             
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold red-glow">🚨 EMERGENCY ASSET RECOVERY</h3>
@@ -12883,7 +12963,7 @@
          // COMPLETE GAME RESET - Start completely fresh for testing
          function completeGameReset() {
              const modal = `
-                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                      <div class="game-panel rounded-lg p-6 max-w-md w-full">
                          <div class="flex items-center justify-between mb-4">
                              <h3 class="text-xl font-bold orange-glow">🔄 COMPLETE GAME RESET</h3>
@@ -13162,7 +13242,7 @@
         // Season reset information modal
         function showSeasonResetInfo() {
             const modal = `
-                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
                     <div class="game-panel rounded-lg p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xl font-bold purple-glow">🏆 SEASON RESET SYSTEM</h3>

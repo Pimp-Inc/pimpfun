@@ -4,18 +4,20 @@
 **Last Updated**: 2025-10-21
 
 ### What We're Working On Right Now:
-- [x] **COMPLETED**: Committed turn system work from Oct 13
-- [x] **TESTED**: Game is working correctly
-- [ ] **READY**: Choose next priority task
+- [x] **COMPLETED**: Information Architecture reorganization (Profile/Resources separation)
+- [x] **COMPLETED**: Fixed Net Worth calculation (includes all assets with proper vehicle values)
+- [x] **COMPLETED**: Added Thug modal reconfiguration task
+- [ ] **READY**: Choose next HIGH priority task
 
 ### Quick Context (for token limit situations):
-- Recent work: Committed and tested turn system - working correctly
-- Git status: Working tree clean, all changes pushed to GitHub
-- **NEXT STEP**: Choose from priorities below
+- Recent work: Completed Information Architecture reorganization, fixed Net Worth calc
+- Git commit: 8f7160e - Profile reordered, Resources cleaned up, Net Worth now accurate
+- Git status: Working tree clean
+- **NEXT STEP**: Choose from HIGH priorities below
 - Top priorities waiting:
-  1. Mobile Redesign (CRITICAL - game unusable on mobile) - 🔴 MOST URGENT
-  2. Information Architecture (Profile vs Resources separation) - HIGH PRIORITY
-  3. District/Territory Selection (incomplete flow)
+  1. Thug Modal Reconfiguration (NEW - organize by tier like hoes) - HIGH PRIORITY
+  2. District/Territory Selection (incomplete two-phase flow) - HIGH PRIORITY
+  3. Mobile Redesign (CRITICAL - game unusable on mobile) - 🔴 SAVE FOR LAST
 
 ---
 
@@ -1766,6 +1768,15 @@ IF crew morale < 70%:
 ---
 
 ## 🚀 Future Enhancements
+
+- **STD Attack System** (Classic PimpWar.com feature):
+  - When attacking another pimp, option to infest their hoes with STDs
+  - If target doesn't have enough medicine, some hoes may:
+    - Die (permanent loss)
+    - Become unhappy (morale penalty)
+    - Leave the pimp (lost to the streets)
+  - Adds strategic depth to combat and importance of medicine stockpiling
+  - Could add medicine as a defense/mitigation option
 
 - **Territory Control PvP**: Fight for and hold specific territories
 - **Crew Alliances**: Team up with other players
