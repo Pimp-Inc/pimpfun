@@ -15,9 +15,183 @@
 - Git status: Working tree clean
 - **NEXT STEP**: Choose from HIGH priorities below
 - Top priorities waiting:
-  1. Thug Modal Reconfiguration (NEW - organize by tier like hoes) - HIGH PRIORITY
+  1. **Thug System Implementation** (IN PROGRESS - see detailed plan below) - HIGH PRIORITY
   2. District/Territory Selection (incomplete two-phase flow) - HIGH PRIORITY
   3. Mobile Redesign (CRITICAL - game unusable on mobile) - 🔴 SAVE FOR LAST
+
+---
+
+## 🎖️ THUG SYSTEM IMPLEMENTATION - DETAILED PLAN
+
+**Status**: IN PROGRESS
+**Priority**: HIGH - Core game mechanic expansion
+**Data File**: v1/src/constants/ThugConstants.js ✅ CREATED
+**Total Thugs**: 44 types across 5 tiers (Common, Uncommon, Rare, Epic, Legendary)
+
+### Implementation Philosophy:
+- ✅ **Phase 1**: Hiring functionality FIRST (this plan)
+- ⏳ **Phase 2**: Upkeep math and daily expenses LATER
+- 🎯 **Goal**: Don't break anything - build incrementally
+
+### Tier Unlock Requirements:
+- **Common** (10 thugs): Available to ALL players (Level 1+)
+- **Uncommon** (10 thugs): Unlock at Level 5+
+- **Rare** (10 thugs): Unlock at Level 10+
+- **Epic** (8 thugs): Unlock at Level 15+
+- **Legendary** (6 thugs): Unlock at Level 20+
+- **NFT Drops**: Can award higher-tier thugs regardless of level
+
+### Phase 1: Hiring System (Step-by-Step)
+
+#### Step 1: Load ThugConstants into Game
+**File**: [index.html](v1/index.html)
+- [ ] Add `<script src="src/constants/ThugConstants.js"></script>` in head section
+- [ ] Verify `window.ThugConstants` is accessible in console
+- [ ] Test: `console.log(window.ThugConstants.thugs.length)` should show 44
+
+#### Step 2: Update Game State Structure
+**File**: [index.html](v1/index.html) - `initGameState()` function
+- [ ] Add to `gameState.crew`:
+  ```javascript
+  crew: {
+    thugs: [], // Array of owned thug objects: { id, name, tier, stats, hiredAt, ... }
+    thugCount: 0 // Quick count for UI display
+  }
+  ```
+- [ ] Update `calculateNetWorth()` to include thugs:
+  ```javascript
+  thugs: gameState.crew.thugs.reduce((total, thug) => total + thug.stats.cost, 0)
+  ```
+
+#### Step 3: Create Thug Hiring Modal UI
+**File**: [index.html](v1/index.html) - New function `showThugHiringModal()`
+- [ ] Create modal similar to hoe hiring modal structure
+- [ ] Add tier filter tabs: ALL | COMMON | UNCOMMON | RARE | EPIC | LEGENDARY
+- [ ] Show only unlocked tiers based on player level
+- [ ] For each thug, display:
+  - Name, Tier badge (colored), Faction icon
+  - Stats: Offense, Defense, Cost
+  - Special Ability description
+  - District bonus (if player's current district matches)
+  - "Hire" button (disabled if not enough cash or tier locked)
+- [ ] Add search/filter functionality by name or faction
+- [ ] Add "Close" button and modal backdrop click to close
+
+#### Step 4: Add "Hire Thugs" Button to Main UI
+**File**: [index.html](v1/index.html) - Main game UI section
+- [ ] Add button in Crime/Actions section or Resources panel
+- [ ] Button text: "🥷 Hire Thugs"
+- [ ] `onclick="showThugHiringModal()"`
+- [ ] Add tooltip: "Recruit muscle to protect your operation"
+
+#### Step 5: Implement Hire Functionality
+**File**: [index.html](v1/index.html) - New function `hireThug(thugName)`
+- [ ] Validate player has enough cash
+- [ ] Validate tier is unlocked (check player level)
+- [ ] Find thug data from ThugConstants
+- [ ] Create thug instance with unique ID:
+  ```javascript
+  const newThug = {
+    id: Date.now() + Math.random(), // Unique ID
+    name: thugData.name,
+    tier: thugData.tier,
+    faction: thugData.faction,
+    stats: { ...thugData.stats },
+    specialAbility: thugData.specialAbility,
+    counters: [...thugData.counters],
+    counteredBy: [...thugData.counteredBy],
+    districtBonus: { ...thugData.districtBonus },
+    hiredAt: new Date().toISOString(),
+    morale: thugData.stats.morale, // Current morale (starts at max)
+    loyalty: thugData.stats.loyalty // Current loyalty (starts at max)
+  }
+  ```
+- [ ] Deduct cost from player cash
+- [ ] Add to `gameState.crew.thugs` array
+- [ ] Increment `gameState.crew.thugCount`
+- [ ] `await saveGameState()` - CRITICAL for exploit prevention
+- [ ] Show success notification: "🥷 Hired {thugName} for ${cost}!"
+- [ ] Update UI and refresh modal
+
+#### Step 6: Display Owned Thugs in Resources Panel
+**File**: [index.html](v1/index.html) - Resources modal update
+- [ ] Add "Thugs" section showing owned thugs grouped by tier
+- [ ] For each thug show:
+  - Name, Tier, Faction
+  - Stats (Offense/Defense)
+  - "Fire" button (dismiss thug)
+- [ ] Show total count: "327 Thugs Total"
+- [ ] Show breakdown by tier: "Common: 150 | Uncommon: 100 | ..."
+
+#### Step 7: Implement Fire/Dismiss Thug Functionality
+**File**: [index.html](v1/index.html) - New function `fireThug(thugId)`
+- [ ] Find thug in `gameState.crew.thugs` by ID
+- [ ] Show confirmation modal: "Fire {thugName}? No refund."
+- [ ] Remove from array: `gameState.crew.thugs.filter(t => t.id !== thugId)`
+- [ ] Decrement `gameState.crew.thugCount`
+- [ ] `await saveGameState()`
+- [ ] Show notification: "🚫 Fired {thugName}"
+- [ ] Update UI
+
+#### Step 8: Show District Bonuses in Hiring Modal
+**File**: [index.html](v1/index.html) - `showThugHiringModal()` enhancement
+- [ ] Get player's current district from `gameState.player.district`
+- [ ] Map district name to ThugConstants district key:
+  - "Uptown Plaza" → "uptown"
+  - "Midtown Market" → "midtown"
+  - "Crooklyn Heights" → "crooklyn"
+  - "Harbor Docks" → "docks"
+  - "Financial District" → "financial"
+- [ ] For each thug, check if `thug.districtBonus[districtKey] > 1.0`
+- [ ] If bonus exists, highlight with badge: "⭐ +{X}% in {District}"
+- [ ] Show bonus in green/gold color
+
+#### Step 9: Database Schema Update
+**File**: [supabase-config.js](v1/supabase-config.js) - Save/load functions
+- [ ] Add to player save data:
+  ```javascript
+  crew_thugs: JSON.stringify(gameState.crew.thugs || [])
+  ```
+- [ ] Add to player load:
+  ```javascript
+  gameState.crew.thugs = JSON.parse(player.crew_thugs || '[]')
+  gameState.crew.thugCount = gameState.crew.thugs.length
+  ```
+- [ ] Run SQL in Supabase:
+  ```sql
+  ALTER TABLE players
+  ADD COLUMN IF NOT EXISTS crew_thugs JSONB DEFAULT '[]'::jsonb;
+  ```
+
+#### Step 10: Testing Checklist
+- [ ] Test hiring Common thug at Level 1 (should work)
+- [ ] Test hiring Uncommon thug at Level 1 (should be locked)
+- [ ] Test hiring Uncommon thug at Level 5+ (should work)
+- [ ] Test insufficient cash error handling
+- [ ] Test firing thug (confirm no refund)
+- [ ] Test save/load persistence (hire thugs, refresh page, verify they're still there)
+- [ ] Test net worth includes thug values
+- [ ] Test district bonus highlighting
+- [ ] Test "💾 Saved" notification appears after hiring
+- [ ] Verify no save exploit (can't close browser to undo hire)
+
+### Phase 2: Advanced Features (LATER - After Phase 1 Complete)
+
+#### Future Enhancements:
+- [ ] **Daily Upkeep System**: Deduct upkeep costs at 4:20pm payout
+- [ ] **Morale & Loyalty Mechanics**: Affects thug effectiveness
+- [ ] **Faction Synergy Bonuses**: Hiring same faction gives bonus
+- [ ] **Counter Mechanics in Combat**: Rock-paper-scissors system
+- [ ] **Thug Abilities in Crime**: Special abilities affect crime success rates
+- [ ] **District-Based Recruitment**: Certain thugs only available in certain districts
+- [ ] **Thug Leveling System**: Gain experience and improve stats over time
+- [ ] **NFT Integration**: Rare thug drops from NFT claims
+
+### Notes:
+- All hire/fire actions MUST use `await saveGameState()` to prevent exploits
+- Modal z-index should be `z-[9999]` to appear above game content
+- Follow existing UI patterns from hoe hiring modal for consistency
+- Test on mobile after implementation (save for last if needed)
 
 ---
 

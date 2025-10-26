@@ -11,6 +11,7 @@
     <script src="supabase-config.js?v=18"></script>
     <script src="simple-wallet.js?v=18"></script>
     <script src="src/constants/GameConstants.js?v=18"></script>
+    <script src="src/constants/ThugConstants.js?v=20"></script> <!-- UPDATED: 1985 pricing theme + collapsible tiers! -->
     <script src="src/modules/GameStateManager.js?v=18"></script>
     <!-- TurnManager.js disabled - using simple database persistence instead -->
     <script src="src/modules/StoreSystem.js?v=18"></script>
@@ -541,6 +542,9 @@
                         <button onclick="visitTonysChopShop()" class="w-full action-btn rounded py-2 text-sm">
                             🚗 TONY'S CHOP SHOP
                         </button>
+                        <button onclick="showThugHiringModal()" class="w-full action-btn rounded py-2 text-sm">
+                            🥷 HIRE THUGS
+                        </button>
                     </div>
                 </div>
 
@@ -683,7 +687,7 @@
                     uncommon: { category: 'SugarBabies_Uncommon', description: 'Upgraded sugar baby', multiplier: 1.5, baseIncome: 240 },
                     rare: { category: 'Strippers_Rare', description: 'Professional entertainer', multiplier: 2.0, baseIncome: 350 },
                     epic: { category: 'HighEndEscort_Epic', description: 'Elite escort + one-word name', multiplier: 3.0, baseIncome: 500 },
-                    super: { category: 'OnlyTrampsModels_Super', description: 'Digital empire model', multiplier: 4.0, baseIncome: 800 },
+                    super: { category: 'Phone900_Super', description: 'Premium phone operator', multiplier: 4.0, baseIncome: 800 },
                     legendary: { category: 'VIPLevel_Legendary', description: 'VIP-tier + one-word name', multiplier: 6.0, baseIncome: 1200 },
                     mythic: { category: 'QueenMadam_Mythic', description: 'Empire-level madam', multiplier: 10.0, baseIncome: 2000 }
                 },
@@ -797,7 +801,7 @@
                     "SugarBabies_Uncommon": ["Sugar Sweet", "Honey Heart", "Candy Crush"],
                     "Strippers_Rare": ["Diamond Dancer", "Platinum Performer", "Golden Goddess"],
                     "HighEndEscort_Epic": ["Diamond", "Onyx", "Sapphire"],
-                    "OnlyTrampsModels_Super": ["Cyber Queen", "Digital Diva", "Virtual Vixen"],
+                    "Phone900_Super": ["Velvet Voice", "Midnight Whisper", "Candy Hotline"],
                     "VIPLevel_Legendary": ["Aurora", "Stella", "Luna"],
                     "QueenMadam_Mythic": ["Empire Empress", "Royal Majesty", "Supreme Sovereign"]
                 };
@@ -2123,6 +2127,9 @@
             }
         }
 
+        // Hoe Loss Event System (Every 20 turns)
+        let turnsSinceLastHoeLoss = 0;
+
         // Game State
         let gameState = {
             player: {
@@ -2163,12 +2170,13 @@
                 territory: null
             },
             resources: {
-                hoes: 9, // Updated starting count
+                hoes: 13, // Updated starting count (6+2+1+2+2)
                 hoeDetails: {
                     streetWorkers: 6,     // Crooklyn - $180/day base
-                    sugarBabies: 2,       // Midtown - $240/day base  
+                    sugarBabies: 2,       // Midtown - $240/day base
                     highEndEscorts: 1,    // Uptown - $350/day base
-                    onlyTrampsModels: 0   // Ultra rare - $1050/day base (300% of high-end)
+                    dancers: 2,           // Strippers - $400/day base (tips + lap dances)
+                    phone900: 2           // Phone workers - $468/day base ($1.95/min × 240min, 5 days/week)
                 },
                 thugs: 6,
                 crack: 0,
@@ -2195,6 +2203,7 @@
             },
             crew: {
                 thugs: [], // Array of thug objects with rank/salary
+                thugCount: 0, // Quick count for UI display
                 lastPayrollTime: Date.now(),
                 nextPayrollDue: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days from now
             },
@@ -2341,6 +2350,10 @@
                 gameState.player.turns = currentTurns - amount;
                 console.log(`🎯 Spent ${amount} turns (${reason}). New count: ${gameState.player.turns}`);
                 updateTurnDisplay();
+
+                // Check for hoe loss event (every 20 turns)
+                checkHoeLossEvent();
+
                 await saveGameState(); // CRITICAL: Save turns to database
                 return true;
             }
@@ -2352,6 +2365,10 @@
                 // Update local gameState to match server
                 gameState.player.turns = result.turns;
                 updateTurnDisplay();
+
+                // Check for hoe loss event (every 20 turns)
+                checkHoeLossEvent();
+
                 console.log(`✅ Spent ${amount} turns (${reason}). New count: ${result.turns}`);
                 return true;
             } else {
@@ -2375,6 +2392,183 @@
             // This is a fallback - should migrate to async version
             console.warn('⚠️ Using legacy sync turn spending - migrate to async useTurns()');
             return true;
+        }
+
+        // ========================================
+        // HOE LOSS EVENT SYSTEM (Every 20 Turns)
+        // ========================================
+
+        /**
+         * Check if hoe loss event should trigger
+         * Call this after every turn spent
+         */
+        function checkHoeLossEvent() {
+            turnsSinceLastHoeLoss++;
+
+            if (turnsSinceLastHoeLoss >= 20) {
+                processHoeLossEvent();
+                turnsSinceLastHoeLoss = 0; // Reset counter
+            }
+        }
+
+        /**
+         * Process a hoe loss event - randomly select and remove one hoe
+         */
+        function processHoeLossEvent() {
+            const totalHoes = gameState.resources.hoes || 0;
+
+            if (totalHoes === 0) {
+                console.log('⚠️ Hoe loss event: No hoes to lose');
+                return;
+            }
+
+            const hoeDetails = gameState.resources.hoeDetails || {
+                streetWorkers: 0,
+                sugarBabies: 0,
+                highEndEscorts: 0,
+                dancers: 0,
+                phone900: 0
+            };
+
+            // Find types that have at least 1 hoe
+            const hoeTypes = ['streetWorkers', 'sugarBabies', 'highEndEscorts', 'dancers', 'phone900'];
+            const availableTypes = hoeTypes.filter(type => hoeDetails[type] > 0);
+
+            if (availableTypes.length === 0) {
+                console.log('⚠️ Hoe loss event: No specific types available');
+                return;
+            }
+
+            // Pick random type
+            const lostType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+
+            // Get exit message
+            const message = getRandomHoeExitMessage(lostType);
+
+            // Calculate weekly income loss
+            const incomeLoss = calculateHoeWeeklyIncome(lostType);
+
+            // Subtract the hoe
+            hoeDetails[lostType] -= 1;
+            gameState.resources.hoes -= 1;
+            gameState.resources.hoeDetails = hoeDetails;
+
+            // Show notification
+            const typeName = getHoeTypeName(lostType);
+            showNotification(
+                `🏃‍♀️ ${typeName} QUIT!\n"${message}"\n\nWeekly income lost: $${incomeLoss.toLocaleString()}`,
+                'error'
+            );
+
+            // Console log
+            addConsoleMessage(
+                `🏃‍♀️ ${typeName} quit: "${message}" (-$${incomeLoss.toLocaleString()}/week)`,
+                'pink'
+            );
+
+            // Update UI
+            updateUI();
+
+            console.log(`📉 Hoe Loss Event: ${typeName} departed, -$${incomeLoss}/week income`);
+        }
+
+        /**
+         * Calculate weekly income from one hoe of given type
+         */
+        function calculateHoeWeeklyIncome(hoeType) {
+            const weeklyIncome = {
+                streetWorkers: 450,       // Street worker base income (your cut)
+                dancers: 1680,            // Dancer/stripper income (your cut) - $400/day × 6 days = $2400 gross
+                sugarBabies: 1200,        // Sugar baby income (your cut)
+                highEndEscorts: 3600,     // High-end escort income (your cut)
+                phone900: 1638            // Phone worker income (your cut) - $468/day × 5 days = $2340 gross
+            };
+
+            return weeklyIncome[hoeType] || 500;
+        }
+
+        /**
+         * Get human-readable hoe type name
+         */
+        function getHoeTypeName(typeKey) {
+            const names = {
+                streetWorkers: 'Street Worker',
+                dancers: 'Dancer',
+                sugarBabies: 'Sugar Baby',
+                highEndEscorts: 'High-End Escort',
+                phone900: 'Phone Worker'
+            };
+            return names[typeKey] || 'Hoe';
+        }
+
+        /**
+         * Get random exit message for hoe type
+         */
+        function getRandomHoeExitMessage(hoeType) {
+            const exitMessages = {
+                streetWorkers: [
+                    "Cops know my first name now—time to retire.",
+                    "My heels got more miles than your Cadillac.",
+                    "Inflation hit the quickie market, boss.",
+                    "Snow, rain, sleet… I ain't no postal worker.",
+                    "Got religion, or maybe just pneumonia.",
+                    "Rico down the block promised hazard pay.",
+                    "Tired of handcuff chic.",
+                    "You said we'd move indoors. Still waitin'.",
+                    "Even the streetlights need a break—I'm takin' mine."
+                ],
+
+                sugarBabies: [
+                    "Met a yacht guy with less attitude and better champagne.",
+                    "My allowance comes direct-deposit now—don't need no middleman.",
+                    "You talk stocks, he *owns* 'em.",
+                    "Got tired of Motel 6—he's got a penthouse 7.",
+                    "Spa day turned into proposal day. I'm gone.",
+                    "He said I could keep the Mercedes if I ghost you.",
+                    "Your Rolex turned out to be Rholex.",
+                    "Rich dudes don't get raided, sugar.",
+                    "Love costs nothing—but the maintenance plan's expensive."
+                ],
+
+                dancers: [
+                    "DJ keeps playin' the wrong song—I can't strip to Journey.",
+                    "Club next door's got air-conditioning *and* better lighting.",
+                    "Tired of makin' it rain for pennies.",
+                    "Glitter rash, zero hazard pay.",
+                    "Bouncer called me 'ma'am.' Existential crisis.",
+                    "My G-string's in collections.",
+                    "You said pole upgrade, not parole hearing.",
+                    "Management's tips jar 'mysteriously' empty again.",
+                    "I'm off to Vegas—these legs deserve a union."
+                ],
+
+                highEndEscorts: [
+                    "Got a movie producer flyin' me to L.A.—don't wait up.",
+                    "Client upgraded me to *wife experience*, and I ain't splittin' the tips no more.",
+                    "Some senator's campaign manager offered health insurance, baby.",
+                    "You promised me Paris, not Passaic.",
+                    "Lost my pager, lost my patience, lost my pimp.",
+                    "Boutique agency said I'm *luxury inventory* now—adios, wholesale life.",
+                    "New York's too small for my fur collection.",
+                    "Didn't sign up for SWAT raids and busted taillights.",
+                    "My accountant said I'm a corporation now. Ciao, LLC Daddy."
+                ],
+
+                phone900: [
+                    "Found a desk job—same moaning, fewer stalkers.",
+                    "Throat's tired, wallet ain't inspired.",
+                    "Got replaced by an answering machine named Candy.",
+                    "You forgot to pay the phone bill, genius.",
+                    "Caller asked for you instead of me. I quit on principle.",
+                    "Found out you been recording the calls—nuh uh.",
+                    "Hotline went cold line when you pocketed my cut.",
+                    "I'm taking my 1-800-talent elsewhere.",
+                    "Voice of temptation, now voice of reason—goodbye."
+                ]
+            };
+
+            const messages = exitMessages[hoeType] || ["I'm out."];
+            return messages[Math.floor(Math.random() * messages.length)];
         }
 
         // Display Hood Pimps (reduced logging)
@@ -2904,19 +3098,210 @@
             }
         }
 
-        function checkLevelUp() {
-            while (gameState.player.exp >= gameState.player.expToNext) {
-                gameState.player.exp -= gameState.player.expToNext;
-                gameState.player.level++;
-                gameState.player.expToNext = gameState.player.level * 1000;
-                
-                addConsoleMessage(`LEVEL UP! Now level ${gameState.player.level}`, 'gold');
-                
-                // Level rewards
-                gameState.player.cash += 5000 * gameState.player.level;
-                gameState.resources.thugs += 5;
-                gameState.resources.weapons.pistols += 5;
+        // NEW NET WORTH-BASED LEVELING SYSTEM
+        function getBaseLevelFromNetWorth(netWorth) {
+            // TIER 8: MEME LORD
+            if (netWorth >= 69420000000) return 69;
+
+            // TIER 7: EMPIRE LORD (55-68)
+            if (netWorth >= 66420000000) return 68;
+            if (netWorth >= 58690000000) return 67;
+            if (netWorth >= 51420000000) return 66;
+            if (netWorth >= 44690000000) return 65;
+            if (netWorth >= 38900000000) return 64;
+            if (netWorth >= 33420000000) return 63;
+            if (netWorth >= 28690000000) return 62;
+            if (netWorth >= 24200000000) return 61;
+            if (netWorth >= 20000000000) return 60;
+            if (netWorth >= 16900000000) return 59;
+            if (netWorth >= 14200000000) return 58;
+            if (netWorth >= 11420000000) return 57;
+            if (netWorth >= 9000000000) return 56;
+            if (netWorth >= 6900420000) return 55;
+
+            // TIER 6: KINGPIN (40-54)
+            if (netWorth >= 6420000000) return 54;
+            if (netWorth >= 5690000000) return 53;
+            if (netWorth >= 4969420000) return 52;
+            if (netWorth >= 4420000000) return 51;
+            if (netWorth >= 3900000000) return 50;
+            if (netWorth >= 3420000000) return 49;
+            if (netWorth >= 3069420000) return 48;
+            if (netWorth >= 2690000000) return 47;
+            if (netWorth >= 2420000000) return 46;
+            if (netWorth >= 2000000000) return 45;
+            if (netWorth >= 1690000000) return 44;
+            if (netWorth >= 1420000000) return 43;
+            if (netWorth >= 1142000000) return 42;
+            if (netWorth >= 900000000) return 41;
+            if (netWorth >= 690420000) return 40;
+
+            // TIER 5: LEGENDARY (25-39)
+            if (netWorth >= 690000000) return 39;
+            if (netWorth >= 614200000) return 38;
+            if (netWorth >= 542069000) return 37;
+            if (netWorth >= 476900000) return 36;
+            if (netWorth >= 420000000) return 35;
+            if (netWorth >= 369420000) return 34;
+            if (netWorth >= 314200000) return 33;
+            if (netWorth >= 269420000) return 32;
+            if (netWorth >= 242000000) return 31;
+            if (netWorth >= 200000000) return 30;
+            if (netWorth >= 169000000) return 29;
+            if (netWorth >= 142000000) return 28;
+            if (netWorth >= 114200000) return 27;
+            if (netWorth >= 90000000) return 26;
+            if (netWorth >= 69420000) return 25;
+
+            // TIER 4: EPIC (15-24)
+            if (netWorth >= 69000000) return 24;
+            if (netWorth >= 58420000) return 23;
+            if (netWorth >= 47690000) return 22;
+            if (netWorth >= 38420000) return 21;
+            if (netWorth >= 30690000) return 20;
+            if (netWorth >= 24200000) return 19;
+            if (netWorth >= 18900000) return 18;
+            if (netWorth >= 14200000) return 17;
+            if (netWorth >= 10000000) return 16;
+            if (netWorth >= 6900420) return 15;
+
+            // TIER 3: RARE (10-14)
+            if (netWorth >= 6900000) return 14;
+            if (netWorth >= 4200000) return 13;
+            if (netWorth >= 2690000) return 12;
+            if (netWorth >= 1420000) return 11;
+            if (netWorth >= 690420) return 10;
+
+            // TIER 2: UNCOMMON (5-9)
+            if (netWorth >= 690000) return 9;
+            if (netWorth >= 420000) return 8;
+            if (netWorth >= 269000) return 7;
+            if (netWorth >= 142000) return 6;
+            if (netWorth >= 69420) return 5;
+
+            // TIER 1: COMMON (1-4)
+            if (netWorth >= 42000) return 4;
+            if (netWorth >= 4200) return 3;
+            if (netWorth >= 420) return 2;
+            return 1;
+        }
+
+        function getRespectBonus(respect) {
+            if (respect >= 20000) return 6;  // Infamous
+            if (respect >= 10000) return 6;  // Legendary
+            if (respect >= 5000) return 5;   // Feared
+            if (respect >= 3500) return 4;   // High respect
+            if (respect >= 2500) return 3;   // Strong respect
+            if (respect >= 1500) return 2;   // Moderate respect
+            if (respect >= 1000) return 1;   // Growing respect
+            if (respect >= 500) return 1;    // Basic respect
+            return 0;
+        }
+
+        function getAchievementBonus() {
+            let bonus = 0;
+
+            const npcs = gameState.player.npcsDefeated || 0;
+            if (npcs >= 500) bonus += 3;
+            else if (npcs >= 250) bonus += 2;
+            else if (npcs >= 100) bonus += 1;
+            else if (npcs >= 50) bonus += 1;
+
+            const hoes = gameState.resources.hoes || 0;
+            if (hoes >= 1000) bonus += 3;
+            else if (hoes >= 500) bonus += 2;
+            else if (hoes >= 300) bonus += 1;
+            else if (hoes >= 100) bonus += 1;
+
+            const weapons = Object.values(gameState.resources.weapons || {})
+                .reduce((sum, count) => sum + count, 0);
+            if (weapons >= 500) bonus += 3;
+            else if (weapons >= 300) bonus += 2;
+            else if (weapons >= 150) bonus += 1;
+            else if (weapons >= 100) bonus += 1;
+
+            const vehicles = Object.values(gameState.resources.vehicles || {})
+                .reduce((sum, count) => sum + count, 0);
+            if (vehicles >= 100) bonus += 3;
+            else if (vehicles >= 50) bonus += 2;
+            else if (vehicles >= 25) bonus += 1;
+            else if (vehicles >= 10) bonus += 1;
+
+            const territories = gameState.player.territoriesOwned || 0;
+            if (territories >= 10) bonus += 3;
+            else if (territories >= 5) bonus += 2;
+            else if (territories >= 3) bonus += 1;
+
+            return Math.min(bonus, 10); // Cap at +10 levels
+        }
+
+        function calculatePlayerLevel() {
+            const netWorth = calculateNetWorth();
+
+            // Base level from net worth (60%)
+            let baseLevel = getBaseLevelFromNetWorth(netWorth);
+
+            // Respect bonus (25%)
+            const respectBonus = getRespectBonus(gameState.player.respect);
+
+            // Achievement bonus (15%)
+            const achievementBonus = getAchievementBonus();
+
+            // Total level (capped at 69)
+            return Math.min(baseLevel + respectBonus + achievementBonus, 69);
+        }
+
+        function updatePlayerLevel() {
+            const oldLevel = gameState.player.level;
+            const newLevel = calculatePlayerLevel();
+
+            if (newLevel > oldLevel) {
+                // LEVEL UP!
+                gameState.player.level = newLevel;
+
+                const netWorth = calculateNetWorth();
+                const respect = gameState.player.respect || 0;
+
+                showNotification(`🎉 LEVEL UP! Now Level ${newLevel}!`, 'success');
+                addConsoleMessage(`💰 Level ${oldLevel} → ${newLevel}!`, 'gold');
+                addConsoleMessage(`💵 Net Worth: $${netWorth.toLocaleString()}`, 'cyan');
+                addConsoleMessage(`⭐ Respect: ${respect}`, 'cyan');
+
+                // Check for tier unlocks
+                if (newLevel === 5) {
+                    showNotification('🟢 UNCOMMON THUGS UNLOCKED!', 'success');
+                } else if (newLevel === 10) {
+                    showNotification('🔷 RARE THUGS UNLOCKED!', 'success');
+                } else if (newLevel === 15) {
+                    showNotification('💎 EPIC THUGS UNLOCKED!', 'success');
+                } else if (newLevel === 25) {
+                    showNotification('⭐ LEGENDARY THUGS UNLOCKED!', 'success');
+                } else if (newLevel === 40) {
+                    showNotification('👑 KINGPIN STATUS ACHIEVED!', 'success');
+                } else if (newLevel === 55) {
+                    showNotification('🔥 EMPIRE LORD STATUS ACHIEVED!', 'success');
+                } else if (newLevel === 69) {
+                    showNotification('💎🔥 MEME LORD ACHIEVED! 🔥💎', 'success');
+                }
+
+                // Milestone bonuses (every 10 levels)
+                if (newLevel % 10 === 0) {
+                    const bonus = 10000 * newLevel;
+                    gameState.player.cash += bonus;
+                    showNotification(`🏆 Level ${newLevel} Milestone: +$${bonus.toLocaleString()}!`, 'success');
+                }
+            } else if (newLevel < oldLevel) {
+                // LEVEL DOWN (rare, but possible if you lose wealth)
+                gameState.player.level = newLevel;
+                addConsoleMessage(`📉 Level dropped to ${newLevel}`, 'red');
             }
+
+            updateUI();
+        }
+
+        // Legacy function for compatibility
+        function checkLevelUp() {
+            updatePlayerLevel();
         }
 
         // Mapping between new district names (from GameConstants) and old district keys
@@ -5605,6 +5990,331 @@
             }
         }
 
+        // Global variable to remember selected tier (for persistence after hiring)
+        let currentThugModalTier = 'all';
+
+        // Thug Hiring Modal
+        function showThugHiringModal(selectedTier = 'all') {
+            console.log(`🥷 Opening Thug Hiring Modal (tier: ${selectedTier})...`);
+
+            // Remember the selected tier for next refresh
+            currentThugModalTier = selectedTier;
+
+            if (!window.ThugConstants) {
+                console.error('❌ ThugConstants not loaded!');
+                showNotification('❌ Thug data not available', 'error');
+                return;
+            }
+
+            const playerLevel = gameState.player.level || 1;
+            const playerCash = gameState.player.cash || 0;
+            const playerDistrict = gameState.player.district || 'Uptown Plaza';
+
+            // Map district names to ThugConstants keys
+            const districtKeyMap = {
+                'Uptown Plaza': 'uptown',
+                'Midtown Market': 'midtown',
+                'Crooklyn Heights': 'crooklyn',
+                'Harbor Docks': 'docks',
+                'Financial District': 'financial'
+            };
+            const currentDistrictKey = districtKeyMap[playerDistrict] || 'uptown';
+
+            // Tier unlock levels (UPDATED to match new leveling system!)
+            const tierUnlockLevels = {
+                common: 1,      // Level 1+ (Rookie Hustler)
+                uncommon: 5,    // Level 5+ (Street Boss)
+                rare: 10,       // Level 10+ (Neighborhood Don)
+                epic: 15,       // Level 15+ (Block Captain)
+                legendary: 25   // Level 25+ (Legendary Hustla) - FIXED FROM 20!
+            };
+
+            // Tier colors for badges
+            const tierColors = {
+                common: 'bg-gray-600 text-white',
+                uncommon: 'bg-green-600 text-white',
+                rare: 'bg-blue-600 text-white',
+                epic: 'bg-purple-600 text-white',
+                legendary: 'bg-yellow-500 text-black'
+            };
+
+            // Get all thugs and filter by selected tier
+            let thugsToShow = [];
+            if (selectedTier === 'all') {
+                thugsToShow = window.ThugConstants.getAllThugs();
+            } else {
+                thugsToShow = window.ThugConstants.getThugsByTier(selectedTier);
+            }
+
+            // Count how many thugs player has hired from each tier
+            const hiredCounts = {
+                common: 0,
+                uncommon: 0,
+                rare: 0,
+                epic: 0,
+                legendary: 0
+            };
+            (gameState.crew.thugs || []).forEach(thug => {
+                if (hiredCounts[thug.tier] !== undefined) {
+                    hiredCounts[thug.tier]++;
+                }
+            });
+
+            // Generate thug cards HTML
+            let thugsHTML = '';
+            thugsToShow.forEach(thug => {
+                const isUnlocked = playerLevel >= tierUnlockLevels[thug.tier];
+                const canAfford = playerCash >= thug.stats.cost;
+                const districtBonus = thug.districtBonus[currentDistrictKey] || 1.0;
+                const hasBonus = districtBonus > 1.0;
+
+                const buttonDisabled = !isUnlocked || !canAfford;
+                const buttonClass = buttonDisabled
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-purple-600 hover:bg-purple-500 text-white cursor-pointer';
+
+                const lockedOverlay = !isUnlocked
+                    ? `<div class="absolute inset-0 bg-black/70 flex items-center justify-center rounded-lg">
+                         <div class="text-center">
+                           <div class="text-3xl mb-2">🔒</div>
+                           <div class="text-sm font-bold text-yellow-400">Level ${tierUnlockLevels[thug.tier]} Required</div>
+                         </div>
+                       </div>`
+                    : '';
+
+                thugsHTML += `
+                    <div class="relative bg-gray-800/50 rounded-lg p-4 border border-purple-500/20 hover:border-purple-500/50 transition-all">
+                        ${lockedOverlay}
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-lg font-bold text-white">${thug.name}</h3>
+                                <span class="inline-block px-2 py-1 rounded text-xs font-bold ${tierColors[thug.tier]} mt-1">
+                                    ${thug.tier.toUpperCase()}
+                                </span>
+                                <span class="inline-block px-2 py-1 rounded text-xs font-bold bg-gray-700 text-gray-300 mt-1 ml-1">
+                                    ${thug.faction}
+                                </span>
+                            </div>
+                            ${hasBonus ? `
+                                <div class="bg-yellow-500/20 border border-yellow-500 rounded px-2 py-1">
+                                    <div class="text-xs font-bold text-yellow-400">⭐ +${Math.round((districtBonus - 1) * 100)}%</div>
+                                    <div class="text-[10px] text-yellow-300">${playerDistrict}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
+                            <div class="bg-gray-900/50 rounded p-2">
+                                <div class="text-gray-400 text-xs">Offense</div>
+                                <div class="text-red-400 font-bold">${thug.stats.offense}</div>
+                            </div>
+                            <div class="bg-gray-900/50 rounded p-2">
+                                <div class="text-gray-400 text-xs">Defense</div>
+                                <div class="text-blue-400 font-bold">${thug.stats.defense}</div>
+                            </div>
+                            <div class="bg-gray-900/50 rounded p-2">
+                                <div class="text-gray-400 text-xs">Cost</div>
+                                <div class="text-green-400 font-bold">$${thug.stats.cost.toLocaleString()}</div>
+                            </div>
+                            <div class="bg-gray-900/50 rounded p-2">
+                                <div class="text-gray-400 text-xs">Upkeep</div>
+                                <div class="text-yellow-400 font-bold">$${thug.stats.upkeep}/day</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 text-xs text-gray-300 bg-gray-900/30 rounded p-2">
+                            <div class="font-bold text-purple-400 mb-1">Special Ability:</div>
+                            ${thug.specialAbility}
+                        </div>
+
+                        <button
+                            onclick="hireThug('${thug.name}')"
+                            ${buttonDisabled ? 'disabled' : ''}
+                            class="w-full py-2 rounded font-bold transition-colors ${buttonClass}">
+                            ${!isUnlocked ? '🔒 Locked' : !canAfford ? '💸 Cannot Afford' : '🥷 Hire Thug'}
+                        </button>
+                    </div>
+                `;
+            });
+
+            // Modal HTML
+            const modal = `
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto" onclick="closeModal()">
+                    <div class="bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900 rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto border-2 border-purple-500/30" onclick="event.stopPropagation()">
+                        <!-- Header -->
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-xl sticky top-0 z-10">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                                        🥷 Hire Thugs
+                                    </h2>
+                                    <p class="text-sm text-purple-100 mt-1">
+                                        💰 Your Cash: $${playerCash.toLocaleString()} | ⭐ Level: ${playerLevel}
+                                    </p>
+                                </div>
+                                <button onclick="closeModal()"
+                                        class="text-white hover:text-gray-200 text-3xl font-bold min-w-[44px] min-h-[44px] flex items-center justify-center">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <!-- Tier Filter Tabs -->
+                            <div class="flex gap-2 mt-4 flex-wrap">
+                                <button onclick="showThugHiringModal('all')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'all' ? 'bg-white text-purple-600' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors">
+                                    All (${window.ThugConstants.getAllThugs().length})
+                                </button>
+                                <button onclick="showThugHiringModal('common')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'common' ? 'bg-gray-600 text-white' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors">
+                                    Common (${window.ThugConstants.getThugsByTier('common').length}) ${hiredCounts.common > 0 ? `<span class="ml-1 text-green-400">✓${hiredCounts.common}</span>` : ''}
+                                </button>
+                                <button onclick="showThugHiringModal('uncommon')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'uncommon' ? 'bg-green-600 text-white' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors">
+                                    Uncommon (${window.ThugConstants.getThugsByTier('uncommon').length}) ${hiredCounts.uncommon > 0 ? `<span class="ml-1 text-green-400">✓${hiredCounts.uncommon}</span>` : ''}
+                                </button>
+                                <button onclick="showThugHiringModal('rare')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'rare' ? 'bg-blue-600 text-white' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors">
+                                    Rare (${window.ThugConstants.getThugsByTier('rare').length}) ${hiredCounts.rare > 0 ? `<span class="ml-1 text-green-400">✓${hiredCounts.rare}</span>` : ''}
+                                </button>
+                                <button onclick="showThugHiringModal('epic')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'epic' ? 'bg-purple-600 text-white' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors ${playerLevel < 15 ? 'opacity-50' : ''}">
+                                    Epic (${window.ThugConstants.getThugsByTier('epic').length}) ${playerLevel < 15 ? '🔒' : hiredCounts.epic > 0 ? `<span class="ml-1 text-green-400">✓${hiredCounts.epic}</span>` : ''}
+                                </button>
+                                <button onclick="showThugHiringModal('legendary')"
+                                        class="px-4 py-2 rounded font-bold ${selectedTier === 'legendary' ? 'bg-yellow-500 text-black' : 'bg-purple-800 text-white hover:bg-purple-700'} transition-colors ${playerLevel < 25 ? 'opacity-50' : ''}">
+                                    Legendary (${window.ThugConstants.getThugsByTier('legendary').length}) ${playerLevel < 25 ? '🔒' : hiredCounts.legendary > 0 ? `<span class="ml-1 text-green-400">✓${hiredCounts.legendary}</span>` : ''}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${thugsHTML}
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="bg-gray-800/30 p-4 rounded-b-xl sticky bottom-0">
+                            <button onclick="closeModal()"
+                                    class="w-full py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const modalContainer = document.getElementById('modalContainer');
+            if (!modalContainer) {
+                const newModalContainer = document.createElement('div');
+                newModalContainer.id = 'modalContainer';
+                document.body.appendChild(newModalContainer);
+                newModalContainer.innerHTML = modal;
+            } else {
+                modalContainer.innerHTML = modal;
+            }
+        }
+
+        // Hire Thug Function
+        async function hireThug(thugName) {
+            try {
+                console.log(`🥷 Attempting to hire: ${thugName}`);
+
+                // Validate ThugConstants loaded
+                if (!window.ThugConstants) {
+                    console.error('❌ ThugConstants not loaded!');
+                    showNotification('❌ System error: Thug data unavailable', 'error');
+                    return Promise.resolve(); // Properly resolve the promise
+                }
+
+                // Find thug data
+                const thugData = window.ThugConstants.getThugByName(thugName);
+                if (!thugData) {
+                    console.error(`❌ Thug not found: ${thugName}`);
+                    showNotification(`❌ Thug "${thugName}" not found`, 'error');
+                    return Promise.resolve(); // Properly resolve the promise
+                }
+
+                const playerLevel = gameState.player.level || 1;
+                const playerCash = gameState.player.cash || 0;
+
+                // Tier unlock levels (UPDATED to match new leveling system!)
+                const tierUnlockLevels = {
+                    common: 1,      // Level 1+ (Rookie Hustler)
+                    uncommon: 5,    // Level 5+ (Street Boss)
+                    rare: 10,       // Level 10+ (Neighborhood Don)
+                    epic: 15,       // Level 15+ (Block Captain)
+                    legendary: 25   // Level 25+ (Legendary Hustla) - FIXED FROM 20!
+                };
+
+                // Validate tier is unlocked
+                const requiredLevel = tierUnlockLevels[thugData.tier];
+                if (playerLevel < requiredLevel) {
+                    console.warn(`⚠️ Level ${requiredLevel} required for ${thugData.tier} thugs (player level: ${playerLevel})`);
+                    showNotification(`🔒 Level ${requiredLevel} required for ${thugData.tier.toUpperCase()} thugs!`, 'error');
+                    return Promise.resolve(); // Properly resolve the promise
+                }
+
+                // Validate player has enough cash
+                if (playerCash < thugData.stats.cost) {
+                    console.warn(`⚠️ Not enough cash. Need $${thugData.stats.cost.toLocaleString()}, have $${playerCash.toLocaleString()}`);
+                    showNotification(`💸 Need $${thugData.stats.cost.toLocaleString()}! You have $${playerCash.toLocaleString()}`, 'error');
+                    return Promise.resolve(); // Properly resolve the promise
+                }
+
+                // Create thug instance with unique ID
+                const newThug = {
+                    id: Date.now() + Math.random(), // Unique ID
+                    name: thugData.name,
+                    tier: thugData.tier,
+                    faction: thugData.faction,
+                    stats: { ...thugData.stats },
+                    specialAbility: thugData.specialAbility,
+                    counters: [...thugData.counters],
+                    counteredBy: [...thugData.counteredBy],
+                    districtBonus: { ...thugData.districtBonus },
+                    hiredAt: new Date().toISOString(),
+                    morale: thugData.stats.morale, // Current morale (starts at max)
+                    loyalty: thugData.stats.loyalty // Current loyalty (starts at max)
+                };
+
+                // Deduct cost from player cash
+                gameState.player.cash -= thugData.stats.cost;
+
+                // Add to crew.thugs array
+                if (!gameState.crew.thugs) {
+                    gameState.crew.thugs = [];
+                }
+                gameState.crew.thugs.push(newThug);
+
+                // Update thug count
+                gameState.crew.thugCount = gameState.crew.thugs.length;
+
+                // Log the hire
+                console.log(`✅ Hired ${thugData.name} for $${thugData.stats.cost.toLocaleString()}`);
+                console.log(`📊 New thug count: ${gameState.crew.thugCount}`);
+                console.log(`💰 New cash balance: $${gameState.player.cash.toLocaleString()}`);
+
+                // Show success notification
+                showNotification(`🥷 Hired ${thugData.name} for $${thugData.stats.cost.toLocaleString()}!`, 'success');
+                addConsoleMessage(`🥷 Hired ${thugData.name} (${thugData.tier}) for $${thugData.stats.cost.toLocaleString()}`, 'green');
+
+                // Update UI
+                updateUI();
+
+                // CRITICAL: Save to database to prevent exploit
+                await saveGameState();
+
+                // Refresh modal to show updated cash and thug availability
+                // IMPORTANT: Pass the current tier to stay on the same tab!
+                showThugHiringModal(currentThugModalTier);
+            } catch (error) {
+                console.error('❌ Error hiring thug:', error);
+                showNotification('❌ Error hiring thug. Please try again.', 'error');
+            }
+        }
+
         // Debug Everything  
         function debugHoodPimps() {
             console.log('🔍 COMPLETE SYSTEM DEBUG:');
@@ -5916,6 +6626,7 @@
                     level: 1,
                     territory: null,
                     thugs: [], // Will be populated below
+                    thugCount: 0, // Quick count for UI display
                     lastPayrollTime: Date.now(),
                     nextPayrollDue: Date.now() + (7 * 24 * 60 * 60 * 1000)
                 },
@@ -5925,7 +6636,8 @@
                         streetWorkers: 6,
                         sugarBabies: 2,
                         highEndEscorts: 1,
-                        onlyTrampsModels: 0
+                        dancers: 0,
+                        phone900: 0
                     },
                     thugs: 6,
                     crack: 0,
@@ -6104,7 +6816,7 @@
             if (!gameState.resources || typeof gameState.resources !== 'object') {
                 gameState.resources = {
                     hoes: 10,
-                    hoeDetails: { streetWorkers: 7, sugarBabies: 2, highEndEscorts: 1, onlyTrampsModels: 0 },
+                    hoeDetails: { streetWorkers: 7, sugarBabies: 2, highEndEscorts: 1, dancers: 0, phone900: 0 },
                     thugs: 5,
                     crack: 0,
                     weed: 0,
@@ -6592,7 +7304,8 @@
                     streetWorkers: Math.floor(gameState.resources.hoes * 0.7),
                     sugarBabies: Math.floor(gameState.resources.hoes * 0.2),
                     highEndEscorts: Math.floor(gameState.resources.hoes * 0.1),
-                    onlyTrampsModels: 0
+                    dancers: 0,
+                        phone900: 0
                 };
             }
             
@@ -6958,80 +7671,162 @@
             document.getElementById('modalContainer').innerHTML = modal;
         }
 
-        // Show detailed thug crew breakdown
+        // Show detailed thug crew breakdown - ORGANIZED BY TIER
         function showThugDetails() {
              const thugs = gameState.crew.thugs || [];
+
+             // Calculate total payroll (using upkeep from stats)
              const totalPayroll = thugs.reduce((total, thug) => {
-                 const rank = THUG_RANKS[thug.rank] || THUG_RANKS.rookie;
-                 return total + rank.salary;
+                 return total + (thug.stats?.upkeep || 0);
              }, 0);
-             
-             let thugList = '';
-             
-             if (thugs.length > 0) {
-                 thugs.forEach((thug, index) => {
-                     const rank = THUG_RANKS[thug.rank] || THUG_RANKS.rookie;
-                     const loyaltyColor = thug.loyalty >= 80 ? 'text-green-400' : 
-                                        thug.loyalty >= 50 ? 'text-yellow-400' : 'text-red-400';
-                     
-                     thugList += `
-                         <div class="p-3 border border-gray-700 rounded mb-2">
-                             <div class="flex justify-between items-center mb-2">
+
+             // Group thugs by tier
+             const thugsByTier = {
+                 legendary: [],
+                 epic: [],
+                 rare: [],
+                 uncommon: [],
+                 common: []
+             };
+
+             thugs.forEach(thug => {
+                 const tier = thug.tier || 'common';
+                 if (thugsByTier[tier]) {
+                     thugsByTier[tier].push(thug);
+                 }
+             });
+
+             // Tier config
+             const tierConfig = {
+                 legendary: { name: 'Legendary', color: 'gold-text', bgColor: 'bg-yellow-500/10', emoji: '⭐' },
+                 epic: { name: 'Epic', color: 'text-purple-400', bgColor: 'bg-purple-500/10', emoji: '💎' },
+                 rare: { name: 'Rare', color: 'text-blue-400', bgColor: 'bg-blue-500/10', emoji: '🔷' },
+                 uncommon: { name: 'Uncommon', color: 'text-green-400', bgColor: 'bg-green-500/10', emoji: '🟢' },
+                 common: { name: 'Common', color: 'text-gray-400', bgColor: 'bg-gray-500/10', emoji: '⚪' }
+             };
+
+             // Generate tier sections HTML
+             let tierSectionsHTML = '';
+
+             Object.keys(thugsByTier).forEach(tierKey => {
+                 const tierThugs = thugsByTier[tierKey];
+                 const config = tierConfig[tierKey];
+
+                 if (tierThugs.length === 0) return; // Skip empty tiers
+
+                 const tierPayroll = tierThugs.reduce((sum, t) => sum + (t.stats?.upkeep || 0), 0);
+
+                 let thugsHTML = '';
+                 tierThugs.forEach(thug => {
+                     const loyaltyColor = thug.loyalty >= 80 ? 'text-green-400' :
+                                         thug.loyalty >= 50 ? 'text-yellow-400' : 'text-red-400';
+                     const moraleColor = thug.morale >= 80 ? 'text-green-400' :
+                                         thug.morale >= 50 ? 'text-yellow-400' : 'text-red-400';
+
+                     thugsHTML += `
+                         <div class="p-3 border border-gray-700 rounded mb-2 hover:border-purple-500/50 transition-all">
+                             <div class="flex justify-between items-start mb-2">
                                  <div>
-                                     <span class="font-bold text-white">${thug.name || 'Unknown Thug'}</span>
-                                     <div class="text-xs text-gray-400">${rank.description}</div>
+                                     <span class="font-bold text-white">${thug.name}</span>
+                                     <div class="text-xs text-gray-400">${thug.faction}</div>
                                  </div>
                                  <div class="text-right">
-                                     <div class="text-blue-400 font-bold">${rank.name}</div>
-                                     <div class="text-xs gold-text">$${rank.salary}/week</div>
+                                     <div class="${config.color} font-bold text-sm">${config.name}</div>
+                                     <div class="text-xs gold-text">$${(thug.stats?.upkeep || 0).toLocaleString()}/week</div>
+                                 </div>
+                             </div>
+                             <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                                 <div class="bg-gray-900/50 rounded p-1">
+                                     <span class="text-gray-400">Offense:</span> <span class="text-red-400 font-bold">${thug.stats?.offense || 0}</span>
+                                 </div>
+                                 <div class="bg-gray-900/50 rounded p-1">
+                                     <span class="text-gray-400">Defense:</span> <span class="text-blue-400 font-bold">${thug.stats?.defense || 0}</span>
                                  </div>
                              </div>
                              <div class="flex justify-between text-xs">
                                  <span class="text-gray-400">Loyalty: <span class="${loyaltyColor}">${thug.loyalty || 70}%</span></span>
-                                 <span class="text-gray-400">XP: ${thug.experience || 0}/${rank.promotionXP || 'MAX'}</span>
+                                 <span class="text-gray-400">Morale: <span class="${moraleColor}">${thug.morale || 70}%</span></span>
                              </div>
                          </div>
                      `;
                  });
-             } else {
-                 thugList = '<div class="text-center text-gray-400 py-4">No thugs in your crew</div>';
+
+                 tierSectionsHTML += `
+                     <div class="mb-4" id="tier-section-${tierKey}">
+                         <div class="flex justify-between items-center mb-2 p-3 ${config.bgColor} rounded cursor-pointer hover:opacity-80 transition-all border border-${tierKey === 'legendary' ? 'yellow' : tierKey === 'epic' ? 'purple' : tierKey === 'rare' ? 'blue' : tierKey === 'uncommon' ? 'green' : 'gray'}-500/30" onclick="toggleThugTier('${tierKey}')">
+                             <div class="flex items-center gap-2">
+                                 <span id="tier-arrow-${tierKey}" class="text-lg transition-transform">▼</span>
+                                 <span class="font-bold ${config.color}">${config.emoji} ${config.name} (${tierThugs.length})</span>
+                             </div>
+                             <span class="text-xs gold-text font-bold">$${tierPayroll.toLocaleString()}/week</span>
+                         </div>
+                         <div id="tier-content-${tierKey}" class="space-y-2 tier-content">
+                             ${thugsHTML}
+                         </div>
+                     </div>
+                 `;
+             });
+
+             if (thugs.length === 0) {
+                 tierSectionsHTML = '<div class="text-center text-gray-400 py-8">No thugs hired yet.<br><span class="text-sm">Click "🥷 HIRE THUGS" to build your crew!</span></div>';
              }
-             
+
              const modal = `
                  <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-                     <div class="game-panel rounded-lg p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
+                     <div class="game-panel rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                          <div class="flex items-center justify-between mb-4">
-                             <h3 class="text-xl font-bold cyan-glow">👥 THUG CREW</h3>
+                             <h3 class="text-2xl font-bold cyan-glow">🥷 HIRED THUGS</h3>
                              <button onclick="closeModal()" class="text-red-400 hover:text-red-300 text-2xl font-bold">&times;</button>
                          </div>
-                         
-                         <div class="mb-4 p-3 bg-gray-800/50 rounded">
-                             <div class="flex justify-between">
-                                 <span class="text-gray-400">Total Crew:</span>
-                                 <span class="text-white">${thugs.length} thugs</span>
-                             </div>
-                             <div class="flex justify-between">
-                                 <span class="text-gray-400">Weekly Payroll:</span>
-                                 <span class="gold-text">$${totalPayroll.toLocaleString()}</span>
-                             </div>
-                             <div class="flex justify-between">
-                                 <span class="text-gray-400">Next Payment:</span>
-                                 <span class="text-cyan-400">${Math.ceil((gameState.crew.nextPayrollDue - Date.now()) / (1000 * 60 * 60 * 24))} days</span>
+
+                         <div class="mb-4 p-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded border border-purple-500/30">
+                             <div class="grid grid-cols-3 gap-4 text-center">
+                                 <div>
+                                     <div class="text-gray-400 text-sm">Total Thugs</div>
+                                     <div class="text-2xl font-bold text-white">${thugs.length}</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-gray-400 text-sm">Weekly Payroll</div>
+                                     <div class="text-2xl font-bold gold-text">$${totalPayroll.toLocaleString()}</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-gray-400 text-sm">Next Payment</div>
+                                     <div class="text-2xl font-bold text-cyan-400">${Math.ceil((gameState.crew.nextPayrollDue - Date.now()) / (1000 * 60 * 60 * 24))} days</div>
+                                 </div>
                              </div>
                          </div>
-                         
+
                          <div class="space-y-2">
-                             ${thugList}
+                             ${tierSectionsHTML}
                          </div>
-                         
-                         <button onclick="closeModal()" class="w-full py-3 action-btn rounded font-bold mt-4">
-                             Close Crew
-                         </button>
+
+                         <div class="grid grid-cols-2 gap-2 mt-4">
+                             <button onclick="showThugHiringModal()" class="py-3 bg-purple-600 hover:bg-purple-500 rounded font-bold transition-colors">
+                                 🥷 Hire More Thugs
+                             </button>
+                             <button onclick="closeModal()" class="py-3 bg-gray-700 hover:bg-gray-600 rounded font-bold transition-colors">
+                                 Close
+                             </button>
+                         </div>
                      </div>
                  </div>
              `;
-             
+
              document.getElementById('modalContainer').innerHTML = modal;
+         }
+
+         // Toggle thug tier collapsible sections
+         function toggleThugTier(tierKey) {
+             const content = document.getElementById(`tier-content-${tierKey}`);
+             const arrow = document.getElementById(`tier-arrow-${tierKey}`);
+
+             if (content.style.display === 'none') {
+                 content.style.display = 'block';
+                 arrow.style.transform = 'rotate(0deg)';
+             } else {
+                 content.style.display = 'none';
+                 arrow.style.transform = 'rotate(-90deg)';
+             }
          }
 
          // Show detailed hoe breakdown  
@@ -7046,7 +7841,8 @@
                      streetWorkers: Math.floor(hoeCount * 0.7),
                      sugarBabies: Math.floor(hoeCount * 0.2),
                      highEndEscorts: Math.floor(hoeCount * 0.1),
-                     onlyTrampsModels: 0
+                     dancers: 0,
+                     phone900: 0
                  };
                  addConsoleMessage('👯 Converted hoes to detailed categories', 'pink');
              }
@@ -7086,16 +7882,26 @@
                      district: 'Uptown'
                  },
                  { 
-                     name: 'OnlyTramps Models', 
-                     count: hoeDetails.onlyTrampsModels || 0, 
-                     tricksPerDay: 0, // Fixed daily rate
-                     daysPerWeek: 7,
+                     name: 'Dancers', 
+                     count: hoeDetails.dancers || 0, 
+                     tricksPerDay: 0, // Tips + lap dances
+                     daysPerWeek: 6,
                      pricePerTrick: 0,
-                     weeklyIncome: 7 * 1260, // $8,820/week ($1,260/day × 7 days)
-                     description: '🌟 ULTRA RARE - Digital empire queens ($1,260/day)',
-                     district: 'Global'
+                     weeklyIncome: 6 * 400, // $2,400/week ($400/night avg with tips)
+                     description: 'Strippers - club dancers and entertainers',
+                     district: 'Midtown Clubs'
+                 },
+                 {
+                     name: 'Phone Workers',
+                     count: hoeDetails.phone900 || 0,
+                     tricksPerDay: 0, // Phone sex hotline
+                     daysPerWeek: 5,
+                     pricePerTrick: 0,
+                     weeklyIncome: 5 * 468, // $2,340/week ($1.95/min × 240min/day avg)
+                     description: '☎️ Phone sex hotline operators ($1.95/min)',
+                     district: 'Remote'
                  }
-             ];
+            ];
              
              const totalWeeklyIncome = hoeTypes.reduce((total, type) => {
                  const weeklyGross = type.count * type.weeklyIncome;
@@ -7106,34 +7912,31 @@
              
              let hoeList = '';
              hoeTypes.forEach(type => {
-                 if (type.count > 0) {
-                     const weeklyGrossPerHoe = type.weeklyIncome;
-                     const weeklyNetPerHoe = weeklyGrossPerHoe * payoutMultiplier;
-                     const dailyNetPerHoe = weeklyNetPerHoe / 7;
-                     const totalWeeklyFromType = type.count * weeklyNetPerHoe;
-                     const rarityClass = type.name === 'OnlyTramps Models' ? 'border-purple-500 bg-purple-900/20' : 'border-gray-700';
-                     
-                     hoeList += `
-                         <div class="p-3 border ${rarityClass} rounded mb-2">
-                             <div class="flex justify-between items-center mb-2">
-                                 <div>
-                                     <span class="font-bold text-pink-400">${type.name}</span>
-                                     ${type.name === 'OnlyTramps Models' ? '<span class="text-purple-400 text-xs ml-2">✨ ULTRA RARE</span>' : ''}
-                                     <div class="text-xs text-gray-400">${type.description}</div>
-                                     <div class="text-xs text-cyan-400">📍 ${type.district}</div>
-                                 </div>
-                                 <div class="text-right">
-                                     <div class="text-white font-bold">${type.count}</div>
-                                     <div class="text-xs gold-text">$${dailyNetPerHoe.toFixed(0)}/day each</div>
-                                     <div class="text-xs text-green-400">$${(totalWeeklyFromType/7).toFixed(0)}/day total</div>
-                                     ${type.name !== 'OnlyTramps Models' ? `
-                                         <div class="text-xs text-gray-400">${type.tricksPerDay} tricks × ${type.daysPerWeek} days</div>
-                                     ` : ''}
-                                 </div>
+                 const weeklyGrossPerHoe = type.weeklyIncome;
+                 const weeklyNetPerHoe = weeklyGrossPerHoe * payoutMultiplier;
+                 const dailyNetPerHoe = weeklyNetPerHoe / 7;
+                 const totalWeeklyFromType = type.count * weeklyNetPerHoe;
+                 const rarityClass = 'border-gray-700';
+                 
+                 hoeList += `
+                     <div class="p-3 border ${rarityClass} rounded mb-2">
+                         <div class="flex justify-between items-center mb-2">
+                             <div>
+                                 <span class="font-bold text-pink-400">${type.name}</span>
+                                 <div class="text-xs text-gray-400">${type.description}</div>
+                                 <div class="text-xs text-cyan-400">📍 ${type.district}</div>
+                             </div>
+                             <div class="text-right">
+                                 <div class="text-white font-bold">${type.count}</div>
+                                 <div class="text-xs gold-text">$${dailyNetPerHoe.toFixed(0)}/day each</div>
+                                 <div class="text-xs text-green-400">$${(totalWeeklyFromType/7).toFixed(0)}/day total</div>
+                                 ${type.tricksPerDay > 0 ? `
+                                     <div class="text-xs text-gray-400">${type.tricksPerDay} tricks × ${type.daysPerWeek} days</div>
+                                 ` : ''}
                              </div>
                          </div>
-                     `;
-                 }
+                     </div>
+                 `;
              });
              
              const modal = `
@@ -7163,7 +7966,7 @@
                              </div>
                          </div>
                          
-                         <div class="space-y-2">
+                         <div class="space-y-2 max-h-96 overflow-y-auto pr-2">
                              ${hoeList}
                          </div>
                          
@@ -7413,12 +8216,7 @@
             // Check if we've already done today's payout
             const lastPayoutDate = gameState.player.lastDailyPayoutDate || '';
 
-            console.log('💰 PAYOUT DEBUG - Today:', today);
-            console.log('💰 PAYOUT DEBUG - Last payout date:', lastPayoutDate);
-            console.log('💰 PAYOUT DEBUG - Are they equal?:', lastPayoutDate === today);
-
             if (lastPayoutDate === today) {
-                console.log('💰 Daily payout already completed for today');
                 return; // Already paid today
             }
             
@@ -7458,12 +8256,20 @@
                     payoutDetails.push(`${hoeDetails.highEndEscorts} High-End Escorts: $${pimpEarnings}`);
                 }
                 
-                // OnlyTramps Models - $1260 base per day
-                if (hoeDetails.onlyTrampsModels > 0) {
-                    const baseEarnings = hoeDetails.onlyTrampsModels * 1260;
+                // Dancers - $400 base per day (tips + lap dances, 6 nights/week)
+                if (hoeDetails.dancers > 0) {
+                    const baseEarnings = hoeDetails.dancers * 400;
                     const pimpEarnings = Math.floor(baseEarnings * payoutMultiplier);
                     totalDailyEarnings += pimpEarnings;
-                    payoutDetails.push(`${hoeDetails.onlyTrampsModels} OnlyTramps Models: $${pimpEarnings}`);
+                    payoutDetails.push(`${hoeDetails.dancers} Dancers: $${pimpEarnings}`);
+                }
+
+                // Phone Workers - $468 base per day ($1.95/min × 240min avg, 5 days/week)
+                if (hoeDetails.phone900 > 0) {
+                    const baseEarnings = hoeDetails.phone900 * 468;
+                    const pimpEarnings = Math.floor(baseEarnings * payoutMultiplier);
+                    totalDailyEarnings += pimpEarnings;
+                    payoutDetails.push(`${hoeDetails.phone900} Phone Workers: $${pimpEarnings}`);
                 }
                 
                 // Apply happiness and heat modifiers
@@ -8013,10 +8819,15 @@
                 return total + (count * value);
             }, 0);
 
+            // Calculate thug value based on actual hired thugs' cost
+            const thugTotal = (gameState.crew.thugs || []).reduce((total, thug) => {
+                return total + (thug.stats?.cost || 0);
+            }, 0);
+
             const breakdown = {
                 cash: gameState.player.cash || 0,
                 hoes: (gameState.resources.hoes || 0) * 2000,
-                thugs: (gameState.resources.thugs || 0) * 750,
+                thugs: thugTotal, // Use actual thug costs from crew.thugs array
                 crack: (gameState.resources.crack || 0) * 3,
                 weed: Math.floor((gameState.resources.weed || 0) * 100),
                 beer: (gameState.resources.beer || 0) * 1,
@@ -8390,6 +9201,15 @@
 
         // Update UI
         function updateUI() {
+            // RECALCULATE LEVEL BASED ON NET WORTH (New system!)
+            const oldLevel = gameState.player.level;
+            const calculatedLevel = calculatePlayerLevel();
+
+            // Silent update (no notifications on refresh)
+            if (calculatedLevel !== oldLevel) {
+                gameState.player.level = calculatedLevel;
+            }
+
             // FORCE FIX WEAPONS CORRUPTION FIRST
             if (!gameState.resources.weapons || typeof gameState.resources.weapons !== 'object') {
                 console.log('🔧 EMERGENCY: Fixing corrupted weapons object in updateUI');
@@ -9148,7 +9968,8 @@
                                     streetWorkers: 0,
                                     sugarBabies: 0,
                                     highEndEscorts: 0,
-                                    onlyTrampsModels: 0
+                                    dancers: 0,
+                        phone900: 0
                                 },
                                 thugs: player.thugs || 0,
                                 crack: player.crack || 0,
@@ -9180,7 +10001,8 @@
                                 streetWorkers: 0,
                                 sugarBabies: 0,
                                 highEndEscorts: 0,
-                                onlyTrampsModels: 0
+                                dancers: 0,
+                        phone900: 0
                             },
                             thugs: player.thugs || 0,
                             crack: player.crack || 0,
@@ -11103,7 +11925,8 @@
             // Add hoes to appropriate categories
             if (!gameState.resources.hoeDetails) {
                 gameState.resources.hoeDetails = {
-                    streetWorkers: 0, sugarBabies: 0, highEndEscorts: 0, onlyTrampsModels: 0
+                    streetWorkers: 0, sugarBabies: 0, highEndEscorts: 0, dancers: 0,
+                        phone900: 0
                 };
             }
             
@@ -12111,7 +12934,7 @@
                         resources: { 
                             hoes: 9, 
                             thugs: 6,
-                            hoeDetails: { streetWorkers: 6, sugarBabies: 2, highEndEscorts: 1, onlyTrampsModels: 0 } 
+                            hoeDetails: { streetWorkers: 6, sugarBabies: 2, highEndEscorts: 1, dancers: 0, phone900: 0 } 
                         },
                         supplies: { hoeHappiness: 70, thugHappiness: 70 }
                     };
@@ -12156,11 +12979,18 @@
                         total: (hoeDetails.highEndEscorts || 0) * Math.floor(350 * payoutMultiplier)
                     },
                     {
-                        type: 'OnlyTramps Models',
-                        count: hoeDetails.onlyTrampsModels || 0,
-                        baseDaily: 1260,
-                        pimpDaily: Math.floor(1260 * payoutMultiplier),
-                        total: (hoeDetails.onlyTrampsModels || 0) * Math.floor(1260 * payoutMultiplier)
+                        type: 'Dancers',
+                        count: hoeDetails.dancers || 0,
+                        baseDaily: 400,
+                        pimpDaily: Math.floor(400 * payoutMultiplier),
+                        total: (hoeDetails.dancers || 0) * Math.floor(400 * payoutMultiplier)
+                    },
+                    {
+                        type: 'Phone Workers',
+                        count: hoeDetails.phone900 || 0,
+                        baseDaily: 468,
+                        pimpDaily: Math.floor(468 * payoutMultiplier),
+                        total: (hoeDetails.phone900 || 0) * Math.floor(468 * payoutMultiplier)
                     }
                 ];
                 
@@ -13061,6 +13891,7 @@
                      level: 1,
                      territory: null,
                      thugs: [], // Will be populated below
+                     thugCount: 0, // Quick count for UI display
                      lastPayrollTime: now,
                      nextPayrollDue: now + (7 * 24 * 60 * 60 * 1000)
                  },
@@ -13070,7 +13901,8 @@
                          streetWorkers: 6,
                          sugarBabies: 2,
                          highEndEscorts: 1,
-                         onlyTrampsModels: 0
+                         dancers: 0,
+                        phone900: 0
                      },
                      thugs: 6,
                      crack: 0,
