@@ -8,12 +8,12 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="supabase-config.js?v=18"></script>
+    <script src="supabase-config.js?v=19"></script>
     <script src="simple-wallet.js?v=18"></script>
     <script src="src/constants/GameConstants.js?v=18"></script>
     <script src="src/constants/ThugConstants.js?v=20"></script> <!-- UPDATED: 1985 pricing theme + collapsible tiers! -->
     <script src="src/modules/GameStateManager.js?v=18"></script>
-    <!-- TurnManager.js disabled - using simple database persistence instead -->
+    <script src="src/modules/TurnManager.js?v=19"></script>
     <script src="src/modules/StoreSystem.js?v=18"></script>
     <script src="src/utils/GameUtils.js?v=18"></script>
     <!-- store-systems.js embedded inline to avoid loading issues -->
@@ -9697,15 +9697,35 @@
                 addConsoleMessage('🌐 MULTIPLAYER MODE: Connected to shared database', 'green');
                 await loadPlayerProfileFromAuth();
 
-                // TurnManager disabled - using simple database persistence
-                // Turns are loaded from database and saved on game actions
-                console.log('🎯 Turn system: Simple database persistence (TurnManager disabled)');
-                console.log('📊 Current turns from database:', gameState.player.turns);
+                // Initialize TurnManager with server-side turn accrual
+                console.log('🎯 Initializing TurnManager for server-side turn tracking...');
+                if (window.TurnManager && typeof window.TurnManager.initialize === 'function') {
+                    try {
+                        await window.TurnManager.initialize(currentUser.id);
 
-                // Ensure turns are set
-                if (!gameState.player.turns && gameState.player.turns !== 0) {
-                    console.warn('⚠️ Turns not set, using default');
-                    gameState.player.turns = 150;
+                        // Register callback to update UI when turns change
+                        window.TurnManager.onTurnUpdate((newTurns) => {
+                            console.log('🔔 Turn update callback:', newTurns);
+                            gameState.player.turns = newTurns;
+                            updateTurnDisplay();
+                        });
+
+                        // Sync turns from server to get latest accrued turns
+                        const serverTurns = await window.TurnManager.syncFromServer();
+                        gameState.player.turns = serverTurns;
+                        console.log('✅ TurnManager initialized. Current turns:', serverTurns);
+                    } catch (error) {
+                        console.error('❌ Failed to initialize TurnManager:', error);
+                        // Fallback to gameState turns
+                        if (!gameState.player.turns && gameState.player.turns !== 0) {
+                            gameState.player.turns = 150;
+                        }
+                    }
+                } else {
+                    console.warn('⚠️ TurnManager not available, using fallback');
+                    if (!gameState.player.turns && gameState.player.turns !== 0) {
+                        gameState.player.turns = 150;
+                    }
                 }
 
                 updateUI();
@@ -12394,9 +12414,10 @@
                         resources: JSON.stringify(gameState.resources),
                         supplies: JSON.stringify(gameState.supplies),
                         crew_data: JSON.stringify(gameState.crew),
-                        // Use new turn column names (old columns removed)
-                        turns: gameState.player.turns || 150,
-                        last_turn_update: new Date().toISOString(),
+                        // Don't save turn data - TurnManager handles all turn operations server-side
+                        // Saving turns here was resetting last_turn_update and preventing turn accrual!
+                        // turns: gameState.player.turns || 150,  // REMOVED - managed by TurnManager
+                        // last_turn_update: new Date().toISOString(),  // REMOVED - managed by server
                         last_daily_payout_date: gameState.player.lastDailyPayoutDate || null
                     };
 

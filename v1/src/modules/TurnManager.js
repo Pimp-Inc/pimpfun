@@ -48,13 +48,13 @@ class TurnManager {
      */
     async initialize(playerId) {
         try {
-            console.log('🔄 Initializing TurnManager for player:', playerId);
-            this.playerId = playerId;
+            console.log('🔄 Initializing TurnManager for wallet:', playerId);
+            this.playerId = playerId; // Stores wallet address (auth user ID)
 
             // Get initial turn count from server
             await this.syncFromServer();
 
-            // Start auto-sync every 60 seconds
+            // Start auto-sync every 10 minutes (turns accrue every 10 min)
             this.startAutoSync();
 
             // Sync on page focus (user returns to tab)
@@ -228,7 +228,7 @@ class TurnManager {
     }
 
     /**
-     * Start auto-sync (every 60 seconds)
+     * Start auto-sync (every 10 minutes to match turn accrual interval)
      */
     startAutoSync() {
         // Clear existing interval if any
@@ -236,16 +236,16 @@ class TurnManager {
             clearInterval(this.syncIntervalId);
         }
 
-        // Sync every 60 seconds
+        // Sync every 10 minutes (600 seconds) to match turn accrual interval
         this.syncIntervalId = setInterval(async () => {
             try {
                 await this.syncFromServer();
             } catch (error) {
                 console.error('❌ Auto-sync failed:', error);
             }
-        }, 60000); // 60 seconds
+        }, 600000); // 10 minutes (600 seconds)
 
-        console.log('✅ Auto-sync started (every 60 seconds)');
+        console.log('✅ Auto-sync started (every 10 minutes to match turn accrual)');
     }
 
     /**

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(python -c:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nReplace OnlyTramps with 1985-era Dancers and Phone900 workers\n\nMajor historical accuracy update to align with 1985 setting:\n\n## Hoe Type Changes\n- Removed anachronistic \"OnlyTramps Models\" (OnlyFans didn''t exist in 1985)\n- Added \"Dancers\" (strippers): $250/day, 6 days/week, Midtown Clubs\n- Added \"Phone900 Workers\": $280/day ($1.95/min), 7 days/week, Remote\n- Updated all hoeDetails structures throughout codebase\n\n## Income & Pricing Updates\n- Dancers weekly income: $1,500/week ($250/night avg with tips + lap dances)\n- Phone900 weekly income: $1,960/week (historically accurate $1.95/min rate)\n- Updated daily income calculations for both new worker types\n- Fixed all income breakdown displays\n\n## UI & Display Updates\n- Updated hoe types modal with new worker categories\n- Removed \"ULTRA RARE\" special styling for OnlyTramps\n- Changed conditional display logic from name-based to tricksPerDay-based\n- Updated all hoeDetails initializations (9 locations)\n- Fixed indentation and formatting consistency\n\n## Exit Messages\n- Replaced 9 OnlyTramps exit messages (Instagram/Patreon references)\n- Added 9 Dancer exit messages (club/stripper themed)\n- Added 9 Phone900 exit messages (hotline/phone sex themed)\n- Total: 45 exit messages across 5 worker types\n\n## Upgrade System Updates\n- Changed \"OnlyTrampsModels_Super\" → \"Phone900_Super\"\n- Updated category names: \"Velvet Voice\", \"Midnight Whisper\", \"Candy Hotline\"\n- Removed \"Cyber Queen\", \"Digital Diva\", \"Virtual Vixen\" (too modern)\n\n## Additional Changes\n- Updated ThugConstants.js with 1985-themed $69/420 salary structure\n- All Common thugs: $69/week\n- Epic thugs (OG, Lieutenant): $669/week\n- Legendary Boss: $1,469/week\n- Added comprehensive leveling system documentation\n- Added thug rebalance analysis\n- Updated TODO.md with thug system implementation plan\n- Cleaned up old leveling system iteration docs\n\nFiles changed: 6 files, 4,225 insertions(+), 95 deletions(-)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(dir:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

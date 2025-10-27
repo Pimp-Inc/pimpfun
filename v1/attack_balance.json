@@ -1,0 +1,506 @@
+{
+  "version": "0.9.0",
+  "notes": "Initial drop for PvE/PvP balancing. All values are starter targets... tune after telemetry.",
+  "scaling": {
+    "rookie": {
+      "min": 1,
+      "max": 20,
+      "linear": [
+        0.6,
+        1.4
+      ],
+      "sublinear": [
+        0.7,
+        1.2
+      ],
+      "money": [
+        0.8,
+        1.6
+      ],
+      "delta": [
+        -4,
+        2
+      ]
+    },
+    "mid": {
+      "min": 20,
+      "max": 45,
+      "linear": [
+        0.9,
+        1.6
+      ],
+      "sublinear": [
+        0.8,
+        1.3
+      ],
+      "money": [
+        1.0,
+        1.8
+      ],
+      "delta": [
+        -2,
+        6
+      ]
+    },
+    "boss": {
+      "min": 45,
+      "max": 99,
+      "linear": [
+        1.2,
+        2.0
+      ],
+      "sublinear": [
+        1.0,
+        1.5
+      ],
+      "money": [
+        1.2,
+        2.2
+      ],
+      "delta": [
+        4,
+        12
+      ]
+    }
+  },
+  "combat": {
+    "weaponWeight": {
+      "pistol": 1,
+      "shotgun": 3,
+      "glock": 6,
+      "uzi": 9,
+      "ak47": 30
+    },
+    "vehicleWeight": {
+      "bicycle": 0,
+      "lowrider": 6,
+      "escalade": 12
+    },
+    "hoeWeight": 1.5,
+    "cashPerKWeight": 1,
+    "levelWeight": 3,
+    "respectWeight": 2,
+    "territoryAttackBonusMax": 0.15
+  },
+  "heat": {
+    "decayMinutes": 20,
+    "max": 5,
+    "perFail": 1,
+    "perRepeat": 1,
+    "reconReduce": 1,
+    "defenderPowerPerStack": 0.05
+  },
+  "streaks": {
+    "bonuses": [
+      0,
+      0.1,
+      0.2,
+      0.25,
+      0.3
+    ],
+    "windowMinutes": 60
+  },
+  "territory": {
+    "Uptown Plaza": {
+      "morale": 2,
+      "underdogDefensePct": 0.08,
+      "style": {}
+    },
+    "Midtown Market": {
+      "allianceFlip": 1,
+      "incomePct": 0.15,
+      "style": {}
+    },
+    "Crooklyn Heights": {
+      "stoopDefensePct": 0.25,
+      "allyRecruitPct": 0.1,
+      "style": {}
+    },
+    "Harbor Docks": {
+      "evasionPct": 0.3,
+      "sabotageDamagePct": 0.1,
+      "style": {
+        "drivebyBias": 0.03
+      }
+    },
+    "Financial District": {
+      "incomePct": 0.1,
+      "rareImportPct": 0.2,
+      "style": {
+        "bribeBias": 0.05
+      }
+    }
+  },
+  "archetypes": {
+    "Enforcer": {
+      "defense": {
+        "smash": 0.1
+      },
+      "onFail": {
+        "woundThug": 0.3
+      }
+    },
+    "Charmer": {
+      "defense": {
+        "honey": 0.1
+      },
+      "onFail": {
+        "stealHoe": 0.1
+      }
+    },
+    "Wheelman": {
+      "defense": {
+        "driveby": 0.15
+      },
+      "onFail": {
+        "vehicleDamage": 0.2
+      }
+    },
+    "Shadow": {
+      "defense": {
+        "sabotage": 0.15
+      },
+      "onFail": {
+        "revealAttackerHeat": 1
+      }
+    },
+    "Banker": {
+      "defense": {
+        "bribe": 0.15
+      },
+      "onFail": {
+        "bribeCostMultiplier": 1.5
+      }
+    },
+    "Loudmouth": {
+      "startRespect": 5,
+      "ambushProc": 0.1
+    }
+  },
+  "styles": {
+    "smash": {
+      "turns": 2,
+      "bias": 0.0,
+      "cooldownMin": 10,
+      "heatOnFail": 1,
+      "lootProfile": "smash"
+    },
+    "honey": {
+      "turns": 3,
+      "bias": -0.05,
+      "costHoe": 1,
+      "cooldownMin": 20,
+      "heatOnFail": 1,
+      "lootProfile": "honey"
+    },
+    "driveby": {
+      "turns": 3,
+      "bias": -0.02,
+      "costGas": 1,
+      "cooldownMin": 15,
+      "heatOnFail": 1,
+      "lootProfile": "driveby"
+    },
+    "sabotage": {
+      "turns": 2,
+      "bias": 0.03,
+      "cooldownMin": 20,
+      "heatOnFail": 1,
+      "lootProfile": "sabotage"
+    },
+    "bribe": {
+      "turns": 0,
+      "bias": 0.1,
+      "costCashPct": [
+        0.02,
+        0.06
+      ],
+      "cooldownMin": 30,
+      "heatOnFail": 0,
+      "lootProfile": "bribe"
+    },
+    "intimidate": {
+      "turns": 2,
+      "bias": 0.0,
+      "cooldownMin": 15,
+      "heatOnFail": 0,
+      "lootProfile": "intimidate"
+    },
+    "heist": {
+      "turns": 5,
+      "bias": -0.08,
+      "cooldownMin": 60,
+      "heatOnFail": 2,
+      "lootProfile": "heist"
+    },
+    "recon": {
+      "turns": 1,
+      "bias": 0.0,
+      "cooldownMin": 5,
+      "buffMinutes": 30,
+      "buffBonus": 0.1,
+      "heatOnFail": 0,
+      "lootProfile": "recon"
+    }
+  },
+  "statuses": {
+    "infected": {
+      "stackMax": 1,
+      "durationH": 24,
+      "tickHours": 4,
+      "moraleMod": -0.1,
+      "thugMod": -0.05
+    },
+    "protection_damaged": {
+      "durationH": 48,
+      "loyaltyMod": -0.05,
+      "infectBonus": 0.25,
+      "protectionBuff": -0.15
+    },
+    "unhappy": {
+      "stacksMax": 5,
+      "prodPerStack": -0.03,
+      "resistPerStack": -0.02
+    },
+    "quarantined": {
+      "durationH": 12,
+      "incomeDisabled": true
+    }
+  },
+  "pvpSteal": {
+    "min": 1,
+    "max": 3,
+    "payoutRate": [
+      0.35,
+      0.55
+    ],
+    "targetDailyCap": 3,
+    "perHoeCooldownMin": 120,
+    "heatOnSuccess": 2,
+    "weaponLossOnFailPct": 0.1,
+    "ambushOnFailPct": 0.15
+  },
+  "pvpSafety": {
+    "dailyInfectCap": 3,
+    "minHoeSafe": 2,
+    "bountyMinutes": 30,
+    "newPlayerShieldHours": 24
+  },
+  "defense": {
+    "medicKit": {
+      "cooldownMin": 60,
+      "cureInfectedStacks": 1,
+      "reduceUnhappyStacks": 2,
+      "priceByTier": {
+        "rookie": 200,
+        "mid": 1200,
+        "boss": 6000
+      }
+    },
+    "protectionPack": {
+      "durationH": 48,
+      "infectionChanceReduction": 0.15,
+      "price": {
+        "rookie": 150,
+        "mid": 600,
+        "boss": 2400
+      }
+    },
+    "quarantine": {
+      "durationH": 12,
+      "upkeepPerHour": {
+        "rookie": 50,
+        "mid": 150,
+        "boss": 500
+      }
+    },
+    "counselor": {
+      "reduceUnhappyStacks": 3,
+      "respectCost": 2,
+      "price": {
+        "rookie": 150,
+        "mid": 450,
+        "boss": 1500
+      }
+    }
+  },
+  "winRateTargets": {
+    "rookie": {
+      "-150": 0.2,
+      "-50": 0.4,
+      "0": 0.55,
+      "50": 0.7,
+      "150": 0.85
+    },
+    "mid": {
+      "-150": 0.1,
+      "-50": 0.3,
+      "0": 0.45,
+      "50": 0.6,
+      "150": 0.75
+    },
+    "boss": {
+      "-150": 0.05,
+      "-50": 0.2,
+      "0": 0.35,
+      "50": 0.5,
+      "150": 0.65
+    }
+  },
+  "loot": {
+    "rookie": {
+      "smash": {
+        "meanPct": 0.12,
+        "sigmaPct": 0.04,
+        "floorPct": 0.08,
+        "ceilingPct": 0.18
+      },
+      "honey": {
+        "meanPct": 0.05,
+        "sigmaPct": 0.02,
+        "floorPct": 0.03,
+        "ceilingPct": 0.08
+      },
+      "driveby": {
+        "meanPct": 0.09,
+        "sigmaPct": 0.03,
+        "floorPct": 0.06,
+        "ceilingPct": 0.14
+      },
+      "sabotage": {
+        "meanPct": 0.03,
+        "sigmaPct": 0.01,
+        "floorPct": 0.02,
+        "ceilingPct": 0.06
+      },
+      "bribe": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "intimidate": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "heist": {
+        "meanPct": 0.25,
+        "sigmaPct": 0.07,
+        "floorPct": 0.15,
+        "ceilingPct": 0.4
+      },
+      "recon": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      }
+    },
+    "mid": {
+      "smash": {
+        "meanPct": 0.14,
+        "sigmaPct": 0.04,
+        "floorPct": 0.1,
+        "ceilingPct": 0.2
+      },
+      "honey": {
+        "meanPct": 0.06,
+        "sigmaPct": 0.02,
+        "floorPct": 0.04,
+        "ceilingPct": 0.1
+      },
+      "driveby": {
+        "meanPct": 0.11,
+        "sigmaPct": 0.04,
+        "floorPct": 0.07,
+        "ceilingPct": 0.16
+      },
+      "sabotage": {
+        "meanPct": 0.04,
+        "sigmaPct": 0.01,
+        "floorPct": 0.03,
+        "ceilingPct": 0.07
+      },
+      "bribe": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "intimidate": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "heist": {
+        "meanPct": 0.3,
+        "sigmaPct": 0.08,
+        "floorPct": 0.18,
+        "ceilingPct": 0.45
+      },
+      "recon": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      }
+    },
+    "boss": {
+      "smash": {
+        "meanPct": 0.16,
+        "sigmaPct": 0.05,
+        "floorPct": 0.11,
+        "ceilingPct": 0.22
+      },
+      "honey": {
+        "meanPct": 0.07,
+        "sigmaPct": 0.02,
+        "floorPct": 0.04,
+        "ceilingPct": 0.11
+      },
+      "driveby": {
+        "meanPct": 0.12,
+        "sigmaPct": 0.04,
+        "floorPct": 0.08,
+        "ceilingPct": 0.18
+      },
+      "sabotage": {
+        "meanPct": 0.05,
+        "sigmaPct": 0.01,
+        "floorPct": 0.03,
+        "ceilingPct": 0.08
+      },
+      "bribe": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "intimidate": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      },
+      "heist": {
+        "meanPct": 0.35,
+        "sigmaPct": 0.1,
+        "floorPct": 0.2,
+        "ceilingPct": 0.5
+      },
+      "recon": {
+        "meanPct": 0.0,
+        "sigmaPct": 0.0,
+        "floorPct": 0.0,
+        "ceilingPct": 0.0
+      }
+    }
+  },
+  "rng": {
+    "pityAfterBelowFloor": 3,
+    "pityLerpTowardMean": 0.15
+  }
+}

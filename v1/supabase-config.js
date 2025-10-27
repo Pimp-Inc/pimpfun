@@ -315,16 +315,17 @@ const SupabaseAPI = {
 
     /**
      * Get current turn count for a player (with server-side accrual calculation)
-     * @param {string} playerId - Player UUID
+     * @param {string} walletAddress - Player wallet address (auth user ID)
      * @returns {Promise<{success: boolean, turns: number, accrued: number}>}
      */
-    async getTurns(playerId) {
+    async getTurns(walletAddress) {
         try {
-            console.log('🔄 Fetching turns from server for player:', playerId);
+            console.log('🔄 Fetching turns from server for wallet:', walletAddress);
 
             // Call the database function to calculate accrued turns
+            // Uses wallet_address as per migration 007
             const { data, error } = await supabase.rpc('calculate_accrued_turns', {
-                p_player_id: playerId
+                p_wallet_address: walletAddress
             });
 
             if (error) {
@@ -345,7 +346,7 @@ const SupabaseAPI = {
                     turns: result.current_turns,
                     last_turn_update: new Date().toISOString()
                 })
-                .eq('id', playerId);
+                .eq('wallet_address', walletAddress);
 
             console.log(`✅ Current turns: ${result.current_turns} (accrued: ${result.accrued_turns})`);
 
@@ -363,13 +364,13 @@ const SupabaseAPI = {
 
     /**
      * Spend turns (with server-side validation)
-     * @param {string} playerId - Player UUID
+     * @param {string} walletAddress - Player wallet address (auth user ID)
      * @param {number} amount - Number of turns to spend (positive number)
      * @param {string} reason - Reason for spending (e.g., 'scout', 'crack_production')
      * @param {object} metadata - Optional metadata for audit log
      * @returns {Promise<{success: boolean, turns: number, message: string}>}
      */
-    async spendTurns(playerId, amount, reason = 'action', metadata = null) {
+    async spendTurns(walletAddress, amount, reason = 'action', metadata = null) {
         try {
             console.log(`🔄 Spending ${amount} turns for ${reason}`);
 
@@ -378,8 +379,9 @@ const SupabaseAPI = {
             }
 
             // Call the database function to update turns
+            // Uses wallet_address as per migration 007
             const { data, error } = await supabase.rpc('update_player_turns', {
-                p_player_id: playerId,
+                p_wallet_address: walletAddress,
                 p_amount: -amount, // Negative for spending
                 p_action: reason,
                 p_metadata: metadata
@@ -416,13 +418,13 @@ const SupabaseAPI = {
 
     /**
      * Grant turns to a player (for bonuses, admin actions, etc.)
-     * @param {string} playerId - Player UUID
+     * @param {string} walletAddress - Player wallet address (auth user ID)
      * @param {number} amount - Number of turns to grant (positive number)
      * @param {string} reason - Reason for granting (e.g., 'vote_bonus', 'offline_bonus')
      * @param {object} metadata - Optional metadata for audit log
      * @returns {Promise<{success: boolean, turns: number, message: string}>}
      */
-    async grantTurns(playerId, amount, reason = 'bonus', metadata = null) {
+    async grantTurns(walletAddress, amount, reason = 'bonus', metadata = null) {
         try {
             console.log(`🔄 Granting ${amount} turns for ${reason}`);
 
@@ -431,8 +433,9 @@ const SupabaseAPI = {
             }
 
             // Call the database function to update turns
+            // Uses wallet_address as per migration 007
             const { data, error } = await supabase.rpc('update_player_turns', {
-                p_player_id: playerId,
+                p_wallet_address: walletAddress,
                 p_amount: amount, // Positive for granting
                 p_action: reason,
                 p_metadata: metadata
